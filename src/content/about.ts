@@ -36,7 +36,7 @@ export const about: AboutContent = {
    * Substituir src por '/images/about/andressa-bruno.jpg' (4:5 cinematográfico).
    */
   photo: {
-    src: '',
+    src: '/images/about/andressa-bruno.jpg',
     alt: 'Andressa e Bruno em algum lugar do Piauí',
     caption: 'Andressa + Bruno · Piauí, abril/2026',
   },
