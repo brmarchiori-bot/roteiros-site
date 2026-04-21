@@ -4,9 +4,12 @@ import { Section } from '@/components/layout/section'
 import { SectionHeader } from '@/components/layout/section-header'
 import { PhotoPlaceholder } from '@/components/shared/photo-placeholder'
 import { Reveal } from '@/components/shared/reveal'
-import { about } from '@/content'
+import { about as aboutFallback } from '@/content'
+import { getAboutFromSanity } from '@/sanity/queries'
 
-export function AboutSection() {
+export async function AboutSection() {
+  const about = (await getAboutFromSanity()) ?? aboutFallback
+
   return (
     <Section id="about" spacing="xl">
       <SectionHeader meta={about.meta} className="mb-14 md:mb-20" />

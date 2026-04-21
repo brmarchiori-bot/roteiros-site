@@ -4,7 +4,8 @@ import { Section } from '@/components/layout/section'
 import { SectionHeader } from '@/components/layout/section-header'
 import { PhotoPlaceholder } from '@/components/shared/photo-placeholder'
 import { Reveal } from '@/components/shared/reveal'
-import { contentHighlights } from '@/content'
+import { contentHighlights as contentFallback } from '@/content'
+import { getContentHighlightsFromSanity } from '@/sanity/queries'
 import type { ContentChannel, ContentHighlight } from '@/types/content'
 
 const PLATFORM_LABEL: Record<ContentHighlight['platform'], string> = {
@@ -13,7 +14,9 @@ const PLATFORM_LABEL: Record<ContentHighlight['platform'], string> = {
   tiktok: 'TikTok',
 }
 
-export function ContentBridgeSection() {
+export async function ContentBridgeSection() {
+  const contentHighlights = (await getContentHighlightsFromSanity()) ?? contentFallback
+
   return (
     <Section id="content" spacing="xl">
       <SectionHeader meta={contentHighlights.meta} className="mb-10 md:mb-14" />

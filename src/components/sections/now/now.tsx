@@ -4,9 +4,11 @@ import { Section } from '@/components/layout/section'
 import { SectionHeader } from '@/components/layout/section-header'
 import { PhotoPlaceholder } from '@/components/shared/photo-placeholder'
 import { Reveal } from '@/components/shared/reveal'
-import { now } from '@/content'
+import { now as nowFallback } from '@/content'
+import { getNowFromSanity } from '@/sanity/queries'
 
-export function NowSection() {
+export async function NowSection() {
+  const now = (await getNowFromSanity()) ?? nowFallback
   const ctaHref = now.cta?.href ?? now.link
   const ctaLabel = now.cta?.label ?? 'Ver no Instagram'
 
