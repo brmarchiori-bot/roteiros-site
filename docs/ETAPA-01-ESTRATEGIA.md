@@ -135,7 +135,7 @@ A home tem um marcador discreto, sempre visível:
 
 ---
 
-## 4. Voz da Marca (como Bruno e Andressa falam)
+## 4. Voz da Marca (como Andressa e Bruno falam)
 
 A gente vem de **dez anos de bar**. Isso muda tudo na voz.
 
@@ -225,7 +225,7 @@ Sem dropdowns. Nav curta = marca confiante.
 
 Formato editorial, tipografia grande, muito respiro, primeira pessoa plural em formato de carta aberta.
 
-**Texto refinado (voz Bruno/Andressa):**
+**Texto refinado (voz Andressa/Bruno):**
 
 > A gente passou dez anos dentro de um bar.
 >
@@ -246,7 +246,7 @@ Formato editorial, tipografia grande, muito respiro, primeira pessoa plural em f
 > Se tá batendo aí a sensação de que a vida podia ser outra coisa —
 > puxa uma cadeira. A gente tá no caminho.
 >
-> *— Bruno & Andressa*
+> *— Andressa & Bruno*
 
 Assinatura manuscrita estilizada no fim.
 

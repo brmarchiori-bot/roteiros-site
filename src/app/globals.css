@@ -1,26 +1,102 @@
-@import "tailwindcss";
+@import 'tailwindcss';
+
+/* =============================================================
+   DESIGN TOKENS — MENOS ROTEIROS
+   Toda a identidade visual mora aqui.
+   ============================================================= */
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* SUPERFÍCIES */
+  --background: #f3eee5; /* areia quente — fundo principal */
+  --foreground: #0e0e0d; /* preto estrada — texto principal */
+  --surface: #ece5d8; /* areia mais escura — cards, blocos */
+  --muted: #8a8175; /* cinza poeira — texto secundário */
+  --subtle: rgba(14, 14, 13, 0.08); /* bordas e separadores */
+
+  /* MARCA */
+  --primary: #c4512a; /* terracota Piauí — CTAs, destaques */
+  --primary-foreground: #f3eee5;
+  --secondary: #3d4a2b; /* verde sertão — profundidade */
+  --secondary-foreground: #f3eee5;
 }
 
 @theme inline {
+  /* Cores — geram bg-*, text-*, border-*, etc. */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-surface: var(--surface);
+  --color-muted: var(--muted);
+  --color-subtle: var(--subtle);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+
+  /* Tipografia — geram font-display, font-sans, font-mono */
+  --font-display: var(--font-fraunces);
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-jetbrains-mono);
+
+  /* Radius — editorial, mínimo */
+  --radius-none: 0;
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-full: 9999px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* =============================================================
+   BASE EDITORIAL
+   ============================================================= */
+
+html,
+body {
+  height: 100%;
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Fraunces variable axes — sutil suavização para display */
+.font-display {
+  font-feature-settings: 'ss01';
+}
+
+::selection {
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+}
+
+/* Foco acessível, mas elegante */
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* =============================================================
+   ANIMAÇÃO REVEAL — CSS pura, cross-browser garantido
+   Usada pelo componente <Reveal>. Sem JS, sem IntersectionObserver.
+   Respeita prefers-reduced-motion automaticamente.
+   ============================================================= */
+
+@keyframes mr-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .mr-reveal {
+    animation: mr-reveal 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
 }
