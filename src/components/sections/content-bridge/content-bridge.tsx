@@ -44,10 +44,13 @@ export async function ContentBridgeSection() {
                   <figure className="relative aspect-[3/4] w-full overflow-hidden rounded-md bg-surface">
                     <Image
                       src={highlight.thumbnail}
-                      alt={highlight.title}
+                      alt={highlight.thumbnailAlt ?? highlight.title}
                       fill
                       sizes="(min-width: 1024px) 22vw, (min-width: 640px) 45vw, 100vw"
                       className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                      style={{
+                        objectPosition: highlight.thumbnailObjectPosition ?? 'center',
+                      }}
                     />
                   </figure>
                 ) : (

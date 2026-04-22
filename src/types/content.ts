@@ -30,6 +30,12 @@ export type HeroContent = {
     posterSrc?: string
     alt: string
   }
+  /** Imagem de capa opcional (gerenciada via Sanity). Quando vazio, usa gradiente. */
+  coverImage?: {
+    src: string
+    alt: string
+    objectPosition?: string
+  }
 }
 
 /* ---------- Manifesto ---------- */
@@ -58,6 +64,8 @@ export type AboutContent = {
     alt: string
     /** Caption visível abaixo da foto (placeholder ou real) */
     caption: string
+    /** Valor de CSS object-position (ex: "center", "top", "bottom left") */
+    objectPosition?: string
   }
 }
 
@@ -80,6 +88,7 @@ export type NowContent = {
     src?: string
     alt: string
     caption: string
+    objectPosition?: string
   }
   caption: string
   /** CTA pra ler bastidores (Instagram, Caderno, etc.) */
@@ -110,6 +119,8 @@ export type ContentHighlight = {
   url: string
   title: string
   thumbnail?: string
+  thumbnailAlt?: string
+  thumbnailObjectPosition?: string
 }
 
 export type ContentChannel = {

@@ -28,6 +28,7 @@ export async function NowSection() {
                   fill
                   sizes="(min-width: 768px) 55vw, 100vw"
                   className="object-cover"
+                  style={{ objectPosition: now.photo.objectPosition ?? 'center' }}
                 />
               </figure>
             ) : (

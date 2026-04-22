@@ -2,15 +2,17 @@ import type { StructureResolver } from 'sanity/structure'
 
 /**
  * Singletons — cada seção é UM documento só.
- * A barra lateral do Studio mostra um atalho direto, sem menu "Create new".
+ * A ordem aqui é a ordem em que aparecem na barra lateral do Studio.
  */
-const SINGLETONS: Array<{ id: string; type: string; title: string }> = [
-  { id: 'about-singleton', type: 'about', title: 'Seção "Sobre"' },
-  { id: 'now-singleton', type: 'now', title: 'Seção "Agora"' },
+const SINGLETONS: Array<{ id: string; type: string; title: string; emoji: string }> = [
+  { id: 'hero-singleton', type: 'hero', title: 'Capa / Hero', emoji: '🎬' },
+  { id: 'about-singleton', type: 'about', title: 'Seção Sobre', emoji: '👤' },
+  { id: 'now-singleton', type: 'now', title: 'Seção Agora', emoji: '📍' },
   {
     id: 'content-highlights-singleton',
     type: 'contentHighlights',
-    title: 'Seção "Conteúdo"',
+    title: 'Seção Conteúdo',
+    emoji: '🎞️',
   },
 ]
 
@@ -18,13 +20,12 @@ export const structure: StructureResolver = (S) =>
   S.list()
     .title('Menos Roteiros — Conteúdo')
     .items(
-      SINGLETONS.map(({ id, type, title }) =>
+      SINGLETONS.map(({ id, type, title, emoji }) =>
         S.listItem()
-          .title(title)
+          .title(`${emoji}  ${title}`)
           .id(id)
           .child(S.document().schemaType(type).documentId(id).title(title)),
       ),
     )
 
-/** IDs de singleton — usar em queries via GROQ `*[_id == "about-singleton"][0]` se quiser. */
 export const SINGLETON_IDS = SINGLETONS.map((s) => s.id)

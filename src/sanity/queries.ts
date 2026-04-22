@@ -3,6 +3,7 @@ import type {
   AboutContent,
   ContentBridgeContent,
   ContentHighlight,
+  HeroContent,
   NowContent,
 } from '@/types/content'
 import { sanityClient } from './client'
@@ -11,20 +12,74 @@ import { urlForImage } from './image'
 /** Revalidação a cada 60s — equilíbrio entre frescor e performance. */
 const fetchOptions = { next: { revalidate: 60 } } as const
 
+/* ---------------- Hero ---------------- */
+
+const HERO_QUERY = groq`*[_type == "hero"][0]{
+  meta,
+  headline,
+  subheadline,
+  primaryCta,
+  secondaryCta,
+  coverImage{..., "alt": alt, "objectPosition": objectPosition}
+}`
+
+type RawHero = {
+  meta?: HeroContent['meta']
+  headline?: string
+  subheadline?: string
+  primaryCta?: HeroContent['ctas']['primary']
+  secondaryCta?: HeroContent['ctas']['secondary']
+  coverImage?: { asset?: unknown; alt?: string; objectPosition?: string } | null
+}
+
+export async function getHeroFromSanity(): Promise<HeroContent | null> {
+  if (!sanityClient) return null
+  try {
+    const data = await sanityClient.fetch<RawHero | null>(HERO_QUERY, {}, fetchOptions)
+    if (!data?.headline || !data.subheadline || !data.primaryCta || !data.secondaryCta) {
+      return null
+    }
+
+    const coverUrl = data.coverImage?.asset ? urlForImage(data.coverImage, 2400) : null
+
+    return {
+      meta: data.meta ?? { kicker: '' },
+      headline: data.headline,
+      subheadline: data.subheadline,
+      ctas: { primary: data.primaryCta, secondary: data.secondaryCta },
+      media: { alt: data.coverImage?.alt ?? '' },
+      coverImage: coverUrl
+        ? {
+            src: coverUrl,
+            alt: data.coverImage?.alt ?? '',
+            objectPosition: data.coverImage?.objectPosition,
+          }
+        : undefined,
+    }
+  } catch {
+    return null
+  }
+}
+
 /* ---------------- About ---------------- */
 
 const ABOUT_QUERY = groq`*[_type == "about"][0]{
   meta,
   chapters,
   closingCta,
-  photo{..., "alt": alt, "caption": caption}
+  photo{..., "alt": alt, "caption": caption, "objectPosition": objectPosition}
 }`
 
 type RawAbout = {
   meta?: AboutContent['meta']
   chapters?: AboutContent['chapters']
   closingCta?: AboutContent['closingCta']
-  photo?: { asset?: unknown; alt?: string; caption?: string } | null
+  photo?: {
+    asset?: unknown
+    alt?: string
+    caption?: string
+    objectPosition?: string
+  } | null
 }
 
 export async function getAboutFromSanity(): Promise<AboutContent | null> {
@@ -43,6 +98,7 @@ export async function getAboutFromSanity(): Promise<AboutContent | null> {
         src: photoUrl ?? '',
         alt: data.photo?.alt ?? '',
         caption: data.photo?.caption ?? '',
+        objectPosition: data.photo?.objectPosition,
       },
     }
   } catch {
@@ -58,11 +114,16 @@ const NOW_QUERY = groq`*[_type == "now"][0]{
   date, period, dayCount, coordinates,
   caption,
   cta,
-  photo{..., "alt": alt, "caption": caption}
+  photo{..., "alt": alt, "caption": caption, "objectPosition": objectPosition}
 }`
 
 type RawNow = Omit<NowContent, 'photo'> & {
-  photo?: { asset?: unknown; alt?: string; caption?: string } | null
+  photo?: {
+    asset?: unknown
+    alt?: string
+    caption?: string
+    objectPosition?: string
+  } | null
 }
 
 export async function getNowFromSanity(): Promise<NowContent | null> {
@@ -79,6 +140,7 @@ export async function getNowFromSanity(): Promise<NowContent | null> {
         src: photoUrl ?? '',
         alt: data.photo?.alt ?? '',
         caption: data.photo?.caption ?? `${data.city} · ${data.period}`,
+        objectPosition: data.photo?.objectPosition,
       },
     }
   } catch {
@@ -93,7 +155,7 @@ const CONTENT_QUERY = groq`*[_type == "contentHighlights"][0]{
   pullQuote,
   highlights[]{
     _key, platform, url, title,
-    thumbnail{..., "alt": alt}
+    thumbnail{..., "alt": alt, "objectPosition": objectPosition}
   },
   channels
 }`
@@ -103,7 +165,7 @@ type RawHighlight = {
   platform: ContentHighlight['platform']
   url: string
   title: string
-  thumbnail?: { asset?: unknown; alt?: string } | null
+  thumbnail?: { asset?: unknown; alt?: string; objectPosition?: string } | null
 }
 
 type RawContent = {
@@ -128,6 +190,8 @@ export async function getContentHighlightsFromSanity(): Promise<ContentBridgeCon
         url: h.url,
         title: h.title,
         thumbnail: h.thumbnail?.asset ? (urlForImage(h.thumbnail, 800) ?? undefined) : undefined,
+        thumbnailAlt: h.thumbnail?.alt,
+        thumbnailObjectPosition: h.thumbnail?.objectPosition,
       })),
       channels: data.channels,
     }

@@ -1,18 +1,23 @@
+import Image from 'next/image'
 import Link from 'next/link'
 import { Container } from '@/components/layout/container'
 import { GrainOverlay } from '@/components/shared/grain-overlay'
 import { JourneyMarker } from '@/components/shared/journey-marker'
 import { Reveal } from '@/components/shared/reveal'
 import { buttonStyles } from '@/components/ui/button'
-import { hero } from '@/content'
+import { hero as heroFallback } from '@/content'
+import { getHeroFromSanity } from '@/sanity/queries'
+import type { HeroContent } from '@/types/content'
 
-export function HeroSection() {
+export async function HeroSection() {
+  const hero = (await getHeroFromSanity()) ?? heroFallback
+
   return (
     <section
       id="hero"
       className="relative isolate flex min-h-[88svh] flex-col justify-end overflow-hidden border-b border-subtle pb-24 pt-28 md:min-h-[100svh] md:pb-28 md:pt-40"
     >
-      <HeroBackground />
+      <HeroBackground coverImage={hero.coverImage} />
 
       <Container size="default" className="relative z-10">
         <Reveal>
@@ -61,11 +66,29 @@ export function HeroSection() {
 }
 
 /**
- * Fundo do hero. Sem vídeo enquanto não chega arquivo.
- * Quando hero.media.videoSrc apontar pra arquivo real,
- * substituir esta função por um <video autoPlay muted loop playsInline />.
+ * Fundo do hero.
+ * - Se houver imagem de capa do Sanity, usa ela como background com overlay pra preservar leitura
+ * - Caso contrário, mantém o gradiente original da marca
  */
-function HeroBackground() {
+function HeroBackground({ coverImage }: { coverImage?: HeroContent['coverImage'] }) {
+  if (coverImage?.src) {
+    return (
+      <div aria-hidden="true" className="absolute inset-0 -z-10">
+        <Image
+          src={coverImage.src}
+          alt={coverImage.alt ?? ''}
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover"
+          style={{ objectPosition: coverImage.objectPosition ?? 'center' }}
+        />
+        <div className="absolute inset-0 bg-background/55" />
+        <GrainOverlay opacity={0.06} />
+      </div>
+    )
+  }
+
   return (
     <div aria-hidden="true" className="absolute inset-0 -z-10">
       <div
