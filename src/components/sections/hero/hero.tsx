@@ -5,63 +5,95 @@ import { GrainOverlay } from '@/components/shared/grain-overlay'
 import { JourneyMarker } from '@/components/shared/journey-marker'
 import { Reveal } from '@/components/shared/reveal'
 import { buttonStyles } from '@/components/ui/button'
-import { hero as heroFallback } from '@/content'
+import { siteConfig } from '@/content/site.config'
 import { toContainerSize, toImageStyle } from '@/lib/sanity-styles'
 import { getHeroFromSanity } from '@/sanity/queries'
 import type { HeroContent } from '@/types/content'
 
 export async function HeroSection() {
-  const hero = (await getHeroFromSanity()) ?? heroFallback
+  const hero = await getHeroFromSanity()
   const containerSize = toContainerSize(hero.layout?.contentWidth)
 
   return (
     <section
       id="hero"
-      className="relative isolate flex min-h-[88svh] flex-col justify-end overflow-hidden border-b border-subtle pb-24 pt-28 md:min-h-[100svh] md:pb-28 md:pt-40"
+      className="relative isolate flex min-h-svh flex-col justify-end overflow-hidden border-b border-subtle pb-20 pt-28 md:pb-24 md:pt-40"
     >
       <HeroBackground coverImage={hero.coverImage} />
 
+      {/* Rótulo fixo topo-esquerdo — sensação de capa de caderno */}
+      <div className="pointer-events-none absolute left-0 right-0 top-28 z-10 md:top-40">
+        <Container size={containerSize}>
+          <Reveal>
+            <div className="flex items-center gap-3">
+              <span
+                aria-hidden="true"
+                className="h-px w-8 bg-foreground/30 md:w-12"
+              />
+              <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-foreground/55 md:text-[11px]">
+                {hero.meta.kicker}
+              </p>
+            </div>
+          </Reveal>
+        </Container>
+      </div>
+
       <Container size={containerSize} className="relative z-10">
-        <Reveal>
-          <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-foreground/50">
-            {hero.meta.kicker}
-          </p>
-        </Reveal>
+        <div className="max-w-6xl">
+          <Reveal delay={0.08}>
+            <h1 className="font-display text-[48px] font-medium leading-[0.98] tracking-[-0.02em] text-foreground md:text-[96px] lg:text-[112px]">
+              {hero.headline}
+            </h1>
+          </Reveal>
 
-        <Reveal delay={0.08}>
-          <h1 className="mt-8 max-w-5xl font-display text-[44px] font-medium leading-[1.04] tracking-tight text-foreground md:text-[80px] lg:text-[96px]">
-            {hero.headline}
-          </h1>
-        </Reveal>
+          <div className="mt-10 grid gap-10 md:mt-14 md:grid-cols-12 md:gap-12">
+            <Reveal delay={0.18} className="md:col-span-6 md:col-start-1">
+              <p className="text-base leading-relaxed text-foreground/75 md:text-lg md:leading-[1.65]">
+                {hero.subheadline}
+              </p>
+            </Reveal>
 
-        <Reveal delay={0.18}>
-          <p className="mt-8 max-w-xl text-base leading-relaxed text-foreground/70 md:text-lg md:leading-relaxed">
-            {hero.subheadline}
-          </p>
-        </Reveal>
-
-        <Reveal delay={0.28}>
-          <div className="mt-12 flex flex-wrap items-center gap-3 md:gap-4">
-            <Link
-              href={hero.ctas.primary.href}
-              className={buttonStyles({ variant: 'primary', size: 'lg' })}
-            >
-              {hero.ctas.primary.label}
-            </Link>
-            <Link
-              href={hero.ctas.secondary.href}
-              className={buttonStyles({ variant: 'ghost', size: 'lg' })}
-            >
-              {hero.ctas.secondary.label} <span aria-hidden="true">→</span>
-            </Link>
+            <Reveal delay={0.28} className="md:col-span-5 md:col-start-8 md:self-end">
+              <div className="flex flex-wrap items-center gap-4">
+                <Link
+                  href={hero.ctas.primary.href}
+                  className={buttonStyles({ variant: 'primary', size: 'lg' })}
+                >
+                  {hero.ctas.primary.label}
+                </Link>
+                <Link
+                  href={hero.ctas.secondary.href}
+                  className="group inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.25em] text-foreground/70 transition-colors hover:text-foreground"
+                >
+                  {hero.ctas.secondary.label}
+                  <span
+                    aria-hidden="true"
+                    className="transition-transform duration-300 group-hover:translate-x-1"
+                  >
+                    →
+                  </span>
+                </Link>
+              </div>
+            </Reveal>
           </div>
-        </Reveal>
+        </div>
       </Container>
 
-      <div className="absolute bottom-5 right-6 z-10 md:bottom-8 md:right-10">
-        <Reveal delay={0.5}>
-          <JourneyMarker className="rounded-full bg-background/40 px-3 py-1 backdrop-blur-sm" />
-        </Reveal>
+      {/* Ribbon inferior — JourneyMarker + assinatura */}
+      <div className="pointer-events-none absolute bottom-6 left-0 right-0 z-10 md:bottom-10">
+        <Container
+          size={containerSize}
+          className="flex items-end justify-between gap-6"
+        >
+          <Reveal delay={0.45}>
+            <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-foreground/45 md:text-[11px]">
+              {siteConfig.shortTagline}
+            </p>
+          </Reveal>
+          <Reveal delay={0.55}>
+            <JourneyMarker className="pointer-events-auto rounded-full bg-background/40 px-3 py-1 backdrop-blur-sm" />
+          </Reveal>
+        </Container>
       </div>
     </section>
   )
@@ -80,8 +112,15 @@ function HeroBackground({ coverImage }: { coverImage?: HeroContent['coverImage']
           className="object-cover"
           style={toImageStyle(coverImage)}
         />
-        <div className="absolute inset-0 bg-background/55" />
-        <GrainOverlay opacity={0.06} />
+        {/* Gradiente cinema: escurece bordas, preserva o meio-baixo */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              'linear-gradient(to bottom, rgba(14,14,13,0.25) 0%, rgba(14,14,13,0.1) 40%, rgba(243,238,229,0.55) 100%)',
+          }}
+        />
+        <GrainOverlay opacity={0.08} />
       </div>
     )
   }
@@ -92,10 +131,10 @@ function HeroBackground({ coverImage }: { coverImage?: HeroContent['coverImage']
         className="absolute inset-0"
         style={{
           background:
-            'radial-gradient(1200px 800px at 70% 20%, rgba(196,81,42,0.10), transparent 60%), radial-gradient(900px 700px at 15% 85%, rgba(61,74,43,0.08), transparent 55%)',
+            'radial-gradient(1400px 900px at 75% 15%, rgba(196,81,42,0.14), transparent 55%), radial-gradient(1000px 800px at 10% 90%, rgba(61,74,43,0.12), transparent 55%), linear-gradient(to bottom, rgba(14,14,13,0.03), transparent 30%)',
         }}
       />
-      <GrainOverlay opacity={0.04} />
+      <GrainOverlay opacity={0.05} />
     </div>
   )
 }
