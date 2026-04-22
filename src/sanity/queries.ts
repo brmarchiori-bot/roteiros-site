@@ -16,21 +16,40 @@ const fetchOptions = { next: { revalidate: 60 } } as const
 
 /* ---------------- Helpers ---------------- */
 
-type RawPhotoControls = {
-  horizontalFocus?: string
-  verticalFocus?: string
-  fitMode?: 'cover' | 'contain'
-  zoom?: number
+/** Formato cru de `controlledImage` vindo do Sanity. */
+type RawControlledImage = {
+  image?: { asset?: unknown; hotspot?: unknown; crop?: unknown } | null
+  alt?: string
+  caption?: string
+  focusHorizontal?: 'left' | 'center' | 'right'
+  focusVertical?: 'top' | 'center' | 'bottom'
+  fit?: 'cover' | 'contain'
 }
 
-function toPhotoControls(raw?: RawPhotoControls | null): PhotoControls {
-  const h = raw?.horizontalFocus ?? 'center'
-  const v = raw?.verticalFocus ?? 'center'
+/** GROQ projection que puxa todos os sub-campos de um controlledImage. */
+const IMAGE_PROJ = `{ image, alt, caption, focusHorizontal, focusVertical, fit }`
+
+function toPhotoControls(raw?: RawControlledImage | null): PhotoControls {
+  const h = raw?.focusHorizontal ?? 'center'
+  const v = raw?.focusVertical ?? 'center'
   const objectPosition = h === 'center' && v === 'center' ? 'center' : `${h} ${v}`
   return {
     objectPosition,
-    fitMode: raw?.fitMode ?? 'cover',
-    zoom: typeof raw?.zoom === 'number' ? raw.zoom : 0,
+    fitMode: raw?.fit ?? 'cover',
+    zoom: 0,
+  }
+}
+
+/** Resolve URL + metadados de uma controlledImage. Retorna undefined se não tem asset. */
+function resolveImage(raw: RawControlledImage | undefined | null, width: number) {
+  if (!raw?.image?.asset) return undefined
+  const url = urlForImage(raw.image, width)
+  if (!url) return undefined
+  return {
+    src: url,
+    alt: raw.alt ?? '',
+    caption: raw.caption ?? '',
+    controls: toPhotoControls(raw),
   }
 }
 
@@ -46,8 +65,6 @@ function toLayout(raw?: RawLayout | null): SectionLayout {
   }
 }
 
-const PHOTO_PROJ = `{..., "alt": alt, "caption": caption, "horizontalFocus": horizontalFocus, "verticalFocus": verticalFocus, "fitMode": fitMode, "zoom": zoom}`
-
 /* ---------------- Hero ---------------- */
 
 const HERO_QUERY = groq`*[_type == "hero"][0]{
@@ -56,7 +73,7 @@ const HERO_QUERY = groq`*[_type == "hero"][0]{
   subheadline,
   primaryCta,
   secondaryCta,
-  coverImage${PHOTO_PROJ},
+  "imagemFundo": imagemFundo${IMAGE_PROJ},
   contentWidth
 }`
 
@@ -66,7 +83,7 @@ type RawHero = {
   subheadline?: string
   primaryCta?: HeroContent['ctas']['primary']
   secondaryCta?: HeroContent['ctas']['secondary']
-  coverImage?: ({ asset?: unknown; alt?: string } & RawPhotoControls) | null
+  imagemFundo?: RawControlledImage | null
   contentWidth?: SectionLayout['contentWidth']
 }
 
@@ -78,20 +95,16 @@ export async function getHeroFromSanity(): Promise<HeroContent | null> {
       return null
     }
 
-    const coverUrl = data.coverImage?.asset ? urlForImage(data.coverImage, 2400) : null
+    const cover = resolveImage(data.imagemFundo, 2400)
 
     return {
       meta: data.meta ?? { kicker: '' },
       headline: data.headline,
       subheadline: data.subheadline,
       ctas: { primary: data.primaryCta, secondary: data.secondaryCta },
-      media: { alt: data.coverImage?.alt ?? '' },
-      coverImage: coverUrl
-        ? {
-            src: coverUrl,
-            alt: data.coverImage?.alt ?? '',
-            ...toPhotoControls(data.coverImage),
-          }
+      media: { alt: cover?.alt ?? '' },
+      coverImage: cover
+        ? { src: cover.src, alt: cover.alt, ...cover.controls }
         : undefined,
       layout: toLayout({ contentWidth: data.contentWidth }),
     }
@@ -106,10 +119,10 @@ const ABOUT_QUERY = groq`*[_type == "about"][0]{
   meta,
   chapters[]{
     _key, number, title, body,
-    image${PHOTO_PROJ}
+    "imagem": imagem${IMAGE_PROJ}
   },
   closingCta,
-  photo${PHOTO_PROJ},
+  "imagemPrincipal": imagemPrincipal${IMAGE_PROJ},
   contentWidth,
   imagePosition
 }`
@@ -119,20 +132,14 @@ type RawChapter = {
   number?: string
   title?: string
   body?: string
-  image?: ({ asset?: unknown; alt?: string } & RawPhotoControls) | null
+  imagem?: RawControlledImage | null
 }
 
 type RawAbout = {
   meta?: AboutContent['meta']
   chapters?: RawChapter[]
   closingCta?: AboutContent['closingCta']
-  photo?:
-    | ({
-        asset?: unknown
-        alt?: string
-        caption?: string
-      } & RawPhotoControls)
-    | null
+  imagemPrincipal?: RawControlledImage | null
   contentWidth?: SectionLayout['contentWidth']
   imagePosition?: SectionLayout['imagePosition']
 }
@@ -143,34 +150,32 @@ export async function getAboutFromSanity(): Promise<AboutContent | null> {
     const data = await sanityClient.fetch<RawAbout | null>(ABOUT_QUERY, {}, fetchOptions)
     if (!data?.meta || !data.chapters?.length) return null
 
-    const photoUrl = data.photo?.asset ? urlForImage(data.photo, 1600) : null
+    const main = resolveImage(data.imagemPrincipal, 1600)
 
     return {
       meta: data.meta,
       chapters: data.chapters
-        .filter((c): c is RawChapter & { number: string; title: string; body: string } =>
-          !!c.number && !!c.title && !!c.body)
+        .filter(
+          (c): c is RawChapter & { number: string; title: string; body: string } =>
+            !!c.number && !!c.title && !!c.body,
+        )
         .map((c) => {
-          const chapterImageUrl = c.image?.asset ? urlForImage(c.image, 1200) : null
+          const chapterImg = resolveImage(c.imagem, 1200)
           return {
             number: c.number,
             title: c.title,
             body: c.body,
-            image: chapterImageUrl
-              ? {
-                  src: chapterImageUrl,
-                  alt: c.image?.alt ?? '',
-                  ...toPhotoControls(c.image),
-                }
+            image: chapterImg
+              ? { src: chapterImg.src, alt: chapterImg.alt, ...chapterImg.controls }
               : undefined,
           }
         }),
       closingCta: data.closingCta,
       photo: {
-        src: photoUrl ?? '',
-        alt: data.photo?.alt ?? '',
-        caption: data.photo?.caption ?? '',
-        ...toPhotoControls(data.photo),
+        src: main?.src ?? '',
+        alt: main?.alt ?? '',
+        caption: main?.caption ?? '',
+        ...(main?.controls ?? toPhotoControls(null)),
       },
       layout: toLayout(data),
     }
@@ -187,19 +192,13 @@ const NOW_QUERY = groq`*[_type == "now"][0]{
   date, period, dayCount, coordinates,
   caption,
   cta,
-  photo${PHOTO_PROJ},
+  "imagemLocal": imagemLocal${IMAGE_PROJ},
   contentWidth,
   imagePosition
 }`
 
 type RawNow = Omit<NowContent, 'photo' | 'layout'> & {
-  photo?:
-    | ({
-        asset?: unknown
-        alt?: string
-        caption?: string
-      } & RawPhotoControls)
-    | null
+  imagemLocal?: RawControlledImage | null
   contentWidth?: SectionLayout['contentWidth']
   imagePosition?: SectionLayout['imagePosition']
 }
@@ -210,17 +209,17 @@ export async function getNowFromSanity(): Promise<NowContent | null> {
     const data = await sanityClient.fetch<RawNow | null>(NOW_QUERY, {}, fetchOptions)
     if (!data?.meta || !data.city) return null
 
-    const photoUrl = data.photo?.asset ? urlForImage(data.photo, 1600) : null
-    const { photo: _omit, contentWidth, imagePosition, ...rest } = data
+    const local = resolveImage(data.imagemLocal, 1600)
+    const { imagemLocal: _omit, contentWidth, imagePosition, ...rest } = data
     void _omit
 
     return {
       ...rest,
       photo: {
-        src: photoUrl ?? '',
-        alt: data.photo?.alt ?? '',
-        caption: data.photo?.caption ?? `${data.city} · ${data.period}`,
-        ...toPhotoControls(data.photo),
+        src: local?.src ?? '',
+        alt: local?.alt ?? '',
+        caption: local?.caption || `${data.city} · ${data.period}`,
+        ...(local?.controls ?? toPhotoControls(null)),
       },
       layout: toLayout({ contentWidth, imagePosition }),
     }
@@ -236,7 +235,7 @@ const CONTENT_QUERY = groq`*[_type == "contentHighlights"][0]{
   pullQuote,
   highlights[]{
     _key, platform, url, title,
-    thumbnail${PHOTO_PROJ}
+    "imagemCapa": imagemCapa${IMAGE_PROJ}
   },
   channels,
   contentWidth
@@ -247,7 +246,7 @@ type RawHighlight = {
   platform: ContentHighlight['platform']
   url: string
   title: string
-  thumbnail?: ({ asset?: unknown; alt?: string } & RawPhotoControls) | null
+  imagemCapa?: RawControlledImage | null
 }
 
 type RawContent = {
@@ -267,15 +266,18 @@ export async function getContentHighlightsFromSanity(): Promise<ContentBridgeCon
     return {
       meta: data.meta,
       pullQuote: data.pullQuote,
-      highlights: data.highlights.map((h) => ({
-        id: h._key,
-        platform: h.platform,
-        url: h.url,
-        title: h.title,
-        thumbnail: h.thumbnail?.asset ? (urlForImage(h.thumbnail, 800) ?? undefined) : undefined,
-        thumbnailAlt: h.thumbnail?.alt,
-        thumbnailControls: h.thumbnail ? toPhotoControls(h.thumbnail) : undefined,
-      })),
+      highlights: data.highlights.map((h) => {
+        const cover = resolveImage(h.imagemCapa, 800)
+        return {
+          id: h._key,
+          platform: h.platform,
+          url: h.url,
+          title: h.title,
+          thumbnail: cover?.src,
+          thumbnailAlt: cover?.alt,
+          thumbnailControls: cover?.controls,
+        }
+      }),
       channels: data.channels,
       layout: toLayout({ contentWidth: data.contentWidth }),
     }
