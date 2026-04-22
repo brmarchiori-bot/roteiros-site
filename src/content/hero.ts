@@ -12,7 +12,7 @@ export const hero: HeroContent = {
   subheadline:
     'Um diário público de dois que trocaram o balcão pelo caminho. Viagem real, rotina em movimento, perrengue traduzido — sem filtro e sem manual.',
   ctas: {
-    primary: { label: 'Entrar na jornada', href: '/caderno' },
+    primary: { label: 'Entrar na jornada', href: '/#club' },
     secondary: { label: 'Ver onde a gente tá', href: '#now' },
   },
   media: {

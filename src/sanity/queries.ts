@@ -1,12 +1,21 @@
 import { groq } from 'next-sanity'
+import {
+  about as aboutFallback,
+  contentHighlights as contentFallback,
+  hero as heroFallback,
+  now as nowFallback,
+} from '@/content'
 import type {
   AboutContent,
   ContentBridgeContent,
+  ContentChannel,
   ContentHighlight,
+  Cta,
   HeroContent,
   NowContent,
   PhotoControls,
   SectionLayout,
+  SectionMeta,
 } from '@/types/content'
 import { sanityClient } from './client'
 import { urlForImage } from './image'
@@ -14,9 +23,61 @@ import { urlForImage } from './image'
 /** Revalidação a cada 60s. */
 const fetchOptions = { next: { revalidate: 60 } } as const
 
-/* ---------------- Helpers ---------------- */
+/* ---------------- Helpers genéricos ---------------- */
 
-/** Formato cru de `controlledImage` vindo do Sanity. */
+/** Escolhe a primeira string não-vazia (após trim). Usa fallback se Sanity não tem. */
+function pickString(primary: string | undefined | null, fallback: string): string
+function pickString(
+  primary: string | undefined | null,
+  fallback: string | undefined,
+): string | undefined
+function pickString(primary: string | undefined | null, fallback: string | undefined) {
+  const trimmed = typeof primary === 'string' ? primary.trim() : ''
+  if (trimmed) return trimmed
+  return fallback
+}
+
+function mergeMeta(
+  raw: { kicker?: string; title?: string } | undefined | null,
+  fallback: SectionMeta,
+): SectionMeta {
+  return {
+    kicker: pickString(raw?.kicker, fallback.kicker),
+    title: pickString(raw?.title, fallback.title),
+  }
+}
+
+function mergeCta(raw: Partial<Cta> | undefined | null, fallback: Cta): Cta {
+  return {
+    label: pickString(raw?.label, fallback.label),
+    href: pickString(raw?.href, fallback.href),
+  }
+}
+
+function mergeOptionalCta(
+  raw: Partial<Cta> | undefined | null,
+  fallback: Cta | undefined,
+): Cta | undefined {
+  if (!raw && !fallback) return undefined
+  const label = pickString(raw?.label, fallback?.label)
+  const href = pickString(raw?.href, fallback?.href)
+  if (!label || !href) return fallback
+  return { label, href }
+}
+
+function mergeChannel(
+  raw: Partial<ContentChannel> | undefined | null,
+  fallback: ContentChannel,
+): ContentChannel {
+  return {
+    url: pickString(raw?.url, fallback.url),
+    cta: pickString(raw?.cta, fallback.cta),
+    note: pickString(raw?.note, fallback.note),
+  }
+}
+
+/* ---------------- Imagem ---------------- */
+
 type RawControlledImage = {
   image?: { asset?: unknown; hotspot?: unknown; crop?: unknown } | null
   alt?: string
@@ -26,7 +87,6 @@ type RawControlledImage = {
   fit?: 'cover' | 'contain'
 }
 
-/** GROQ projection que puxa todos os sub-campos de um controlledImage. */
 const IMAGE_PROJ = `{ image, alt, caption, focusHorizontal, focusVertical, fit }`
 
 function toPhotoControls(raw?: RawControlledImage | null): PhotoControls {
@@ -40,8 +100,17 @@ function toPhotoControls(raw?: RawControlledImage | null): PhotoControls {
   }
 }
 
-/** Resolve URL + metadados de uma controlledImage. Retorna undefined se não tem asset. */
-function resolveImage(raw: RawControlledImage | undefined | null, width: number) {
+type ResolvedImage = {
+  src: string
+  alt: string
+  caption: string
+  controls: PhotoControls
+}
+
+function resolveImage(
+  raw: RawControlledImage | undefined | null,
+  width: number,
+): ResolvedImage | undefined {
   if (!raw?.image?.asset) return undefined
   const url = urlForImage(raw.image, width)
   if (!url) return undefined
@@ -53,19 +122,26 @@ function resolveImage(raw: RawControlledImage | undefined | null, width: number)
   }
 }
 
+/* ---------------- Layout ---------------- */
+
 type RawLayout = {
   contentWidth?: SectionLayout['contentWidth']
   imagePosition?: SectionLayout['imagePosition']
 }
 
-function toLayout(raw?: RawLayout | null): SectionLayout {
+function mergeLayout(
+  raw: RawLayout | undefined | null,
+  fallback: SectionLayout | undefined,
+): SectionLayout {
   return {
-    contentWidth: raw?.contentWidth ?? 'medium',
-    imagePosition: raw?.imagePosition ?? 'left',
+    contentWidth: raw?.contentWidth ?? fallback?.contentWidth ?? 'medium',
+    imagePosition: raw?.imagePosition ?? fallback?.imagePosition ?? 'left',
   }
 }
 
-/* ---------------- Hero ---------------- */
+/* ================================================================
+   HERO
+   ================================================================ */
 
 const HERO_QUERY = groq`*[_type == "hero"][0]{
   meta,
@@ -78,42 +154,49 @@ const HERO_QUERY = groq`*[_type == "hero"][0]{
 }`
 
 type RawHero = {
-  meta?: HeroContent['meta']
+  meta?: { kicker?: string; title?: string }
   headline?: string
   subheadline?: string
-  primaryCta?: HeroContent['ctas']['primary']
-  secondaryCta?: HeroContent['ctas']['secondary']
+  primaryCta?: Partial<Cta>
+  secondaryCta?: Partial<Cta>
   imagemFundo?: RawControlledImage | null
   contentWidth?: SectionLayout['contentWidth']
 }
 
-export async function getHeroFromSanity(): Promise<HeroContent | null> {
-  if (!sanityClient) return null
+export async function getHeroFromSanity(): Promise<HeroContent> {
+  if (!sanityClient) return heroFallback
   try {
-    const data = await sanityClient.fetch<RawHero | null>(HERO_QUERY, {}, fetchOptions)
-    if (!data?.headline || !data.subheadline || !data.primaryCta || !data.secondaryCta) {
-      return null
-    }
+    const raw = await sanityClient.fetch<RawHero | null>(HERO_QUERY, {}, fetchOptions)
+    if (!raw) return heroFallback
 
-    const cover = resolveImage(data.imagemFundo, 2400)
+    const cover = resolveImage(raw.imagemFundo, 2400)
+    const coverImage = cover
+      ? { src: cover.src, alt: cover.alt, ...cover.controls }
+      : heroFallback.coverImage
 
     return {
-      meta: data.meta ?? { kicker: '' },
-      headline: data.headline,
-      subheadline: data.subheadline,
-      ctas: { primary: data.primaryCta, secondary: data.secondaryCta },
-      media: { alt: cover?.alt ?? '' },
-      coverImage: cover
-        ? { src: cover.src, alt: cover.alt, ...cover.controls }
-        : undefined,
-      layout: toLayout({ contentWidth: data.contentWidth }),
+      meta: mergeMeta(raw.meta, heroFallback.meta),
+      headline: pickString(raw.headline, heroFallback.headline),
+      subheadline: pickString(raw.subheadline, heroFallback.subheadline),
+      ctas: {
+        primary: mergeCta(raw.primaryCta, heroFallback.ctas.primary),
+        secondary: mergeCta(raw.secondaryCta, heroFallback.ctas.secondary),
+      },
+      media: {
+        ...heroFallback.media,
+        alt: cover?.alt || heroFallback.media.alt,
+      },
+      coverImage,
+      layout: mergeLayout({ contentWidth: raw.contentWidth }, heroFallback.layout),
     }
   } catch {
-    return null
+    return heroFallback
   }
 }
 
-/* ---------------- About ---------------- */
+/* ================================================================
+   ABOUT
+   ================================================================ */
 
 const ABOUT_QUERY = groq`*[_type == "about"][0]{
   meta,
@@ -136,55 +219,65 @@ type RawChapter = {
 }
 
 type RawAbout = {
-  meta?: AboutContent['meta']
+  meta?: { kicker?: string; title?: string }
   chapters?: RawChapter[]
-  closingCta?: AboutContent['closingCta']
+  closingCta?: Partial<Cta>
   imagemPrincipal?: RawControlledImage | null
   contentWidth?: SectionLayout['contentWidth']
   imagePosition?: SectionLayout['imagePosition']
 }
 
-export async function getAboutFromSanity(): Promise<AboutContent | null> {
-  if (!sanityClient) return null
+export async function getAboutFromSanity(): Promise<AboutContent> {
+  if (!sanityClient) return aboutFallback
   try {
-    const data = await sanityClient.fetch<RawAbout | null>(ABOUT_QUERY, {}, fetchOptions)
-    if (!data?.meta || !data.chapters?.length) return null
+    const raw = await sanityClient.fetch<RawAbout | null>(ABOUT_QUERY, {}, fetchOptions)
+    if (!raw) return aboutFallback
 
-    const main = resolveImage(data.imagemPrincipal, 1600)
+    const validChapters = (raw.chapters ?? [])
+      .filter(
+        (c): c is RawChapter & { number: string; title: string; body: string } =>
+          !!c.number?.trim() && !!c.title?.trim() && !!c.body?.trim(),
+      )
+      .map((c) => {
+        const img = resolveImage(c.imagem, 1200)
+        return {
+          number: c.number.trim(),
+          title: c.title.trim(),
+          body: c.body.trim(),
+          image: img ? { src: img.src, alt: img.alt, ...img.controls } : undefined,
+        }
+      })
+
+    const chapters = validChapters.length > 0 ? validChapters : aboutFallback.chapters
+
+    const mainImg = resolveImage(raw.imagemPrincipal, 1600)
+    const photo = mainImg
+      ? {
+          src: mainImg.src,
+          alt: mainImg.alt,
+          caption: mainImg.caption || aboutFallback.photo?.caption || '',
+          ...mainImg.controls,
+        }
+      : aboutFallback.photo
 
     return {
-      meta: data.meta,
-      chapters: data.chapters
-        .filter(
-          (c): c is RawChapter & { number: string; title: string; body: string } =>
-            !!c.number && !!c.title && !!c.body,
-        )
-        .map((c) => {
-          const chapterImg = resolveImage(c.imagem, 1200)
-          return {
-            number: c.number,
-            title: c.title,
-            body: c.body,
-            image: chapterImg
-              ? { src: chapterImg.src, alt: chapterImg.alt, ...chapterImg.controls }
-              : undefined,
-          }
-        }),
-      closingCta: data.closingCta,
-      photo: {
-        src: main?.src ?? '',
-        alt: main?.alt ?? '',
-        caption: main?.caption ?? '',
-        ...(main?.controls ?? toPhotoControls(null)),
-      },
-      layout: toLayout(data),
+      meta: mergeMeta(raw.meta, aboutFallback.meta),
+      chapters,
+      closingCta: mergeOptionalCta(raw.closingCta, aboutFallback.closingCta),
+      photo,
+      layout: mergeLayout(
+        { contentWidth: raw.contentWidth, imagePosition: raw.imagePosition },
+        aboutFallback.layout,
+      ),
     }
   } catch {
-    return null
+    return aboutFallback
   }
 }
 
-/* ---------------- Now ---------------- */
+/* ================================================================
+   NOW
+   ================================================================ */
 
 const NOW_QUERY = groq`*[_type == "now"][0]{
   meta,
@@ -197,38 +290,64 @@ const NOW_QUERY = groq`*[_type == "now"][0]{
   imagePosition
 }`
 
-type RawNow = Omit<NowContent, 'photo' | 'layout'> & {
+type RawNow = {
+  meta?: { kicker?: string; title?: string }
+  city?: string
+  state?: string
+  country?: string
+  date?: string
+  period?: string
+  dayCount?: number
+  coordinates?: string
+  caption?: string
+  cta?: Partial<Cta>
   imagemLocal?: RawControlledImage | null
   contentWidth?: SectionLayout['contentWidth']
   imagePosition?: SectionLayout['imagePosition']
 }
 
-export async function getNowFromSanity(): Promise<NowContent | null> {
-  if (!sanityClient) return null
+export async function getNowFromSanity(): Promise<NowContent> {
+  if (!sanityClient) return nowFallback
   try {
-    const data = await sanityClient.fetch<RawNow | null>(NOW_QUERY, {}, fetchOptions)
-    if (!data?.meta || !data.city) return null
+    const raw = await sanityClient.fetch<RawNow | null>(NOW_QUERY, {}, fetchOptions)
+    if (!raw) return nowFallback
 
-    const local = resolveImage(data.imagemLocal, 1600)
-    const { imagemLocal: _omit, contentWidth, imagePosition, ...rest } = data
-    void _omit
+    const localImg = resolveImage(raw.imagemLocal, 1600)
+    const photo = localImg
+      ? {
+          src: localImg.src,
+          alt: localImg.alt,
+          caption: localImg.caption || nowFallback.photo?.caption || '',
+          ...localImg.controls,
+        }
+      : nowFallback.photo
 
     return {
-      ...rest,
-      photo: {
-        src: local?.src ?? '',
-        alt: local?.alt ?? '',
-        caption: local?.caption || `${data.city} · ${data.period}`,
-        ...(local?.controls ?? toPhotoControls(null)),
-      },
-      layout: toLayout({ contentWidth, imagePosition }),
+      meta: mergeMeta(raw.meta, nowFallback.meta),
+      city: pickString(raw.city, nowFallback.city),
+      state: pickString(raw.state, nowFallback.state),
+      country: pickString(raw.country, nowFallback.country),
+      date: pickString(raw.date, nowFallback.date),
+      period: pickString(raw.period, nowFallback.period),
+      dayCount: typeof raw.dayCount === 'number' ? raw.dayCount : nowFallback.dayCount,
+      coordinates: pickString(raw.coordinates, nowFallback.coordinates),
+      caption: pickString(raw.caption, nowFallback.caption),
+      cta: mergeOptionalCta(raw.cta, nowFallback.cta),
+      link: nowFallback.link,
+      photo,
+      layout: mergeLayout(
+        { contentWidth: raw.contentWidth, imagePosition: raw.imagePosition },
+        nowFallback.layout,
+      ),
     }
   } catch {
-    return null
+    return nowFallback
   }
 }
 
-/* ---------------- Content highlights ---------------- */
+/* ================================================================
+   CONTENT HIGHLIGHTS
+   ================================================================ */
 
 const CONTENT_QUERY = groq`*[_type == "contentHighlights"][0]{
   meta,
@@ -242,46 +361,68 @@ const CONTENT_QUERY = groq`*[_type == "contentHighlights"][0]{
 }`
 
 type RawHighlight = {
-  _key: string
-  platform: ContentHighlight['platform']
-  url: string
-  title: string
+  _key?: string
+  platform?: ContentHighlight['platform']
+  url?: string
+  title?: string
   imagemCapa?: RawControlledImage | null
 }
 
 type RawContent = {
-  meta?: ContentBridgeContent['meta']
+  meta?: { kicker?: string; title?: string }
   pullQuote?: string
   highlights?: RawHighlight[]
-  channels?: ContentBridgeContent['channels']
+  channels?: {
+    instagram?: Partial<ContentChannel>
+    youtube?: Partial<ContentChannel>
+  }
   contentWidth?: SectionLayout['contentWidth']
 }
 
-export async function getContentHighlightsFromSanity(): Promise<ContentBridgeContent | null> {
-  if (!sanityClient) return null
+export async function getContentHighlightsFromSanity(): Promise<ContentBridgeContent> {
+  if (!sanityClient) return contentFallback
   try {
-    const data = await sanityClient.fetch<RawContent | null>(CONTENT_QUERY, {}, fetchOptions)
-    if (!data?.meta || !data.highlights?.length || !data.channels) return null
+    const raw = await sanityClient.fetch<RawContent | null>(CONTENT_QUERY, {}, fetchOptions)
+    if (!raw) return contentFallback
 
-    return {
-      meta: data.meta,
-      pullQuote: data.pullQuote,
-      highlights: data.highlights.map((h) => {
+    const validHighlights = (raw.highlights ?? [])
+      .filter(
+        (h): h is RawHighlight & {
+          _key: string
+          platform: ContentHighlight['platform']
+          url: string
+          title: string
+        } => !!h._key && !!h.platform && !!h.url?.trim() && !!h.title?.trim(),
+      )
+      .map((h) => {
         const cover = resolveImage(h.imagemCapa, 800)
         return {
           id: h._key,
           platform: h.platform,
-          url: h.url,
-          title: h.title,
+          url: h.url.trim(),
+          title: h.title.trim(),
           thumbnail: cover?.src,
           thumbnailAlt: cover?.alt,
           thumbnailControls: cover?.controls,
         }
-      }),
-      channels: data.channels,
-      layout: toLayout({ contentWidth: data.contentWidth }),
+      })
+
+    const highlights = validHighlights.length > 0 ? validHighlights : contentFallback.highlights
+
+    return {
+      meta: mergeMeta(raw.meta, contentFallback.meta),
+      pullQuote: pickString(raw.pullQuote, contentFallback.pullQuote),
+      highlights,
+      channels: {
+        instagram: mergeChannel(raw.channels?.instagram, contentFallback.channels.instagram),
+        youtube: mergeChannel(raw.channels?.youtube, contentFallback.channels.youtube),
+      },
+      layout: mergeLayout(
+        { contentWidth: raw.contentWidth },
+        contentFallback.layout,
+      ),
     }
   } catch {
-    return null
+    return contentFallback
   }
 }

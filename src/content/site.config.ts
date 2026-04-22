@@ -31,14 +31,14 @@ export const siteConfig = {
     },
   },
   nav: [
-    { label: 'Jornada', href: '/jornada' },
-    { label: 'Sobre', href: '/sobre' },
-    { label: 'Conteúdo', href: '/conteudo' },
-    { label: 'Parcerias', href: '/parcerias' },
+    { label: 'Jornada', href: '/#now' },
+    { label: 'Sobre', href: '/#about' },
+    { label: 'Conteúdo', href: '/#content' },
+    { label: 'Parcerias', href: '/#partnerships' },
   ],
   primaryCta: {
     label: 'Entrar na lista',
-    href: '/caderno',
+    href: '/#club',
   },
   legal: {
     copyrightYear: 2026,
