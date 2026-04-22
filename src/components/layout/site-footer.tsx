@@ -1,18 +1,19 @@
 import Link from 'next/link'
 import { JourneyMarker } from '@/components/shared/journey-marker'
+import { SocialIcon, type SocialPlatform } from '@/components/shared/social-icon'
 import { club } from '@/content/club'
 import { siteConfig } from '@/content/site.config'
 import { Container } from './container'
 import { NewsletterForm } from './newsletter-form'
 
-const SOCIAL_LABELS: Record<keyof typeof siteConfig.social, string> = {
+const SOCIAL_LABELS: Record<SocialPlatform, string> = {
   instagram: 'Instagram',
   youtube: 'YouTube',
   tiktok: 'TikTok',
 }
 
 export function SiteFooter() {
-  const socials = (Object.entries(siteConfig.social) as [keyof typeof siteConfig.social, string][])
+  const socials = (Object.entries(siteConfig.social) as [SocialPlatform, string][])
     .filter(([, url]) => Boolean(url))
 
   return (
@@ -67,16 +68,17 @@ export function SiteFooter() {
               <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-muted">
                 Canais
               </p>
-              <ul className="space-y-3 text-sm">
+              <ul className="flex items-center gap-5">
                 {socials.map(([key, url]) => (
                   <li key={key}>
                     <a
                       href={url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-foreground/80 transition-colors hover:text-primary"
+                      aria-label={SOCIAL_LABELS[key]}
+                      className="inline-flex text-foreground/70 transition-colors hover:text-primary"
                     >
-                      {SOCIAL_LABELS[key]}
+                      <SocialIcon platform={key} className="h-5 w-5" />
                     </a>
                   </li>
                 ))}

@@ -4,12 +4,13 @@ import { Section } from '@/components/layout/section'
 import { SectionHeader } from '@/components/layout/section-header'
 import { PhotoPlaceholder } from '@/components/shared/photo-placeholder'
 import { Reveal } from '@/components/shared/reveal'
+import { SocialIcon, type SocialPlatform } from '@/components/shared/social-icon'
 import { contentHighlights as contentFallback } from '@/content'
 import { toContainerSize, toImageStyle } from '@/lib/sanity-styles'
 import { getContentHighlightsFromSanity } from '@/sanity/queries'
-import type { ContentChannel, ContentHighlight } from '@/types/content'
+import type { ContentChannel } from '@/types/content'
 
-const PLATFORM_LABEL: Record<ContentHighlight['platform'], string> = {
+const PLATFORM_LABEL: Record<SocialPlatform, string> = {
   instagram: 'Instagram',
   youtube: 'YouTube',
   tiktok: 'TikTok',
@@ -55,8 +56,9 @@ export async function ContentBridgeSection() {
                 ) : (
                   <PhotoPlaceholder aspect="aspect-[3/4]" caption={highlight.title} />
                 )}
-                <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.2em] text-muted">
-                  {PLATFORM_LABEL[highlight.platform]}
+                <p className="mt-4 text-muted">
+                  <SocialIcon platform={highlight.platform} className="h-4 w-4" />
+                  <span className="sr-only">{PLATFORM_LABEL[highlight.platform]}</span>
                 </p>
                 <p className="mt-2 text-base leading-snug text-foreground/85 transition-colors group-hover:text-primary md:text-lg">
                   {highlight.title}
@@ -69,12 +71,12 @@ export async function ContentBridgeSection() {
 
       <div className="mt-20 grid gap-px overflow-hidden rounded-md bg-foreground/10 md:mt-28 md:grid-cols-2">
         <ChannelBlock
-          platform="Instagram"
+          platform="instagram"
           channel={contentHighlights.channels.instagram}
           delay={0}
         />
         <ChannelBlock
-          platform="YouTube"
+          platform="youtube"
           channel={contentHighlights.channels.youtube}
           delay={0.08}
         />
@@ -88,7 +90,7 @@ function ChannelBlock({
   channel,
   delay,
 }: {
-  platform: string
+  platform: SocialPlatform
   channel: ContentChannel
   delay: number
 }) {
@@ -98,9 +100,10 @@ function ChannelBlock({
         href={channel.url}
         target="_blank"
         rel="noopener noreferrer"
+        aria-label={`${PLATFORM_LABEL[platform]} — ${channel.cta}`}
         className="group flex h-full flex-col gap-6 bg-background p-8 transition-colors hover:bg-surface md:p-12"
       >
-        <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-muted">{platform}</p>
+        <SocialIcon platform={platform} className="h-5 w-5 text-muted" />
         {channel.note && (
           <p className="font-display text-xl italic leading-snug text-foreground md:text-2xl">
             “{channel.note}”
