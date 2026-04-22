@@ -6,11 +6,13 @@ import { JourneyMarker } from '@/components/shared/journey-marker'
 import { Reveal } from '@/components/shared/reveal'
 import { buttonStyles } from '@/components/ui/button'
 import { hero as heroFallback } from '@/content'
+import { toContainerSize, toImageStyle } from '@/lib/sanity-styles'
 import { getHeroFromSanity } from '@/sanity/queries'
 import type { HeroContent } from '@/types/content'
 
 export async function HeroSection() {
   const hero = (await getHeroFromSanity()) ?? heroFallback
+  const containerSize = toContainerSize(hero.layout?.contentWidth)
 
   return (
     <section
@@ -19,7 +21,7 @@ export async function HeroSection() {
     >
       <HeroBackground coverImage={hero.coverImage} />
 
-      <Container size="default" className="relative z-10">
+      <Container size={containerSize} className="relative z-10">
         <Reveal>
           <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-foreground/50">
             {hero.meta.kicker}
@@ -65,11 +67,6 @@ export async function HeroSection() {
   )
 }
 
-/**
- * Fundo do hero.
- * - Se houver imagem de capa do Sanity, usa ela como background com overlay pra preservar leitura
- * - Caso contrário, mantém o gradiente original da marca
- */
 function HeroBackground({ coverImage }: { coverImage?: HeroContent['coverImage'] }) {
   if (coverImage?.src) {
     return (
@@ -81,7 +78,7 @@ function HeroBackground({ coverImage }: { coverImage?: HeroContent['coverImage']
           priority
           sizes="100vw"
           className="object-cover"
-          style={{ objectPosition: coverImage.objectPosition ?? 'center' }}
+          style={toImageStyle(coverImage)}
         />
         <div className="absolute inset-0 bg-background/55" />
         <GrainOverlay opacity={0.06} />

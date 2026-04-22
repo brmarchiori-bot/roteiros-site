@@ -5,6 +5,7 @@ import { SectionHeader } from '@/components/layout/section-header'
 import { PhotoPlaceholder } from '@/components/shared/photo-placeholder'
 import { Reveal } from '@/components/shared/reveal'
 import { contentHighlights as contentFallback } from '@/content'
+import { toContainerSize, toImageStyle } from '@/lib/sanity-styles'
 import { getContentHighlightsFromSanity } from '@/sanity/queries'
 import type { ContentChannel, ContentHighlight } from '@/types/content'
 
@@ -16,9 +17,10 @@ const PLATFORM_LABEL: Record<ContentHighlight['platform'], string> = {
 
 export async function ContentBridgeSection() {
   const contentHighlights = (await getContentHighlightsFromSanity()) ?? contentFallback
+  const containerSize = toContainerSize(contentHighlights.layout?.contentWidth)
 
   return (
-    <Section id="content" spacing="xl">
+    <Section id="content" spacing="xl" size={containerSize}>
       <SectionHeader meta={contentHighlights.meta} className="mb-10 md:mb-14" />
 
       {contentHighlights.pullQuote && (
@@ -29,7 +31,6 @@ export async function ContentBridgeSection() {
         </Reveal>
       )}
 
-      {/* Grid de destaques */}
       <ul className="grid gap-8 sm:grid-cols-2 md:gap-10 lg:grid-cols-4">
         {contentHighlights.highlights.map((highlight, i) => (
           <Reveal key={highlight.id} delay={i * 0.06}>
@@ -47,10 +48,8 @@ export async function ContentBridgeSection() {
                       alt={highlight.thumbnailAlt ?? highlight.title}
                       fill
                       sizes="(min-width: 1024px) 22vw, (min-width: 640px) 45vw, 100vw"
-                      className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-                      style={{
-                        objectPosition: highlight.thumbnailObjectPosition ?? 'center',
-                      }}
+                      className="transition-transform duration-500 group-hover:scale-[1.03]"
+                      style={toImageStyle(highlight.thumbnailControls)}
                     />
                   </figure>
                 ) : (
@@ -68,7 +67,6 @@ export async function ContentBridgeSection() {
         ))}
       </ul>
 
-      {/* Blocos de canal — Instagram + YouTube */}
       <div className="mt-20 grid gap-px overflow-hidden rounded-md bg-foreground/10 md:mt-28 md:grid-cols-2">
         <ChannelBlock
           platform="Instagram"

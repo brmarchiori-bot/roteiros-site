@@ -1,35 +1,51 @@
 import { defineField, defineType } from 'sanity'
+import { photoFields, sectionLayoutFields } from './shared'
 
 export const contentHighlightsSchema = defineType({
   name: 'contentHighlights',
   title: 'Seção Conteúdo (grade de destaques + canais)',
   type: 'document',
+  groups: [
+    { name: 'content', title: '📝 Conteúdo', default: true },
+    { name: 'channels', title: '📱 Canais' },
+    { name: 'layout', title: '📐 Layout' },
+  ],
   fields: [
     defineField({
       name: 'meta',
       title: 'Topo da seção',
+      group: 'content',
       type: 'object',
       fields: [
         defineField({
           name: 'kicker',
           title: 'Rótulo pequeno (ex: "06 · Conteúdo")',
           type: 'string',
+          validation: (r) => r.max(30),
         }),
-        defineField({ name: 'title', title: 'Título grande', type: 'string' }),
+        defineField({
+          name: 'title',
+          title: 'Título grande',
+          type: 'string',
+          validation: (r) => r.max(60),
+        }),
       ],
       validation: (r) => r.required(),
     }),
     defineField({
       name: 'pullQuote',
-      title: 'Citação em destaque (opcional — aparece em itálico grande)',
-      description: 'Uma frase que resume o tom editorial. Fica entre o título e os cards.',
+      title: 'Citação em itálico (aparece entre título e cards)',
+      description: 'Uma frase que resume o tom editorial. Opcional.',
+      group: 'content',
       type: 'text',
       rows: 3,
+      validation: (r) => r.max(300),
     }),
     defineField({
       name: 'highlights',
-      title: 'Cards de conteúdo (4 recomendados)',
-      description: 'Cada card é um post/vídeo em destaque, com imagem e link.',
+      title: 'Cards de conteúdo (arraste pra reordenar)',
+      description: 'Cada card é um post/vídeo com foto + título + link. 1 a 8 cards.',
+      group: 'content',
       type: 'array',
       of: [
         {
@@ -38,7 +54,7 @@ export const contentHighlightsSchema = defineType({
           fields: [
             defineField({
               name: 'platform',
-              title: 'De qual rede é este conteúdo',
+              title: 'Rede social',
               type: 'string',
               options: {
                 list: [
@@ -52,9 +68,10 @@ export const contentHighlightsSchema = defineType({
             }),
             defineField({
               name: 'title',
-              title: 'Título do card (texto que aparece abaixo da imagem)',
+              title: 'Título do card (aparece abaixo da imagem)',
               type: 'string',
-              validation: (r) => r.required(),
+              validation: (r) =>
+                r.required().max(100).warning('Passou de 100 — pode cortar no mobile.'),
             }),
             defineField({
               name: 'url',
@@ -64,36 +81,11 @@ export const contentHighlightsSchema = defineType({
             }),
             defineField({
               name: 'thumbnail',
-              title: '📷 Foto de capa do card',
-              description: 'Aparece SÓ neste card. Cada card tem sua própria foto.',
+              title: 'Foto de capa do card',
+              description: 'Aparece SÓ neste card.',
               type: 'image',
               options: { hotspot: true },
-              fields: [
-                defineField({
-                  name: 'alt',
-                  title: 'Descrição da foto (acessibilidade)',
-                  type: 'string',
-                }),
-                defineField({
-                  name: 'objectPosition',
-                  title: 'Alinhamento da foto',
-                  type: 'string',
-                  options: {
-                    list: [
-                      { title: 'Centro (padrão)', value: 'center' },
-                      { title: 'Topo', value: 'top' },
-                      { title: 'Base (pé)', value: 'bottom' },
-                      { title: 'Esquerda', value: 'left' },
-                      { title: 'Direita', value: 'right' },
-                      { title: 'Canto superior esquerdo', value: 'top left' },
-                      { title: 'Canto superior direito', value: 'top right' },
-                      { title: 'Canto inferior esquerdo', value: 'bottom left' },
-                      { title: 'Canto inferior direito', value: 'bottom right' },
-                    ],
-                  },
-                  initialValue: 'center',
-                }),
-              ],
+              fields: photoFields({ sectionName: 'Card', withCaption: false }),
             }),
           ],
           preview: {
@@ -106,47 +98,52 @@ export const contentHighlightsSchema = defineType({
     defineField({
       name: 'channels',
       title: 'Blocos de canais (aparecem abaixo dos cards)',
-      description: 'Os dois blocos grandes de Instagram e YouTube no final da seção.',
+      group: 'channels',
       type: 'object',
       fields: [
         defineField({
           name: 'instagram',
-          title: 'Bloco do Instagram',
+          title: 'Bloco Instagram',
           type: 'object',
           fields: [
-            defineField({ name: 'url', title: 'Link do perfil no Instagram', type: 'url' }),
+            defineField({ name: 'url', title: 'Link do perfil', type: 'url' }),
             defineField({
               name: 'cta',
-              title: 'Texto do botão (ex: "Acompanhar dia a dia")',
+              title: 'Texto do botão',
               type: 'string',
+              validation: (r) => r.max(40),
             }),
             defineField({
               name: 'note',
-              title: 'Frase em itálico grande (opcional)',
+              title: 'Frase em itálico (opcional)',
               type: 'string',
+              validation: (r) => r.max(100),
             }),
           ],
         }),
         defineField({
           name: 'youtube',
-          title: 'Bloco do YouTube',
+          title: 'Bloco YouTube',
           type: 'object',
           fields: [
-            defineField({ name: 'url', title: 'Link do canal no YouTube', type: 'url' }),
+            defineField({ name: 'url', title: 'Link do canal', type: 'url' }),
             defineField({
               name: 'cta',
-              title: 'Texto do botão (ex: "Ver no YouTube")',
+              title: 'Texto do botão',
               type: 'string',
+              validation: (r) => r.max(40),
             }),
             defineField({
               name: 'note',
-              title: 'Frase em itálico grande (opcional)',
+              title: 'Frase em itálico (opcional)',
               type: 'string',
+              validation: (r) => r.max(100),
             }),
           ],
         }),
       ],
     }),
+    ...sectionLayoutFields().map((f) => ({ ...f, group: 'layout' })),
   ],
   preview: {
     select: { title: 'meta.title' },

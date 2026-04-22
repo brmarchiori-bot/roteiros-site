@@ -5,12 +5,48 @@ import type {
   ContentHighlight,
   HeroContent,
   NowContent,
+  PhotoControls,
+  SectionLayout,
 } from '@/types/content'
 import { sanityClient } from './client'
 import { urlForImage } from './image'
 
-/** Revalidação a cada 60s — equilíbrio entre frescor e performance. */
+/** Revalidação a cada 60s. */
 const fetchOptions = { next: { revalidate: 60 } } as const
+
+/* ---------------- Helpers ---------------- */
+
+type RawPhotoControls = {
+  horizontalFocus?: string
+  verticalFocus?: string
+  fitMode?: 'cover' | 'contain'
+  zoom?: number
+}
+
+function toPhotoControls(raw?: RawPhotoControls | null): PhotoControls {
+  const h = raw?.horizontalFocus ?? 'center'
+  const v = raw?.verticalFocus ?? 'center'
+  const objectPosition = h === 'center' && v === 'center' ? 'center' : `${h} ${v}`
+  return {
+    objectPosition,
+    fitMode: raw?.fitMode ?? 'cover',
+    zoom: typeof raw?.zoom === 'number' ? raw.zoom : 0,
+  }
+}
+
+type RawLayout = {
+  contentWidth?: SectionLayout['contentWidth']
+  imagePosition?: SectionLayout['imagePosition']
+}
+
+function toLayout(raw?: RawLayout | null): SectionLayout {
+  return {
+    contentWidth: raw?.contentWidth ?? 'medium',
+    imagePosition: raw?.imagePosition ?? 'left',
+  }
+}
+
+const PHOTO_PROJ = `{..., "alt": alt, "caption": caption, "horizontalFocus": horizontalFocus, "verticalFocus": verticalFocus, "fitMode": fitMode, "zoom": zoom}`
 
 /* ---------------- Hero ---------------- */
 
@@ -20,7 +56,8 @@ const HERO_QUERY = groq`*[_type == "hero"][0]{
   subheadline,
   primaryCta,
   secondaryCta,
-  coverImage{..., "alt": alt, "objectPosition": objectPosition}
+  coverImage${PHOTO_PROJ},
+  contentWidth
 }`
 
 type RawHero = {
@@ -29,7 +66,8 @@ type RawHero = {
   subheadline?: string
   primaryCta?: HeroContent['ctas']['primary']
   secondaryCta?: HeroContent['ctas']['secondary']
-  coverImage?: { asset?: unknown; alt?: string; objectPosition?: string } | null
+  coverImage?: ({ asset?: unknown; alt?: string } & RawPhotoControls) | null
+  contentWidth?: SectionLayout['contentWidth']
 }
 
 export async function getHeroFromSanity(): Promise<HeroContent | null> {
@@ -52,9 +90,10 @@ export async function getHeroFromSanity(): Promise<HeroContent | null> {
         ? {
             src: coverUrl,
             alt: data.coverImage?.alt ?? '',
-            objectPosition: data.coverImage?.objectPosition,
+            ...toPhotoControls(data.coverImage),
           }
         : undefined,
+      layout: toLayout({ contentWidth: data.contentWidth }),
     }
   } catch {
     return null
@@ -65,21 +104,37 @@ export async function getHeroFromSanity(): Promise<HeroContent | null> {
 
 const ABOUT_QUERY = groq`*[_type == "about"][0]{
   meta,
-  chapters,
+  chapters[]{
+    _key, number, title, body,
+    image${PHOTO_PROJ}
+  },
   closingCta,
-  photo{..., "alt": alt, "caption": caption, "objectPosition": objectPosition}
+  photo${PHOTO_PROJ},
+  contentWidth,
+  imagePosition
 }`
+
+type RawChapter = {
+  _key?: string
+  number?: string
+  title?: string
+  body?: string
+  image?: ({ asset?: unknown; alt?: string } & RawPhotoControls) | null
+}
 
 type RawAbout = {
   meta?: AboutContent['meta']
-  chapters?: AboutContent['chapters']
+  chapters?: RawChapter[]
   closingCta?: AboutContent['closingCta']
-  photo?: {
-    asset?: unknown
-    alt?: string
-    caption?: string
-    objectPosition?: string
-  } | null
+  photo?:
+    | ({
+        asset?: unknown
+        alt?: string
+        caption?: string
+      } & RawPhotoControls)
+    | null
+  contentWidth?: SectionLayout['contentWidth']
+  imagePosition?: SectionLayout['imagePosition']
 }
 
 export async function getAboutFromSanity(): Promise<AboutContent | null> {
@@ -92,14 +147,32 @@ export async function getAboutFromSanity(): Promise<AboutContent | null> {
 
     return {
       meta: data.meta,
-      chapters: data.chapters,
+      chapters: data.chapters
+        .filter((c): c is RawChapter & { number: string; title: string; body: string } =>
+          !!c.number && !!c.title && !!c.body)
+        .map((c) => {
+          const chapterImageUrl = c.image?.asset ? urlForImage(c.image, 1200) : null
+          return {
+            number: c.number,
+            title: c.title,
+            body: c.body,
+            image: chapterImageUrl
+              ? {
+                  src: chapterImageUrl,
+                  alt: c.image?.alt ?? '',
+                  ...toPhotoControls(c.image),
+                }
+              : undefined,
+          }
+        }),
       closingCta: data.closingCta,
       photo: {
         src: photoUrl ?? '',
         alt: data.photo?.alt ?? '',
         caption: data.photo?.caption ?? '',
-        objectPosition: data.photo?.objectPosition,
+        ...toPhotoControls(data.photo),
       },
+      layout: toLayout(data),
     }
   } catch {
     return null
@@ -114,16 +187,21 @@ const NOW_QUERY = groq`*[_type == "now"][0]{
   date, period, dayCount, coordinates,
   caption,
   cta,
-  photo{..., "alt": alt, "caption": caption, "objectPosition": objectPosition}
+  photo${PHOTO_PROJ},
+  contentWidth,
+  imagePosition
 }`
 
-type RawNow = Omit<NowContent, 'photo'> & {
-  photo?: {
-    asset?: unknown
-    alt?: string
-    caption?: string
-    objectPosition?: string
-  } | null
+type RawNow = Omit<NowContent, 'photo' | 'layout'> & {
+  photo?:
+    | ({
+        asset?: unknown
+        alt?: string
+        caption?: string
+      } & RawPhotoControls)
+    | null
+  contentWidth?: SectionLayout['contentWidth']
+  imagePosition?: SectionLayout['imagePosition']
 }
 
 export async function getNowFromSanity(): Promise<NowContent | null> {
@@ -133,15 +211,18 @@ export async function getNowFromSanity(): Promise<NowContent | null> {
     if (!data?.meta || !data.city) return null
 
     const photoUrl = data.photo?.asset ? urlForImage(data.photo, 1600) : null
+    const { photo: _omit, contentWidth, imagePosition, ...rest } = data
+    void _omit
 
     return {
-      ...data,
+      ...rest,
       photo: {
         src: photoUrl ?? '',
         alt: data.photo?.alt ?? '',
         caption: data.photo?.caption ?? `${data.city} · ${data.period}`,
-        objectPosition: data.photo?.objectPosition,
+        ...toPhotoControls(data.photo),
       },
+      layout: toLayout({ contentWidth, imagePosition }),
     }
   } catch {
     return null
@@ -155,9 +236,10 @@ const CONTENT_QUERY = groq`*[_type == "contentHighlights"][0]{
   pullQuote,
   highlights[]{
     _key, platform, url, title,
-    thumbnail{..., "alt": alt, "objectPosition": objectPosition}
+    thumbnail${PHOTO_PROJ}
   },
-  channels
+  channels,
+  contentWidth
 }`
 
 type RawHighlight = {
@@ -165,7 +247,7 @@ type RawHighlight = {
   platform: ContentHighlight['platform']
   url: string
   title: string
-  thumbnail?: { asset?: unknown; alt?: string; objectPosition?: string } | null
+  thumbnail?: ({ asset?: unknown; alt?: string } & RawPhotoControls) | null
 }
 
 type RawContent = {
@@ -173,6 +255,7 @@ type RawContent = {
   pullQuote?: string
   highlights?: RawHighlight[]
   channels?: ContentBridgeContent['channels']
+  contentWidth?: SectionLayout['contentWidth']
 }
 
 export async function getContentHighlightsFromSanity(): Promise<ContentBridgeContent | null> {
@@ -191,9 +274,10 @@ export async function getContentHighlightsFromSanity(): Promise<ContentBridgeCon
         title: h.title,
         thumbnail: h.thumbnail?.asset ? (urlForImage(h.thumbnail, 800) ?? undefined) : undefined,
         thumbnailAlt: h.thumbnail?.alt,
-        thumbnailObjectPosition: h.thumbnail?.objectPosition,
+        thumbnailControls: h.thumbnail ? toPhotoControls(h.thumbnail) : undefined,
       })),
       channels: data.channels,
+      layout: toLayout({ contentWidth: data.contentWidth }),
     }
   } catch {
     return null

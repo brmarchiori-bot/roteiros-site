@@ -5,18 +5,22 @@ import { SectionHeader } from '@/components/layout/section-header'
 import { PhotoPlaceholder } from '@/components/shared/photo-placeholder'
 import { Reveal } from '@/components/shared/reveal'
 import { about as aboutFallback } from '@/content'
+import { cn } from '@/lib/utils'
+import { toContainerSize, toImageStyle } from '@/lib/sanity-styles'
 import { getAboutFromSanity } from '@/sanity/queries'
 
 export async function AboutSection() {
   const about = (await getAboutFromSanity()) ?? aboutFallback
+  const containerSize = toContainerSize(about.layout?.contentWidth)
+  const imageOnRight = about.layout?.imagePosition === 'right'
 
   return (
-    <Section id="about" spacing="xl">
+    <Section id="about" spacing="xl" size={containerSize}>
       <SectionHeader meta={about.meta} className="mb-14 md:mb-20" />
 
       <div className="grid gap-12 md:grid-cols-12 md:gap-16">
-        {/* Coluna esquerda — foto sticky no scroll */}
-        <div className="md:col-span-5">
+        {/* Coluna da foto */}
+        <div className={cn('md:col-span-5', imageOnRight && 'md:order-2')}>
           <div className="lg:sticky lg:top-28">
             <Reveal>
               {about.photo?.src ? (
@@ -26,8 +30,7 @@ export async function AboutSection() {
                     alt={about.photo.alt}
                     fill
                     sizes="(min-width: 768px) 40vw, 100vw"
-                    className="object-cover"
-                    style={{ objectPosition: about.photo.objectPosition ?? 'center' }}
+                    style={toImageStyle(about.photo)}
                     priority={false}
                   />
                 </figure>
@@ -38,8 +41,13 @@ export async function AboutSection() {
           </div>
         </div>
 
-        {/* Coluna direita — 3 capítulos + CTA */}
-        <div className="space-y-12 md:col-span-7 md:space-y-16">
+        {/* Coluna dos textos */}
+        <div
+          className={cn(
+            'space-y-12 md:col-span-7 md:space-y-16',
+            imageOnRight && 'md:order-1',
+          )}
+        >
           {about.chapters.map((chapter, i) => (
             <Reveal key={chapter.number} delay={i * 0.08}>
               <article>
@@ -52,6 +60,17 @@ export async function AboutSection() {
                 <p className="mt-5 text-base leading-relaxed text-foreground/80 md:text-lg md:leading-[1.7]">
                   {chapter.body}
                 </p>
+                {chapter.image?.src && (
+                  <figure className="relative mt-8 aspect-[16/10] w-full overflow-hidden rounded-md bg-surface">
+                    <Image
+                      src={chapter.image.src}
+                      alt={chapter.image.alt}
+                      fill
+                      sizes="(min-width: 768px) 55vw, 100vw"
+                      style={toImageStyle(chapter.image)}
+                    />
+                  </figure>
+                )}
               </article>
             </Reveal>
           ))}

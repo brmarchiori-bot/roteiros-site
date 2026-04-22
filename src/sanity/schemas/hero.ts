@@ -1,101 +1,95 @@
 import { defineField, defineType } from 'sanity'
+import { photoFields, sectionLayoutFields } from './shared'
 
 export const heroSchema = defineType({
   name: 'hero',
   title: 'Capa / Hero (topo do site)',
   type: 'document',
+  groups: [
+    { name: 'content', title: '📝 Conteúdo', default: true },
+    { name: 'media', title: '🖼️ Imagem de capa' },
+    { name: 'layout', title: '📐 Layout' },
+  ],
   fields: [
     defineField({
       name: 'meta',
       title: 'Topo da seção (rótulo pequeno)',
-      description: 'Aparece bem pequeno, acima do título enorme.',
+      description: 'Texto minúsculo acima do título enorme.',
+      group: 'content',
       type: 'object',
       fields: [
         defineField({
           name: 'kicker',
-          title: 'Rótulo pequeno (ex: "01 · Hero")',
+          title: 'Rótulo (ex: "01 · Hero")',
           type: 'string',
+          validation: (r) => r.max(30),
         }),
       ],
     }),
     defineField({
       name: 'headline',
-      title: 'Título grande (aparece na entrada do site)',
-      description: 'É a primeira coisa que a pessoa lê quando abre o site. Curto e impactante.',
+      title: 'Título grande (primeira coisa que lê-se no site)',
+      description: 'Curto e impactante. Limite recomendado: 60 caracteres.',
+      group: 'content',
       type: 'string',
-      validation: (r) => r.required(),
+      validation: (r) =>
+        r.required().max(80).warning('Passou de 60 caracteres — pode ficar longo visualmente.'),
     }),
     defineField({
       name: 'subheadline',
-      title: 'Subtítulo (texto logo abaixo do título)',
-      description: 'Complementa o título com 1 ou 2 frases explicando o projeto.',
+      title: 'Subtítulo (frase de apoio logo abaixo)',
+      description: '1 ou 2 frases que explicam o projeto. Limite recomendado: 180 caracteres.',
+      group: 'content',
       type: 'text',
       rows: 3,
-      validation: (r) => r.required(),
+      validation: (r) =>
+        r.required().max(240).warning('Passou de 180 — pode quebrar muito no mobile.'),
     }),
     defineField({
       name: 'primaryCta',
       title: 'Botão principal (cor sólida)',
+      group: 'content',
       type: 'object',
       fields: [
-        defineField({ name: 'label', title: 'Texto do botão', type: 'string' }),
+        defineField({
+          name: 'label',
+          title: 'Texto do botão',
+          type: 'string',
+          validation: (r) => r.max(30),
+        }),
         defineField({
           name: 'href',
-          title: 'Para onde o botão leva (URL ou #ancora)',
+          title: 'Para onde leva (URL ou #ancora da mesma página)',
           type: 'string',
         }),
       ],
     }),
     defineField({
       name: 'secondaryCta',
-      title: 'Botão secundário (estilo discreto)',
+      title: 'Botão secundário (estilo discreto com seta)',
+      group: 'content',
       type: 'object',
       fields: [
-        defineField({ name: 'label', title: 'Texto do botão', type: 'string' }),
         defineField({
-          name: 'href',
-          title: 'Para onde o botão leva (URL ou #ancora)',
+          name: 'label',
+          title: 'Texto do botão',
           type: 'string',
+          validation: (r) => r.max(30),
         }),
+        defineField({ name: 'href', title: 'Destino', type: 'string' }),
       ],
     }),
     defineField({
       name: 'coverImage',
-      title: '📷 Imagem de capa (opcional — fica atrás do texto)',
+      title: 'Imagem de capa (opcional — substitui o gradiente)',
       description:
-        'Se vazio, a capa fica com o fundo de gradiente atual. Quando você subir uma foto aqui, ela passa a ser o fundo da capa, com o texto sobreposto.',
+        'Se vazio, a capa mantém o gradiente atual. Se preenchido, vira o fundo da capa (com o texto sobreposto). Afeta SOMENTE a capa.',
+      group: 'media',
       type: 'image',
       options: { hotspot: true },
-      fields: [
-        defineField({
-          name: 'alt',
-          title: 'Descrição da imagem (acessibilidade — obrigatório)',
-          type: 'string',
-          validation: (r) => r.required(),
-        }),
-        defineField({
-          name: 'objectPosition',
-          title: 'Alinhamento da foto (qual parte aparece em foco)',
-          description:
-            'Se a foto tiver alguém num canto, escolha o canto pra que não seja cortado.',
-          type: 'string',
-          options: {
-            list: [
-              { title: 'Centro (padrão)', value: 'center' },
-              { title: 'Topo', value: 'top' },
-              { title: 'Base (pé)', value: 'bottom' },
-              { title: 'Esquerda', value: 'left' },
-              { title: 'Direita', value: 'right' },
-              { title: 'Canto superior esquerdo', value: 'top left' },
-              { title: 'Canto superior direito', value: 'top right' },
-              { title: 'Canto inferior esquerdo', value: 'bottom left' },
-              { title: 'Canto inferior direito', value: 'bottom right' },
-            ],
-          },
-          initialValue: 'center',
-        }),
-      ],
+      fields: photoFields({ sectionName: 'Capa', withCaption: false }),
     }),
+    ...sectionLayoutFields().map((f) => ({ ...f, group: 'layout' })),
   ],
   preview: {
     select: { title: 'headline', subtitle: 'subheadline', media: 'coverImage' },

@@ -15,6 +15,19 @@ export type Cta = {
   href: string
 }
 
+/** Controles compartilhados de imagem (Sanity) */
+export type PhotoControls = {
+  objectPosition?: string // "center", "top left" etc — derivado de horizontalFocus + verticalFocus
+  fitMode?: 'cover' | 'contain'
+  /** 0 a 100 — aplicado como transform: scale(1 + zoom/100) */
+  zoom?: number
+}
+
+export type SectionLayout = {
+  contentWidth?: 'narrow' | 'medium' | 'wide'
+  imagePosition?: 'left' | 'right'
+}
+
 /* ---------- Hero ---------- */
 
 export type HeroContent = {
@@ -34,8 +47,8 @@ export type HeroContent = {
   coverImage?: {
     src: string
     alt: string
-    objectPosition?: string
-  }
+  } & PhotoControls
+  layout?: SectionLayout
 }
 
 /* ---------- Manifesto ---------- */
@@ -52,6 +65,10 @@ export type AboutChapter = {
   number: string
   title: string
   body: string
+  image?: {
+    src: string
+    alt: string
+  } & PhotoControls
 }
 
 export type AboutContent = {
@@ -62,11 +79,9 @@ export type AboutContent = {
     /** Caminho em /public — quando vazio, renderiza PhotoPlaceholder */
     src?: string
     alt: string
-    /** Caption visível abaixo da foto (placeholder ou real) */
     caption: string
-    /** Valor de CSS object-position (ex: "center", "top", "bottom left") */
-    objectPosition?: string
-  }
+  } & PhotoControls
+  layout?: SectionLayout
 }
 
 /* ---------- Now ---------- */
@@ -88,13 +103,13 @@ export type NowContent = {
     src?: string
     alt: string
     caption: string
-    objectPosition?: string
-  }
+  } & PhotoControls
   caption: string
   /** CTA pra ler bastidores (Instagram, Caderno, etc.) */
   cta?: Cta
   /** Mantido por compatibilidade — link cru pro Instagram */
   link?: string
+  layout?: SectionLayout
 }
 
 /* ---------- Pillars ---------- */
@@ -120,7 +135,7 @@ export type ContentHighlight = {
   title: string
   thumbnail?: string
   thumbnailAlt?: string
-  thumbnailObjectPosition?: string
+  thumbnailControls?: PhotoControls
 }
 
 export type ContentChannel = {
@@ -137,6 +152,7 @@ export type ContentBridgeContent = {
     instagram: ContentChannel
     youtube: ContentChannel
   }
+  layout?: SectionLayout
 }
 
 /* ---------- Club (Caderno de Viagem) ---------- */

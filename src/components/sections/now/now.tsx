@@ -5,20 +5,24 @@ import { SectionHeader } from '@/components/layout/section-header'
 import { PhotoPlaceholder } from '@/components/shared/photo-placeholder'
 import { Reveal } from '@/components/shared/reveal'
 import { now as nowFallback } from '@/content'
+import { cn } from '@/lib/utils'
+import { toContainerSize, toImageStyle } from '@/lib/sanity-styles'
 import { getNowFromSanity } from '@/sanity/queries'
 
 export async function NowSection() {
   const now = (await getNowFromSanity()) ?? nowFallback
   const ctaHref = now.cta?.href ?? now.link
   const ctaLabel = now.cta?.label ?? 'Ver no Instagram'
+  const containerSize = toContainerSize(now.layout?.contentWidth)
+  const imageOnRight = now.layout?.imagePosition === 'right'
 
   return (
-    <Section id="now" spacing="xl">
+    <Section id="now" spacing="xl" size={containerSize}>
       <SectionHeader meta={now.meta} className="mb-14 md:mb-20" />
 
       <div className="grid gap-12 md:grid-cols-12 md:gap-16">
-        {/* Coluna esquerda — foto da semana */}
-        <div className="md:col-span-7">
+        {/* Coluna da foto */}
+        <div className={cn('md:col-span-7', imageOnRight && 'md:order-2')}>
           <Reveal>
             {now.photo?.src ? (
               <figure className="relative aspect-[4/5] w-full overflow-hidden rounded-md bg-surface md:aspect-[5/4]">
@@ -27,8 +31,7 @@ export async function NowSection() {
                   alt={now.photo.alt}
                   fill
                   sizes="(min-width: 768px) 55vw, 100vw"
-                  className="object-cover"
-                  style={{ objectPosition: now.photo.objectPosition ?? 'center' }}
+                  style={toImageStyle(now.photo)}
                 />
               </figure>
             ) : (
@@ -40,8 +43,8 @@ export async function NowSection() {
           </Reveal>
         </div>
 
-        {/* Coluna direita — diário em texto */}
-        <div className="md:col-span-5">
+        {/* Coluna do diário */}
+        <div className={cn('md:col-span-5', imageOnRight && 'md:order-1')}>
           <Reveal delay={0.1}>
             <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-primary">
               Agora
