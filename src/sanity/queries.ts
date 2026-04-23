@@ -178,9 +178,12 @@ export async function getHeroFromSanity(): Promise<HeroContent> {
       ? { src: cover.src, alt: cover.alt, ...cover.controls }
       : heroFallback.coverImage
 
-    // Limpa palavras dinâmicas: descarta strings vazias, aplica trim
+    // Limpa palavras dinâmicas: trim + descarta strings vazias ou curtas demais (< 3 chars).
+    // Frases com menos de 3 caracteres não têm densidade visual pra rodar no Hero.
     const cleanedWords = Array.isArray(raw.dynamicWords)
-      ? raw.dynamicWords.map((w) => (typeof w === 'string' ? w.trim() : '')).filter(Boolean)
+      ? raw.dynamicWords
+          .map((w) => (typeof w === 'string' ? w.trim() : ''))
+          .filter((w) => w.length >= 3)
       : []
     const dynamicWords = cleanedWords.length > 0 ? cleanedWords : heroFallback.dynamicWords
 

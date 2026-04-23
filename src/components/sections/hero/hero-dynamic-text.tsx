@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils'
 
 type Props = {
   words: string[]
-  /** Intervalo entre trocas, em ms. Default: 3200 (calmo, editorial). */
+  /** Intervalo entre trocas, em ms. Default: 3400 (calmo, cinematográfico). */
   intervalMs?: number
   className?: string
 }
@@ -21,7 +21,7 @@ type Props = {
  * Acessibilidade: a rotação é marcada aria-hidden. O h1 em volta deve
  * ter um aria-label estável com a primeira palavra pra leitores de tela.
  */
-export function HeroDynamicText({ words, intervalMs = 3200, className }: Props) {
+export function HeroDynamicText({ words, intervalMs = 3400, className }: Props) {
   const [index, setIndex] = useState(0)
 
   useEffect(() => {
@@ -46,7 +46,7 @@ export function HeroDynamicText({ words, intervalMs = 3200, className }: Props) 
         <span
           key={`${i}-${word}`}
           className={cn(
-            'col-start-1 row-start-1 transition-opacity duration-1000 ease-in-out',
+            'col-start-1 row-start-1 transition-opacity duration-1300 ease-[cubic-bezier(0.33,1,0.68,1)]',
             i === index ? 'opacity-100' : 'opacity-0',
           )}
         >

@@ -16,8 +16,10 @@ export async function HeroSection() {
   const hero = await getHeroFromSanity()
   const containerSize = toContainerSize(hero.layout?.contentWidth)
 
-  // Versão rotativa ativa só quando HÁ titlePrefix + pelo menos 2 palavras
-  const words = (hero.dynamicWords ?? []).filter((w) => w.trim().length > 0)
+  // Versão rotativa ativa só quando HÁ titlePrefix + pelo menos 2 frases válidas (≥ 3 chars)
+  const words = (hero.dynamicWords ?? [])
+    .map((w) => w.trim())
+    .filter((w) => w.length >= 3)
   const useRotator = Boolean(hero.titlePrefix?.trim()) && words.length >= 2
   const h1AriaLabel = useRotator
     ? `${hero.titlePrefix} ${words[0]}`

@@ -1,4 +1,5 @@
 import { defineField, defineType } from 'sanity'
+import { HeroHelpInput } from './hero-help'
 import { sectionLayoutFields } from './shared'
 
 export const heroSchema = defineType({
@@ -30,20 +31,31 @@ export const heroSchema = defineType({
         }),
       ],
     }),
+
+    /* ----- Helper block: como funciona o título ----- */
+    defineField({
+      name: 'heroHelp',
+      title: 'Como funciona o título',
+      type: 'string',
+      group: 'conteudo',
+      readOnly: true,
+      components: { input: HeroHelpInput },
+    }),
+
+    /* ----- Título em 3 campos (2 com animação, 1 fallback) ----- */
     defineField({
       name: 'titlePrefix',
-      title: 'Começo do título (frase fixa)',
-      description:
-        '📍 Onde aparece: primeira parte do título grande — fica FIXA na tela. Ex: "Viajando o mundo e". Deixe vazio pra usar o "Título grande" (abaixo) como versão estática.',
+      title: 'Texto fixo do título',
+      description: 'Parte inicial da frase. Ex: "Viajando o mundo e"',
       group: 'conteudo',
       type: 'string',
       validation: (r) => r.max(80),
     }),
     defineField({
       name: 'dynamicWords',
-      title: 'Palavras dinâmicas (trocam suavemente)',
+      title: 'Palavras que trocam (animação)',
       description:
-        '📍 Onde aparece: depois do "Começo do título", alternando com fade a cada ~3.2s. Pode ser palavra ou frase curta (ex: "vivendo sem roteiro"). Mínimo 2 entradas pra ativar rotação — se tiver menos, usa "Título grande". Máximo 8.',
+        'Essas frases vão aparecer uma por vez no final do título.\n\nExemplo:\n- vivendo sem roteiro\n- errando de verdade\n\nMínimo: 2 frases para ativar animação\nMáximo: 8 frases',
       group: 'conteudo',
       type: 'array',
       of: [
@@ -56,19 +68,21 @@ export const heroSchema = defineType({
     }),
     defineField({
       name: 'headline',
-      title: 'Título grande (estático — usado se não tiver rotação)',
+      title: 'Título completo (sem animação)',
       description:
-        '📍 Onde aparece: PRIMEIRA coisa que a pessoa lê. Só é usado se "Começo do título" OU "Palavras dinâmicas" estiverem vazios. Curto e impactante. Recomendado até 60 caracteres.',
+        'Use esse campo se quiser um título fixo, sem animação.\nSe preencher "Palavras que trocam", esse campo será ignorado.',
       group: 'conteudo',
       type: 'string',
       validation: (r) =>
         r.max(80).warning('Passou de 60 caracteres — pode ficar longo visualmente.'),
     }),
+
+    /* ----- Resto do conteúdo ----- */
     defineField({
       name: 'subheadline',
       title: 'Subtítulo',
       description:
-        '📍 Onde aparece: logo abaixo do título grande. Frase de apoio, 1 ou 2 linhas. Recomendado até 180 caracteres.',
+        '📍 Onde aparece: logo abaixo do título. Frase de apoio, 1 ou 2 linhas. Recomendado até 180 caracteres.',
       group: 'conteudo',
       type: 'text',
       rows: 3,
@@ -86,7 +100,7 @@ export const heroSchema = defineType({
         defineField({
           name: 'label',
           title: 'Texto do botão',
-          description: 'Até 30 caracteres. Ex: "Seguir a jornada".',
+          description: 'Até 30 caracteres. Ex: "Quero acompanhar a jornada".',
           type: 'string',
           validation: (r) => r.max(30),
         }),
@@ -140,14 +154,21 @@ export const heroSchema = defineType({
       media: 'imagemFundo.image',
     },
     prepare: ({ headline, titlePrefix, words, subtitle, media }) => {
+      // Filtra frases válidas pra decidir se a rotação está ativa
+      const validWords = Array.isArray(words)
+        ? (words as unknown[]).filter(
+            (w): w is string => typeof w === 'string' && w.trim().length >= 3,
+          )
+        : []
       const hasRotator =
         typeof titlePrefix === 'string' &&
         titlePrefix.trim().length > 0 &&
-        Array.isArray(words) &&
-        words.length > 0
+        validWords.length >= 2
+
       const display = hasRotator
-        ? `${titlePrefix} [${(words as string[]).join(' · ')}]`
+        ? `${titlePrefix} [${validWords.join(' · ')}]`
         : headline || '⚠️ Capa sem título'
+
       return {
         title: display,
         subtitle: subtitle ? `Home · ${subtitle.substring(0, 60)}` : 'Home · Seção 1',
