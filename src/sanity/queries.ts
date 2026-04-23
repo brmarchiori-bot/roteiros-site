@@ -145,6 +145,8 @@ function mergeLayout(
 
 const HERO_QUERY = groq`*[_type == "hero"][0]{
   meta,
+  titlePrefix,
+  dynamicWords,
   headline,
   subheadline,
   primaryCta,
@@ -155,6 +157,8 @@ const HERO_QUERY = groq`*[_type == "hero"][0]{
 
 type RawHero = {
   meta?: { kicker?: string; title?: string }
+  titlePrefix?: string
+  dynamicWords?: string[]
   headline?: string
   subheadline?: string
   primaryCta?: Partial<Cta>
@@ -174,8 +178,16 @@ export async function getHeroFromSanity(): Promise<HeroContent> {
       ? { src: cover.src, alt: cover.alt, ...cover.controls }
       : heroFallback.coverImage
 
+    // Limpa palavras dinâmicas: descarta strings vazias, aplica trim
+    const cleanedWords = Array.isArray(raw.dynamicWords)
+      ? raw.dynamicWords.map((w) => (typeof w === 'string' ? w.trim() : '')).filter(Boolean)
+      : []
+    const dynamicWords = cleanedWords.length > 0 ? cleanedWords : heroFallback.dynamicWords
+
     return {
       meta: mergeMeta(raw.meta, heroFallback.meta),
+      titlePrefix: pickString(raw.titlePrefix, heroFallback.titlePrefix),
+      dynamicWords,
       headline: pickString(raw.headline, heroFallback.headline),
       subheadline: pickString(raw.subheadline, heroFallback.subheadline),
       ctas: {

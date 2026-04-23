@@ -6,13 +6,22 @@ import { JourneyMarker } from '@/components/shared/journey-marker'
 import { Reveal } from '@/components/shared/reveal'
 import { buttonStyles } from '@/components/ui/button'
 import { siteConfig } from '@/content/site.config'
+import { cn } from '@/lib/utils'
 import { toContainerSize, toImageStyle } from '@/lib/sanity-styles'
 import { getHeroFromSanity } from '@/sanity/queries'
 import type { HeroContent } from '@/types/content'
+import { HeroDynamicText } from './hero-dynamic-text'
 
 export async function HeroSection() {
   const hero = await getHeroFromSanity()
   const containerSize = toContainerSize(hero.layout?.contentWidth)
+
+  // Versão rotativa ativa só quando HÁ titlePrefix + pelo menos 2 palavras
+  const words = (hero.dynamicWords ?? []).filter((w) => w.trim().length > 0)
+  const useRotator = Boolean(hero.titlePrefix?.trim()) && words.length >= 2
+  const h1AriaLabel = useRotator
+    ? `${hero.titlePrefix} ${words[0]}`
+    : hero.headline
 
   return (
     <section
@@ -41,8 +50,24 @@ export async function HeroSection() {
       <Container size={containerSize} className="relative z-10">
         <div className="max-w-6xl">
           <Reveal delay={0.08}>
-            <h1 className="font-display text-[48px] font-medium leading-[0.98] tracking-[-0.02em] text-foreground md:text-[96px] lg:text-[112px]">
-              {hero.headline}
+            <h1
+              aria-label={h1AriaLabel}
+              className="font-display text-[48px] font-medium leading-[0.98] tracking-[-0.02em] text-foreground md:text-[96px] lg:text-[112px]"
+            >
+              {useRotator ? (
+                <span aria-hidden="true">
+                  {hero.titlePrefix}{' '}
+                  {/* Mobile: quebra em bloco pra frase não ficar órfã do prefix */}
+                  <span className="block md:inline-block md:align-baseline">
+                    <HeroDynamicText
+                      words={words}
+                      className="text-primary"
+                    />
+                  </span>
+                </span>
+              ) : (
+                hero.headline
+              )}
             </h1>
           </Reveal>
 
@@ -57,7 +82,10 @@ export async function HeroSection() {
               <div className="flex flex-wrap items-center gap-4">
                 <Link
                   href={hero.ctas.primary.href}
-                  className={buttonStyles({ variant: 'primary', size: 'lg' })}
+                  className={cn(
+                    buttonStyles({ variant: 'primary', size: 'lg' }),
+                    'shimmer-button glow-primary',
+                  )}
                 >
                   {hero.ctas.primary.label}
                 </Link>

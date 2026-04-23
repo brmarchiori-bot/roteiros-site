@@ -31,14 +31,38 @@ export const heroSchema = defineType({
       ],
     }),
     defineField({
-      name: 'headline',
-      title: 'Título grande',
+      name: 'titlePrefix',
+      title: 'Começo do título (frase fixa)',
       description:
-        '📍 Onde aparece: é a PRIMEIRA coisa que a pessoa lê ao entrar no site. Curto e impactante. Recomendado até 60 caracteres.',
+        '📍 Onde aparece: primeira parte do título grande — fica FIXA na tela. Ex: "Viajando o mundo e". Deixe vazio pra usar o "Título grande" (abaixo) como versão estática.',
+      group: 'conteudo',
+      type: 'string',
+      validation: (r) => r.max(80),
+    }),
+    defineField({
+      name: 'dynamicWords',
+      title: 'Palavras dinâmicas (trocam suavemente)',
+      description:
+        '📍 Onde aparece: depois do "Começo do título", alternando com fade a cada ~3.2s. Pode ser palavra ou frase curta (ex: "vivendo sem roteiro"). Mínimo 2 entradas pra ativar rotação — se tiver menos, usa "Título grande". Máximo 8.',
+      group: 'conteudo',
+      type: 'array',
+      of: [
+        {
+          type: 'string',
+          validation: (r) => r.max(60),
+        },
+      ],
+      validation: (r) => r.max(8).error('Máximo 8 frases — mantenha curto.'),
+    }),
+    defineField({
+      name: 'headline',
+      title: 'Título grande (estático — usado se não tiver rotação)',
+      description:
+        '📍 Onde aparece: PRIMEIRA coisa que a pessoa lê. Só é usado se "Começo do título" OU "Palavras dinâmicas" estiverem vazios. Curto e impactante. Recomendado até 60 caracteres.',
       group: 'conteudo',
       type: 'string',
       validation: (r) =>
-        r.required().max(80).warning('Passou de 60 caracteres — pode ficar longo visualmente.'),
+        r.max(80).warning('Passou de 60 caracteres — pode ficar longo visualmente.'),
     }),
     defineField({
       name: 'subheadline',
@@ -109,14 +133,26 @@ export const heroSchema = defineType({
   ],
   preview: {
     select: {
-      title: 'headline',
+      headline: 'headline',
+      titlePrefix: 'titlePrefix',
+      words: 'dynamicWords',
       subtitle: 'subheadline',
       media: 'imagemFundo.image',
     },
-    prepare: ({ title, subtitle, media }) => ({
-      title: title || '⚠️ Capa sem título',
-      subtitle: subtitle ? `Home · ${subtitle.substring(0, 60)}` : 'Home · Seção 1',
-      media,
-    }),
+    prepare: ({ headline, titlePrefix, words, subtitle, media }) => {
+      const hasRotator =
+        typeof titlePrefix === 'string' &&
+        titlePrefix.trim().length > 0 &&
+        Array.isArray(words) &&
+        words.length > 0
+      const display = hasRotator
+        ? `${titlePrefix} [${(words as string[]).join(' · ')}]`
+        : headline || '⚠️ Capa sem título'
+      return {
+        title: display,
+        subtitle: subtitle ? `Home · ${subtitle.substring(0, 60)}` : 'Home · Seção 1',
+        media,
+      }
+    },
   },
 })

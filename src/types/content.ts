@@ -33,6 +33,10 @@ export type SectionLayout = {
 export type HeroContent = {
   meta: SectionMeta
   headline: string
+  /** Começo fixo do título quando houver rotação (ex: "Viajando o mundo e"). */
+  titlePrefix?: string
+  /** Palavras que alternam com fade após o titlePrefix. 2+ ativam a rotação. */
+  dynamicWords?: string[]
   subheadline: string
   ctas: {
     primary: Cta

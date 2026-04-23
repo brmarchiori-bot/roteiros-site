@@ -3,16 +3,30 @@ import type { HeroContent } from '@/types/content'
 /**
  * HERO — primeiro vislumbre da marca.
  * Quebra em 3 segundos: pergunta + promessa + convite.
+ *
+ * Título em duas camadas:
+ *   - titlePrefix  → parte fixa, sempre visível
+ *   - dynamicWords → frases que alternam com fade suave (min. 2 pra ativar)
+ *
+ * headline é o backup estático: só aparece quando titlePrefix OU
+ * dynamicWords estiverem vazios (tanto no Sanity quanto aqui).
  */
 export const hero: HeroContent = {
   meta: {
     kicker: '01 · Hero',
   },
+  titlePrefix: 'Viajando o mundo e',
+  dynamicWords: [
+    'vivendo sem roteiro',
+    'errando de verdade',
+    'aprendendo na prática',
+    'recomeçando longe de casa',
+  ],
   headline: 'Onde o roteiro acaba, a gente começa.',
   subheadline:
-    'Um diário público de dois que trocaram o balcão pelo caminho. Viagem real, rotina em movimento, perrengue traduzido — sem filtro e sem manual.',
+    'A gente largou 10 anos de bar pra viver viajando, trabalhando remoto e mostrando tudo como realmente é.',
   ctas: {
-    primary: { label: 'Entrar na jornada', href: '/#club' },
+    primary: { label: 'Quero acompanhar a jornada', href: '/#club' },
     secondary: { label: 'Ver onde a gente tá', href: '#now' },
   },
   media: {
