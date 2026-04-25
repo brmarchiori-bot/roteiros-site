@@ -2,6 +2,7 @@ import { groq } from 'next-sanity'
 import {
   about as aboutFallback,
   contentHighlights as contentFallback,
+  faq as faqFallback,
   hero as heroFallback,
   now as nowFallback,
 } from '@/content'
@@ -11,6 +12,8 @@ import type {
   ContentChannel,
   ContentHighlight,
   Cta,
+  FaqContent,
+  FaqItem,
   HeroContent,
   NowContent,
   PhotoControls,
@@ -439,5 +442,54 @@ export async function getContentHighlightsFromSanity(): Promise<ContentBridgeCon
     }
   } catch {
     return contentFallback
+  }
+}
+
+/* ================================================================
+   FAQ
+   ================================================================ */
+
+const FAQ_QUERY = groq`*[_type == "faq"][0]{
+  meta,
+  items[]{ _key, question, answer }
+}`
+
+type RawFaqItem = {
+  _key?: string
+  question?: string
+  answer?: string
+}
+
+type RawFaq = {
+  meta?: { kicker?: string; title?: string }
+  items?: RawFaqItem[]
+}
+
+export async function getFaqFromSanity(): Promise<FaqContent> {
+  if (!sanityClient) return faqFallback
+  try {
+    const raw = await sanityClient.fetch<RawFaq | null>(FAQ_QUERY, {}, fetchOptions)
+    if (!raw) return faqFallback
+
+    // Filtra itens válidos: precisa ter pergunta E resposta (ambas não-vazias após trim)
+    const validItems: FaqItem[] = (raw.items ?? [])
+      .filter(
+        (i): i is RawFaqItem & { question: string; answer: string } =>
+          !!i.question?.trim() && !!i.answer?.trim(),
+      )
+      .map((i) => ({
+        question: i.question.trim(),
+        answer: i.answer.trim(),
+      }))
+
+    // Se filtrado ficou vazio, usa fallback inteiro (não deixa seção "morta")
+    const items = validItems.length > 0 ? validItems : faqFallback.items
+
+    return {
+      meta: mergeMeta(raw.meta, faqFallback.meta),
+      items,
+    }
+  } catch {
+    return faqFallback
   }
 }

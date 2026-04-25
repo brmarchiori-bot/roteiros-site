@@ -1,8 +1,10 @@
 import { Section } from '@/components/layout/section'
 import { Reveal } from '@/components/shared/reveal'
-import { faq } from '@/content'
+import { getFaqFromSanity } from '@/sanity/queries'
 
-export function FaqSection() {
+export async function FaqSection() {
+  const faq = await getFaqFromSanity()
+
   return (
     <Section id="faq" spacing="xl" bordered={false}>
       {/* Header editorial consistente */}

@@ -14,6 +14,7 @@ const SINGLETONS: Array<{ id: string; type: string; title: string; emoji: string
     title: 'Seção Conteúdo',
     emoji: '🎞️',
   },
+  { id: 'faq-singleton', type: 'faq', title: 'Seção FAQ', emoji: '❓' },
 ]
 
 export const structure: StructureResolver = (S) =>
