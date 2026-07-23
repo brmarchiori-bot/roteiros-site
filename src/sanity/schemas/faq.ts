@@ -48,11 +48,10 @@ export const faqSchema = defineType({
               title: 'Pergunta',
               description: 'Curta e direta. Recomendado até 80 caracteres.',
               type: 'string',
-              validation: (r) =>
-                r
-                  .required()
-                  .max(120)
-                  .warning('Passou de 80 caracteres — pode cortar no mobile.'),
+              validation: (r) => [
+                r.required().error('A pergunta é obrigatória.'),
+                r.max(120).warning('Passou de 80 caracteres — pode cortar no mobile.'),
+              ],
             }),
             defineField({
               name: 'answer',
@@ -61,11 +60,10 @@ export const faqSchema = defineType({
                 'Tom direto, 2-4 linhas. Recomendado até 280 caracteres.',
               type: 'text',
               rows: 4,
-              validation: (r) =>
-                r
-                  .required()
-                  .max(500)
-                  .warning('Passou de 280 — pode ficar longo visualmente.'),
+              validation: (r) => [
+                r.required().error('A resposta é obrigatória.'),
+                r.max(500).warning('Passou de 280 — pode ficar longo visualmente.'),
+              ],
             }),
           ],
           preview: {

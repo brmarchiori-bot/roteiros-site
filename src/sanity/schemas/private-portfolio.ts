@@ -5,6 +5,8 @@ const mediaKinds = [
   { title: '📱 Reel', value: 'reel' },
   { title: '▶️ YouTube', value: 'youtube' },
   { title: '🎬 Vídeo', value: 'video' },
+  { title: '📱 Vídeo vertical', value: 'verticalVideo' },
+  { title: '🖥️ Vídeo horizontal', value: 'horizontalVideo' },
 ]
 
 export const privatePortfolioSchema = defineType({
@@ -73,6 +75,39 @@ export const privatePortfolioSchema = defineType({
                       validation: (rule) => rule.max(100),
                     }),
                     defineField({
+                      name: 'visible',
+                      title: 'Exibir na apresentação',
+                      description:
+                        'Desative para guardar o trabalho no Studio sem mostrá-lo no portfólio.',
+                      type: 'boolean',
+                      initialValue: true,
+                    }),
+                    defineField({
+                      name: 'featured',
+                      title: 'Marcar como destaque',
+                      description: 'Adiciona um selo discreto ao trabalho.',
+                      type: 'boolean',
+                      initialValue: false,
+                    }),
+                    defineField({
+                      name: 'city',
+                      title: 'Cidade (opcional)',
+                      type: 'string',
+                      validation: (rule) => rule.max(100),
+                    }),
+                    defineField({
+                      name: 'date',
+                      title: 'Data do trabalho (opcional)',
+                      type: 'date',
+                    }),
+                    defineField({
+                      name: 'format',
+                      title: 'Formato ou entrega principal',
+                      description: 'Ex.: Reel, vídeo horizontal, fotografia ou pacote de conteúdo.',
+                      type: 'string',
+                      validation: (rule) => rule.max(100),
+                    }),
+                    defineField({
                       name: 'objective',
                       title: 'Objetivo',
                       type: 'text',
@@ -92,6 +127,53 @@ export const privatePortfolioSchema = defineType({
                       type: 'text',
                       rows: 3,
                       validation: (rule) => rule.max(500),
+                    }),
+                    defineField({
+                      name: 'services',
+                      title: 'Serviços executados',
+                      description:
+                        'Adicione somente o que foi realizado neste trabalho. Arraste para ordenar.',
+                      type: 'array',
+                      of: [
+                        {
+                          type: 'string',
+                          validation: (rule) => rule.required().max(80),
+                        },
+                      ],
+                      validation: (rule) => rule.unique().max(12),
+                    }),
+                    defineField({
+                      name: 'testimonial',
+                      title: 'Depoimento (opcional)',
+                      type: 'object',
+                      fields: [
+                        defineField({
+                          name: 'quote',
+                          title: 'Depoimento',
+                          type: 'text',
+                          rows: 4,
+                          validation: (rule) => rule.required().max(700),
+                        }),
+                        defineField({
+                          name: 'author',
+                          title: 'Nome',
+                          type: 'string',
+                          validation: (rule) => rule.max(100),
+                        }),
+                        defineField({
+                          name: 'role',
+                          title: 'Cargo ou relação com o projeto',
+                          type: 'string',
+                          validation: (rule) => rule.max(120),
+                        }),
+                      ],
+                    }),
+                    defineField({
+                      name: 'cover',
+                      title: 'Capa do trabalho (opcional)',
+                      description:
+                        'Imagem principal usada antes das demais mídias. Prefira enquadramento horizontal.',
+                      type: 'controlledImage',
                     }),
                     defineField({
                       name: 'media',
@@ -120,12 +202,26 @@ export const privatePortfolioSchema = defineType({
                               title: 'Link do vídeo ou publicação',
                               type: 'url',
                               hidden: ({ parent }) => parent?.kind === 'image',
+                              validation: (rule) =>
+                                rule.custom((value, context) =>
+                                  (context.parent as { kind?: string } | undefined)?.kind !==
+                                    'image' && !value
+                                    ? 'Informe o link desta mídia.'
+                                    : true,
+                                ),
                             }),
                             defineField({
                               name: 'image',
                               title: 'Imagem',
                               type: 'controlledImage',
                               hidden: ({ parent }) => parent?.kind !== 'image',
+                              validation: (rule) =>
+                                rule.custom((value, context) =>
+                                  (context.parent as { kind?: string } | undefined)?.kind ===
+                                    'image' && !value
+                                    ? 'Escolha a imagem.'
+                                    : true,
+                                ),
                             }),
                           ],
                           preview: {
@@ -142,6 +238,7 @@ export const privatePortfolioSchema = defineType({
                           },
                         },
                       ],
+                      validation: (rule) => rule.max(20),
                     }),
                     defineField({
                       name: 'links',
@@ -170,6 +267,7 @@ export const privatePortfolioSchema = defineType({
                           },
                         },
                       ],
+                      validation: (rule) => rule.max(10),
                     }),
                   ],
                   preview: {
@@ -186,6 +284,7 @@ export const privatePortfolioSchema = defineType({
                   },
                 },
               ],
+              validation: (rule) => rule.max(50),
             }),
           ],
           preview: {
@@ -197,6 +296,7 @@ export const privatePortfolioSchema = defineType({
           },
         },
       ],
+      validation: (rule) => rule.max(30),
     }),
     defineField({
       name: 'contactLabel',

@@ -15,20 +15,20 @@ export function proxy(req: NextRequest) {
     const configuredKey = process.env.PRIVATE_PORTFOLIO_SLUG ?? ''
     const expectedPath = `/portfolio/${configuredKey}`
 
-    if (configuredKey.length < 24 || req.nextUrl.pathname !== expectedPath) {
-      return new NextResponse('Não encontrado', {
+    if (configuredKey.length < 24 || !constantTimeEqual(req.nextUrl.pathname, expectedPath)) {
+      return secureResponse(new NextResponse('Não encontrado', {
         status: 404,
         headers: {
           'X-Robots-Tag': 'noindex, nofollow, noarchive, noimageindex',
           'Cache-Control': 'private, no-store, max-age=0',
         },
-      })
+      }))
     }
   }
 
   // Toggle principal — se não tiver ENABLE_PASSWORD=true, libera tudo
   if (process.env.ENABLE_PASSWORD !== 'true') {
-    return NextResponse.next()
+    return secureResponse(NextResponse.next())
   }
 
   const expectedUser = process.env.BASIC_AUTH_USER ?? ''
@@ -48,8 +48,11 @@ export function proxy(req: NextRequest) {
       if (sep !== -1) {
         const user = decoded.slice(0, sep)
         const password = decoded.slice(sep + 1)
-        if (user === expectedUser && password === expectedPassword) {
-          return NextResponse.next()
+        if (
+          constantTimeEqual(user, expectedUser) &&
+          constantTimeEqual(password, expectedPassword)
+        ) {
+          return secureResponse(NextResponse.next())
         }
       }
     } catch {
@@ -57,7 +60,7 @@ export function proxy(req: NextRequest) {
     }
   }
 
-  return unauthorized()
+  return secureResponse(unauthorized())
 }
 
 function unauthorized() {
@@ -67,6 +70,39 @@ function unauthorized() {
       'WWW-Authenticate': 'Basic realm="Menos Roteiros (preview privado)"',
     },
   })
+}
+
+const CONTENT_SECURITY_POLICY = [
+  "default-src 'self'",
+  "script-src 'self' 'unsafe-inline' https://va.vercel-scripts.com",
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: blob: https://cdn.sanity.io",
+  "font-src 'self' data:",
+  "connect-src 'self' https://*.sanity.io https://*.apicdn.sanity.io https://vitals.vercel-insights.com https://*.vercel-insights.com",
+  "media-src 'self' blob: https:",
+  'frame-src https://www.youtube-nocookie.com',
+  "worker-src 'self' blob:",
+  "manifest-src 'self'",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "frame-ancestors 'self'",
+].join('; ')
+
+function secureResponse(response: NextResponse) {
+  response.headers.set('Content-Security-Policy', CONTENT_SECURITY_POLICY)
+  return response
+}
+
+function constantTimeEqual(left: string, right: string) {
+  const size = Math.max(left.length, right.length)
+  let difference = left.length ^ right.length
+
+  for (let index = 0; index < size; index += 1) {
+    difference |= (left.charCodeAt(index) || 0) ^ (right.charCodeAt(index) || 0)
+  }
+
+  return difference === 0
 }
 
 export const config = {

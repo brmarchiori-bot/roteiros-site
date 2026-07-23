@@ -26,8 +26,8 @@ export const hero: HeroContent = {
   subheadline:
     'A gente largou 10 anos de bar pra viver viajando, trabalhando remoto e mostrando tudo como realmente é.',
   ctas: {
-    primary: { label: 'Quero acompanhar a jornada', href: '/#club' },
-    secondary: { label: 'Ver onde a gente tá', href: '#now' },
+    primary: { label: 'Ver onde a gente tá', href: '#now' },
+    secondary: { label: 'Conhecer nossa história', href: '#about' },
   },
   media: {
     // Placeholders — subir arquivo real em public/videos/hero/ e public/images/og/

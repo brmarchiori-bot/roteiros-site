@@ -12,6 +12,7 @@ export const dynamic = 'force-dynamic'
 export const metadata: Metadata = {
   title: `Portfólio privado · ${siteConfig.name}`,
   description: 'Apresentação privada de trabalhos selecionados.',
+  alternates: { canonical: null },
   robots: {
     index: false,
     follow: false,
@@ -40,6 +41,12 @@ export default async function PrivatePortfolioPage({
   }
 
   const portfolio = await getPrivatePortfolio()
+  const contactLabel = portfolio?.contactLabel || 'Conversar sobre um projeto'
+  const contactUrl =
+    portfolio?.contactUrl ||
+    `mailto:${siteConfig.contact.partnerships}?subject=${encodeURIComponent(
+      'Contato pelo portfólio privado',
+    )}`
 
   return (
     <main className="min-h-screen bg-background pb-24 text-foreground md:pb-32">
@@ -83,8 +90,18 @@ export default async function PrivatePortfolioPage({
           </Container>
 
           <Container size="wide">
-            <div className="space-y-28 md:space-y-40">
-              {portfolio.categories.map((category, categoryIndex) => (
+            {portfolio.categories.length === 0 ? (
+              <div className="border-y border-foreground/15 py-16 text-center md:py-24">
+                <p className="font-display text-3xl font-medium tracking-tight md:text-5xl">
+                  Seleção em preparação.
+                </p>
+                <p className="mx-auto mt-5 max-w-xl leading-relaxed text-foreground/65">
+                  Os trabalhos estão sendo organizados antes da publicação nesta apresentação.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-28 md:space-y-40">
+                {portfolio.categories.map((category, categoryIndex) => (
                 <section key={category.id} aria-labelledby={`category-${category.id}`}>
                   <div className="border-t border-foreground/20 pt-8 md:grid md:grid-cols-12 md:gap-12">
                     <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-primary md:col-span-2">
@@ -105,8 +122,13 @@ export default async function PrivatePortfolioPage({
                     </div>
                   </div>
 
-                  <div className="mt-14 space-y-16 md:mt-20 md:space-y-24">
-                    {category.projects.map((project, projectIndex) => (
+                  {category.projects.length === 0 ? (
+                    <p className="mt-12 border-t border-subtle pt-8 text-sm leading-relaxed text-muted">
+                      Os trabalhos desta categoria ainda não foram publicados.
+                    </p>
+                  ) : (
+                    <div className="mt-14 space-y-16 md:mt-20 md:space-y-24">
+                      {category.projects.map((project, projectIndex) => (
                       <article
                         key={project.id}
                         className="grid gap-10 border-t border-subtle pt-10 md:grid-cols-12 md:gap-12"
@@ -118,12 +140,51 @@ export default async function PrivatePortfolioPage({
                           <h3 className="mt-4 font-display text-3xl font-medium tracking-tight md:text-4xl">
                             {project.title}
                           </h3>
+                          {project.featured && (
+                            <p className="mt-4 inline-flex rounded-full border border-primary/30 px-3 py-1 font-mono text-[9px] uppercase tracking-[0.2em] text-primary">
+                              Destaque
+                            </p>
+                          )}
                           {project.client && (
                             <p className="mt-3 text-sm text-foreground/60">{project.client}</p>
+                          )}
+                          {(project.city || project.date || project.format) && (
+                            <dl className="mt-7 space-y-3 border-t border-foreground/10 pt-5 text-sm">
+                              {project.city && (
+                                <MetaRow label="Local" value={project.city} />
+                              )}
+                              {project.date && (
+                                <MetaRow
+                                  label="Data"
+                                  value={formatPortfolioDate(project.date)}
+                                />
+                              )}
+                              {project.format && (
+                                <MetaRow label="Formato" value={project.format} />
+                              )}
+                            </dl>
                           )}
                         </div>
 
                         <div className="space-y-8 md:col-span-8">
+                          {project.cover && (
+                            <figure>
+                              <div className="relative aspect-[16/10] overflow-hidden bg-surface">
+                                <Image
+                                  src={project.cover.src}
+                                  alt={project.cover.alt}
+                                  fill
+                                  sizes="(min-width: 768px) 65vw, 100vw"
+                                  style={toImageStyle(project.cover)}
+                                />
+                              </div>
+                              {project.cover.caption && (
+                                <figcaption className="mt-3 text-sm text-muted">
+                                  {project.cover.caption}
+                                </figcaption>
+                              )}
+                            </figure>
+                          )}
                           <div className="grid gap-7 md:grid-cols-2">
                             {project.objective && (
                               <ProjectText label="Objetivo" text={project.objective} />
@@ -136,6 +197,39 @@ export default async function PrivatePortfolioPage({
                             <p className="max-w-3xl text-base leading-relaxed text-foreground/75 md:text-lg">
                               {project.description}
                             </p>
+                          )}
+
+                          {project.services.length > 0 && (
+                            <div>
+                              <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-primary">
+                                Serviços executados
+                              </p>
+                              <ul className="mt-4 flex flex-wrap gap-2">
+                                {project.services.map((service) => (
+                                  <li
+                                    key={service}
+                                    className="rounded-full border border-foreground/15 px-3 py-1.5 text-xs text-foreground/70"
+                                  >
+                                    {service}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+
+                          {project.testimonial && (
+                            <blockquote className="border-l-2 border-primary pl-6">
+                              <p className="font-display text-xl italic leading-relaxed text-foreground/80 md:text-2xl">
+                                “{project.testimonial.quote}”
+                              </p>
+                              {(project.testimonial.author || project.testimonial.role) && (
+                                <footer className="mt-4 text-sm text-muted">
+                                  {[project.testimonial.author, project.testimonial.role]
+                                    .filter(Boolean)
+                                    .join(' · ')}
+                                </footer>
+                              )}
+                            </blockquote>
                           )}
 
                           {project.media.length > 0 && (
@@ -164,28 +258,32 @@ export default async function PrivatePortfolioPage({
                           )}
                         </div>
                       </article>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                  )}
                 </section>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
 
-            {portfolio.contactLabel && portfolio.contactUrl && (
-              <div className="mt-28 border-t border-foreground/20 pt-12 text-center md:mt-40 md:pt-16">
+            <div className="mt-28 border-t border-foreground/20 pt-12 text-center md:mt-40 md:pt-16">
+              <p className="mx-auto mb-7 max-w-xl leading-relaxed text-foreground/65">
+                Se algum trabalho daqui conversa com o que você está construindo, a próxima
+                conversa pode começar sem formulário e sem roteiro pronto.
+              </p>
                 <a
-                  href={portfolio.contactUrl}
-                  target={portfolio.contactUrl.startsWith('http') ? '_blank' : undefined}
+                  href={contactUrl}
+                  target={contactUrl.startsWith('http') ? '_blank' : undefined}
                   rel={
-                    portfolio.contactUrl.startsWith('http')
+                    contactUrl.startsWith('http')
                       ? 'noopener noreferrer'
                       : undefined
                   }
                   className="inline-flex rounded-full bg-primary px-7 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-foreground"
                 >
-                  {portfolio.contactLabel}
+                  {contactLabel}
                 </a>
-              </div>
-            )}
+            </div>
           </Container>
         </>
       )}
@@ -200,6 +298,17 @@ function ProjectText({ label, text }: { label: string; text: string }) {
         {label}
       </p>
       <p className="mt-3 leading-relaxed text-foreground/75">{text}</p>
+    </div>
+  )
+}
+
+function MetaRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-baseline justify-between gap-4">
+      <dt className="font-mono text-[9px] uppercase tracking-[0.18em] text-muted">
+        {label}
+      </dt>
+      <dd className="text-right text-foreground/70">{value}</dd>
     </div>
   )
 }
@@ -228,6 +337,55 @@ function PortfolioMediaCard({ media }: { media: PortfolioMedia }) {
 
   if (!media.url) return null
 
+  const youtubeEmbed = media.kind === 'youtube' ? getYouTubeEmbedUrl(media.url) : null
+  if (youtubeEmbed) {
+    return (
+      <figure>
+        <div className="relative aspect-video overflow-hidden bg-foreground">
+          <iframe
+            src={youtubeEmbed}
+            title={media.title || 'Vídeo do portfólio'}
+            loading="lazy"
+            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+            referrerPolicy="strict-origin-when-cross-origin"
+            className="absolute inset-0 h-full w-full"
+          />
+        </div>
+        {media.title && (
+          <figcaption className="mt-3 text-sm text-muted">{media.title}</figcaption>
+        )}
+      </figure>
+    )
+  }
+
+  if (
+    media.kind === 'video' ||
+    media.kind === 'verticalVideo' ||
+    media.kind === 'horizontalVideo'
+  ) {
+    return (
+      <figure className={media.kind === 'verticalVideo' ? 'sm:max-w-sm' : undefined}>
+        <video
+          controls
+          playsInline
+          preload="metadata"
+          className={
+            media.kind === 'verticalVideo'
+              ? 'aspect-[9/16] w-full bg-foreground object-contain'
+              : 'aspect-video w-full bg-foreground object-contain'
+          }
+        >
+          <source src={media.url} />
+          Seu navegador não conseguiu reproduzir este vídeo.
+        </video>
+        {media.title && (
+          <figcaption className="mt-3 text-sm text-muted">{media.title}</figcaption>
+        )}
+      </figure>
+    )
+  }
+
   return (
     <a
       href={media.url}
@@ -248,4 +406,37 @@ function PortfolioMediaCard({ media }: { media: PortfolioMedia }) {
       </div>
     </a>
   )
+}
+
+function getYouTubeEmbedUrl(value: string) {
+  try {
+    const url = new URL(value)
+    let id = ''
+
+    if (url.hostname === 'youtu.be') {
+      id = url.pathname.slice(1).split('/')[0] ?? ''
+    } else if (url.hostname.endsWith('youtube.com')) {
+      id =
+        url.searchParams.get('v') ??
+        (url.pathname.startsWith('/shorts/') || url.pathname.startsWith('/embed/')
+          ? url.pathname.split('/')[2] ?? ''
+          : '')
+    }
+
+    return /^[\w-]{6,20}$/.test(id)
+      ? `https://www.youtube-nocookie.com/embed/${id}`
+      : null
+  } catch {
+    return null
+  }
+}
+
+function formatPortfolioDate(value: string) {
+  const date = new Date(`${value}T00:00:00`)
+  return Number.isNaN(date.getTime())
+    ? value
+    : new Intl.DateTimeFormat('pt-BR', {
+        month: 'long',
+        year: 'numeric',
+      }).format(date)
 }

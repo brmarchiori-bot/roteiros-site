@@ -1,8 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
-import { AnimatePresence, motion } from 'motion/react'
+import { useEffect, useRef, useState } from 'react'
 import { JourneyMarker } from '@/components/shared/journey-marker'
 import { buttonStyles } from '@/components/ui/button'
 import { siteConfig } from '@/content/site.config'
@@ -15,46 +14,74 @@ type MobileMenuProps = {
 
 export function MobileMenu({ journey }: MobileMenuProps) {
   const [open, setOpen] = useState(false)
+  const triggerRef = useRef<HTMLButtonElement>(null)
+  const closeButtonRef = useRef<HTMLButtonElement>(null)
+  const dialogRef = useRef<HTMLDivElement>(null)
 
-  // Fechar com ESC + bloquear scroll do body
   useEffect(() => {
     if (!open) return
+    const trigger = triggerRef.current
 
     function onKey(e: KeyboardEvent) {
-      if (e.key === 'Escape') setOpen(false)
+      if (e.key === 'Escape') {
+        setOpen(false)
+        return
+      }
+
+      if (e.key !== 'Tab' || !dialogRef.current) return
+
+      const focusable = Array.from(
+        dialogRef.current.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ),
+      )
+      const first = focusable[0]
+      const last = focusable.at(-1)
+      if (!first || !last) return
+
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault()
+        last.focus()
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault()
+        first.focus()
+      }
     }
+
     document.addEventListener('keydown', onKey)
     document.body.style.overflow = 'hidden'
+    const focusTimer = window.setTimeout(() => {
+      closeButtonRef.current?.focus()
+    }, 0)
 
     return () => {
+      window.clearTimeout(focusTimer)
       document.removeEventListener('keydown', onKey)
       document.body.style.overflow = ''
+      trigger?.focus()
     }
   }, [open])
 
   return (
     <>
       <button
+        ref={triggerRef}
         type="button"
         onClick={() => setOpen(true)}
         aria-label="Abrir menu"
         aria-expanded={open}
-        className="font-mono text-sm uppercase tracking-widest text-foreground/70 transition-colors hover:text-primary md:hidden"
+        className="inline-flex min-h-11 min-w-11 items-center justify-center font-mono text-sm uppercase tracking-widest text-foreground/70 transition-colors hover:text-primary md:hidden"
       >
         Menu
       </button>
 
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2, ease: 'easeOut' }}
+      {open && (
+          <div
+            ref={dialogRef}
             role="dialog"
             aria-modal="true"
             aria-label="Menu principal"
-            className="fixed inset-0 z-[60] flex flex-col bg-background"
+            className="fixed inset-0 z-[60] flex flex-col overflow-y-auto bg-background"
           >
             <div className="flex items-center justify-between border-b border-subtle px-6 py-4 md:px-10">
               <Link
@@ -65,10 +92,11 @@ export function MobileMenu({ journey }: MobileMenuProps) {
                 {siteConfig.name}
               </Link>
               <button
+                ref={closeButtonRef}
                 type="button"
                 onClick={() => setOpen(false)}
                 aria-label="Fechar menu"
-                className="font-mono text-xs uppercase tracking-widest text-foreground/60 transition-colors hover:text-primary"
+                className="inline-flex min-h-11 min-w-11 items-center justify-center font-mono text-xs uppercase tracking-widest text-foreground/70 transition-colors hover:text-primary"
               >
                 Fechar
               </button>
@@ -79,11 +107,10 @@ export function MobileMenu({ journey }: MobileMenuProps) {
               className="flex flex-1 flex-col items-start justify-center gap-6 px-6 md:px-10"
             >
               {siteConfig.nav.map((item, i) => (
-                <motion.div
+                <div
                   key={item.href}
-                  initial={{ opacity: 0, x: -16 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.1 + i * 0.06, duration: 0.4, ease: 'easeOut' }}
+                  className="mr-reveal"
+                  style={{ animationDelay: `${0.06 + i * 0.05}s` }}
                 >
                   <Link
                     href={item.href}
@@ -92,15 +119,13 @@ export function MobileMenu({ journey }: MobileMenuProps) {
                   >
                     {item.label}
                   </Link>
-                </motion.div>
+                </div>
               ))}
             </nav>
 
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.35, duration: 0.4 }}
-              className="space-y-5 border-t border-subtle px-6 py-6 md:px-10"
+            <div
+              className="mr-reveal space-y-5 border-t border-subtle px-6 py-6 md:px-10"
+              style={{ animationDelay: '0.25s' }}
             >
               <Link
                 href={siteConfig.primaryCta.href}
@@ -112,10 +137,9 @@ export function MobileMenu({ journey }: MobileMenuProps) {
               <div className="flex justify-center">
                 <JourneyMarker journey={journey} />
               </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            </div>
+          </div>
+      )}
     </>
   )
 }

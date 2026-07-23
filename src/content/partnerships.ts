@@ -53,7 +53,12 @@ export const partnerships: PartnershipsContent = {
     ],
   },
   ctas: {
-    mediaKit: { label: 'Baixar mídia kit em PDF', href: '/midia-kit.pdf' },
+    mediaKit: {
+      label: 'Solicitar apresentação por email',
+      href: `mailto:${siteConfig.contact.partnerships}?subject=${encodeURIComponent(
+        'Quero conhecer o trabalho do Menos Roteiros',
+      )}`,
+    },
     whatsapp: {
       label: 'Conversar no WhatsApp',
       href: buildWhatsAppUrl(

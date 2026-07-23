@@ -79,8 +79,10 @@ export const contentHighlightsSchema = defineType({
               title: 'Título do card',
               description: '📍 Onde aparece: abaixo da imagem. Recomendado até 100 caracteres.',
               type: 'string',
-              validation: (r) =>
-                r.required().max(100).warning('Passou de 100 — pode cortar no mobile.'),
+              validation: (r) => [
+                r.required().error('O título do card é obrigatório.'),
+                r.max(100).warning('Passou de 100 — pode cortar no mobile.'),
+              ],
             }),
             defineField({
               name: 'url',

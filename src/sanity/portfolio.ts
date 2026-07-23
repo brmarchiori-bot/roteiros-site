@@ -22,9 +22,17 @@ const PRIVATE_PORTFOLIO_QUERY = groq`*[_id == "private-portfolio-singleton"][0]{
       _key,
       title,
       client,
+      visible,
+      featured,
+      city,
+      date,
+      format,
       objective,
       description,
       result,
+      services,
+      testimonial,
+      cover{ image, alt, caption, focusHorizontal, focusVertical, fit },
       links[]{ _key, label, url },
       media[]{
         _key,
@@ -58,9 +66,17 @@ type RawProject = {
   _key?: string
   title?: string
   client?: string
+  visible?: boolean
+  featured?: boolean
+  city?: string
+  date?: string
+  format?: string
   objective?: string
   description?: string
   result?: string
+  services?: string[]
+  testimonial?: { quote?: string; author?: string; role?: string }
+  cover?: RawControlledImage
   links?: Array<{ _key?: string; label?: string; url?: string }>
   media?: RawMedia[]
 }
@@ -85,32 +101,38 @@ function text(value?: string) {
   return normalized || undefined
 }
 
+function resolveImage(raw?: RawControlledImage) {
+  const src = raw?.image?.asset ? urlForImage(raw.image, 1800) : null
+  const alt = text(raw?.alt)
+  if (!src || !alt) return undefined
+
+  const horizontal = raw?.focusHorizontal ?? 'center'
+  const vertical = raw?.focusVertical ?? 'center'
+
+  return {
+    src,
+    alt,
+    caption: text(raw?.caption),
+    objectPosition:
+      horizontal === 'center' && vertical === 'center'
+        ? 'center'
+        : `${horizontal} ${vertical}`,
+    fitMode: raw?.fit ?? 'cover',
+  } as const
+}
+
 function resolveMedia(raw: RawMedia): PortfolioMedia | null {
   if (!raw._key || !raw.kind) return null
 
   if (raw.kind === 'image') {
-    const src = raw.image?.image?.asset
-      ? urlForImage(raw.image.image, 1800)
-      : null
-    if (!src || !text(raw.image?.alt)) return null
-
-    const horizontal = raw.image?.focusHorizontal ?? 'center'
-    const vertical = raw.image?.focusVertical ?? 'center'
+    const image = resolveImage(raw.image)
+    if (!image) return null
 
     return {
       id: raw._key,
       kind: raw.kind,
       title: text(raw.title),
-      image: {
-        src,
-        alt: raw.image?.alt?.trim() ?? '',
-        caption: text(raw.image?.caption),
-        objectPosition:
-          horizontal === 'center' && vertical === 'center'
-            ? 'center'
-            : `${horizontal} ${vertical}`,
-        fitMode: raw.image?.fit ?? 'cover',
-      },
+      image,
     }
   }
 
@@ -127,7 +149,7 @@ function resolveMedia(raw: RawMedia): PortfolioMedia | null {
 
 function resolveProject(raw: RawProject): PortfolioProject | null {
   const title = text(raw.title)
-  if (!raw._key || !title) return null
+  if (!raw._key || !title || raw.visible === false) return null
 
   const links: PortfolioLink[] = (raw.links ?? []).flatMap((link) => {
     const label = text(link.label)
@@ -138,10 +160,25 @@ function resolveProject(raw: RawProject): PortfolioProject | null {
   return {
     id: raw._key,
     title,
+    featured: raw.featured === true,
     client: text(raw.client),
+    city: text(raw.city),
+    date: text(raw.date),
+    format: text(raw.format),
     objective: text(raw.objective),
     description: text(raw.description),
     result: text(raw.result),
+    services: Array.isArray(raw.services)
+      ? [...new Set(raw.services.map((service) => service.trim()).filter(Boolean))]
+      : [],
+    testimonial: text(raw.testimonial?.quote)
+      ? {
+          quote: raw.testimonial?.quote?.trim() ?? '',
+          author: text(raw.testimonial?.author),
+          role: text(raw.testimonial?.role),
+        }
+      : undefined,
+    cover: resolveImage(raw.cover),
     links,
     media: (raw.media ?? []).flatMap((media) => {
       const resolved = resolveMedia(media)

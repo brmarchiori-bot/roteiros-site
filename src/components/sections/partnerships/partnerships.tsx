@@ -5,6 +5,10 @@ import { buttonStyles } from '@/components/ui/button'
 import { partnerships } from '@/content'
 
 export function PartnershipsSection() {
+  const publishedNumbers = partnerships.numbers.items.filter(
+    (item) => item.value.trim() && item.value !== '—',
+  )
+
   return (
     <Section id="partnerships" spacing="xl">
       {/* Header editorial */}
@@ -67,38 +71,40 @@ export function PartnershipsSection() {
       </div>
 
       {/* 3. Números — grade escalonada, cada número enorme */}
-      <div className="mt-24 md:mt-32">
-        <Reveal>
-          <div className="flex items-end justify-between border-t border-foreground/20 pt-10 md:pt-14">
-            <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted md:text-[11px]">
-              Números
-            </p>
-            <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted/70 md:text-[11px]">
-              Atualizado em {partnerships.numbers.updatedAt}
-            </p>
-          </div>
-        </Reveal>
+      {publishedNumbers.length > 0 && (
+        <div className="mt-24 md:mt-32">
+          <Reveal>
+            <div className="flex flex-col gap-3 border-t border-foreground/20 pt-10 sm:flex-row sm:items-end sm:justify-between md:pt-14">
+              <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted md:text-[11px]">
+                Números
+              </p>
+              <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted/70 md:text-[11px]">
+                Atualizado em {partnerships.numbers.updatedAt}
+              </p>
+            </div>
+          </Reveal>
 
-        <ul className="mt-12 grid gap-12 sm:grid-cols-2 md:mt-16 md:grid-cols-4 md:gap-8">
-          {partnerships.numbers.items.map((stat, i) => (
-            <Reveal key={stat.label} delay={0.05 + i * 0.06}>
-              <li className="border-t border-foreground/15 pt-6">
-                <p className="font-display text-5xl font-medium leading-none tracking-[-0.02em] text-foreground md:text-[64px]">
-                  {stat.value}
-                </p>
-                <p className="mt-5 font-mono text-[10px] uppercase tracking-[0.2em] text-muted md:text-[11px]">
-                  {stat.label}
-                </p>
-                {stat.note && (
-                  <p className="mt-2 font-mono text-[9px] uppercase tracking-[0.15em] text-muted/60 md:text-[10px]">
-                    ({stat.note})
+          <ul className="mt-12 grid gap-12 sm:grid-cols-2 md:mt-16 md:grid-cols-4 md:gap-8">
+            {publishedNumbers.map((stat, i) => (
+              <Reveal key={stat.label} delay={0.05 + i * 0.06}>
+                <li className="border-t border-foreground/15 pt-6">
+                  <p className="font-display text-5xl font-medium leading-none tracking-[-0.02em] text-foreground md:text-[64px]">
+                    {stat.value}
                   </p>
-                )}
-              </li>
-            </Reveal>
-          ))}
-        </ul>
-      </div>
+                  <p className="mt-5 font-mono text-[10px] uppercase tracking-[0.2em] text-muted md:text-[11px]">
+                    {stat.label}
+                  </p>
+                  {stat.note && (
+                    <p className="mt-2 font-mono text-[9px] uppercase tracking-[0.15em] text-muted/60 md:text-[10px]">
+                      ({stat.note})
+                    </p>
+                  )}
+                </li>
+              </Reveal>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {/* 4. CTAs duplos */}
       <div className="mt-24 border-t border-foreground/20 pt-10 md:mt-32 md:pt-14">

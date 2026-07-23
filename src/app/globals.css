@@ -10,7 +10,7 @@
   --background: #f3eee5; /* areia quente — fundo principal */
   --foreground: #0e0e0d; /* preto estrada — texto principal */
   --surface: #ece5d8; /* areia mais escura — cards, blocos */
-  --muted: #8a8175; /* cinza poeira — texto secundário */
+  --muted: #6f675f; /* cinza poeira — contraste AA sobre areia */
   --subtle: rgba(14, 14, 13, 0.08); /* bordas e separadores */
 
   /* MARCA */
@@ -51,6 +51,16 @@
 html,
 body {
   height: 100%;
+}
+
+html {
+  scroll-padding-top: 6rem;
+}
+
+@media (min-width: 768px) {
+  html {
+    scroll-padding-top: 7rem;
+  }
 }
 
 body {

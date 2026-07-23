@@ -86,8 +86,10 @@ export const heroSchema = defineType({
       group: 'conteudo',
       type: 'text',
       rows: 3,
-      validation: (r) =>
-        r.required().max(240).warning('Passou de 180 — pode quebrar muito no mobile.'),
+      validation: (r) => [
+        r.required().error('O subtítulo é obrigatório.'),
+        r.max(240).warning('Passou de 180 — pode quebrar muito no mobile.'),
+      ],
     }),
     defineField({
       name: 'primaryCta',

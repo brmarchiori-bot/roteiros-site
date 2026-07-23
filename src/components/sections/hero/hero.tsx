@@ -33,7 +33,7 @@ export async function HeroSection() {
       <HeroBackground coverImage={hero.coverImage} />
 
       {/* Rótulo fixo topo-esquerdo — sensação de capa de caderno */}
-      <div className="pointer-events-none absolute left-0 right-0 top-28 z-10 md:top-40">
+      <div className="pointer-events-none absolute left-0 right-0 top-12 z-10 sm:top-20 md:top-40">
         <Container size={containerSize}>
           <Reveal>
             <div className="flex items-center gap-3">
@@ -51,27 +51,25 @@ export async function HeroSection() {
 
       <Container size={containerSize} className="relative z-10">
         <div className="max-w-6xl">
-          <Reveal delay={0.08}>
-            <h1
-              aria-label={h1AriaLabel}
-              className="font-display text-[48px] font-medium leading-[0.98] tracking-[-0.02em] text-foreground md:text-[96px] lg:text-[112px]"
-            >
-              {useRotator ? (
-                <span aria-hidden="true">
-                  {hero.titlePrefix}{' '}
-                  {/* Mobile: quebra em bloco pra frase não ficar órfã do prefix */}
-                  <span className="block md:inline-block md:align-baseline">
-                    <HeroDynamicText
-                      words={words}
-                      className="text-primary"
-                    />
-                  </span>
+          <h1
+            aria-label={h1AriaLabel}
+            className="font-display text-[48px] font-medium leading-[0.98] tracking-[-0.02em] text-foreground md:text-[96px] lg:text-[112px]"
+          >
+            {useRotator ? (
+              <span aria-hidden="true">
+                {hero.titlePrefix}{' '}
+                {/* Mobile: quebra em bloco pra frase não ficar órfã do prefix */}
+                <span className="block md:inline-block md:align-baseline">
+                  <HeroDynamicText
+                    words={words}
+                    className="text-primary"
+                  />
                 </span>
-              ) : (
-                hero.headline
-              )}
-            </h1>
-          </Reveal>
+              </span>
+            ) : (
+              hero.headline
+            )}
+          </h1>
 
           <div className="mt-10 grid gap-10 md:mt-14 md:grid-cols-12 md:gap-12">
             <Reveal delay={0.18} className="md:col-span-6 md:col-start-1">

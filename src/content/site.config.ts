@@ -37,8 +37,8 @@ export const siteConfig = {
     { label: 'Parcerias', href: '/#partnerships' },
   ],
   primaryCta: {
-    label: 'Entrar na lista',
-    href: '/#club',
+    label: 'Acompanhar a jornada',
+    href: '/#now',
   },
   legal: {
     copyrightYear: 2026,

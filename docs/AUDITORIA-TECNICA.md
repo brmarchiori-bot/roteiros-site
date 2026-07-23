@@ -53,6 +53,9 @@ no Sanity, a URL autorizada informa que o conteúdo ainda não foi publicado.
 - Portfólio protegido por slug secreto de no mínimo 24 caracteres.
 - Portfólio recebe `X-Robots-Tag` e `Cache-Control: private, no-store`.
 - Basic Auth opcional continua disponível para proteger ambientes de preview.
+- CSP pública restringe scripts, conexões, frames, mídia, objetos e origem de imagens.
+- Chave do portfólio e credenciais Basic Auth usam comparação de tempo constante simples.
+- Sanity Vision foi removido do Studio de produção.
 
 O último `pnpm audit --prod` encontrou cinco vulnerabilidades transitivas na CLI do Sanity 5:
 duas altas e três moderadas. Não há vulnerabilidade crítica. A remoção restante exige migração
@@ -70,6 +73,18 @@ informam claramente a indisponibilidade. Eles só devem voltar a aceitar email a
 - consentimento e política de privacidade;
 - tratamento observável de falhas.
 
+Existe uma interface independente de fornecedor em `src/lib/forms/lead.ts`. Ela valida email,
+consentimento, finalidade, limites de payload e honeypot. Nenhuma rota de escrita foi exposta
+enquanto não há provedor, rate limit persistente e política de privacidade publicada.
+
+## Testes automatizados
+
+- Vitest: validação dos leads, FAQ JSON-LD e Proxy/Basic Auth.
+- Playwright: home, navegação, menu mobile/foco, cinco larguras, `noindex`, sitemap, portfólio,
+  formulários e estado do Studio sem configuração.
+- Os E2E executam contra `next build` + `next start`, evitando diferenças do modo dev em CSP e
+  cache.
+
 ## Validação obrigatória
 
 Antes de qualquer entrega:
@@ -84,7 +99,8 @@ pnpm audit --prod
 ## Próximas prioridades
 
 1. Escolher e integrar a plataforma real de contatos/newsletter.
-2. Adicionar testes E2E para home, navegação, formulários desativados, portfólio e Basic Auth.
-3. Implantar CSP testada contra Next.js, Analytics e Sanity Studio.
-4. Planejar a migração isolada de Sanity 5 para 6.
-5. Publicar conteúdo real no portfólio e completar as páginas secundárias antes de indexá-las.
+2. Publicar política de privacidade antes de reativar coleta de dados.
+3. Planejar a migração isolada de Sanity 5 para 6.
+4. Publicar conteúdo real no portfólio.
+5. Completar as páginas secundárias antes de indexá-las.
+6. Atualizar o conteúdo editorial de “Agora” antes do lançamento público.

@@ -7,7 +7,7 @@ export type PortfolioLink = {
 
 export type PortfolioMedia = {
   id: string
-  kind: 'image' | 'reel' | 'youtube' | 'video'
+  kind: 'image' | 'reel' | 'youtube' | 'video' | 'verticalVideo' | 'horizontalVideo'
   title?: string
   url?: string
   image?: {
@@ -20,10 +20,25 @@ export type PortfolioMedia = {
 export type PortfolioProject = {
   id: string
   title: string
+  featured: boolean
   client?: string
+  city?: string
+  date?: string
+  format?: string
   objective?: string
   description?: string
   result?: string
+  services: string[]
+  testimonial?: {
+    quote: string
+    author?: string
+    role?: string
+  }
+  cover?: {
+    src: string
+    alt: string
+    caption?: string
+  } & PhotoControls
   links: PortfolioLink[]
   media: PortfolioMedia[]
 }

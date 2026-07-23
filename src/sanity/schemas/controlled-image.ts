@@ -27,8 +27,10 @@ export const controlledImageSchema = defineType({
       description:
         '📖 Pra quê serve: leitores de tela (acessibilidade) e o Google usam este texto. Descreva o que aparece na foto. Ex: "Andressa e Bruno sentados na van ao pôr do sol". Até 140 caracteres.',
       type: 'string',
-      validation: (r) =>
-        r.required().max(140).warning('Passou de 140 — muito longo pro alt text.'),
+      validation: (r) => [
+        r.required().error('A descrição da foto é obrigatória.'),
+        r.max(140).warning('Passou de 140 — muito longo pro alt text.'),
+      ],
     }),
     defineField({
       name: 'caption',
