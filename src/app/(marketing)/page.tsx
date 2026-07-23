@@ -10,6 +10,7 @@ import { NowSection } from '@/components/sections/now/now'
 import { PartnershipsSection } from '@/components/sections/partnerships/partnerships'
 import { PillarsSection } from '@/components/sections/pillars/pillars'
 import { getFaqSchema } from '@/lib/seo'
+import { getFaqFromSanity } from '@/sanity/queries'
 
 /**
  * Home — composição final das 10 seções da marca.
@@ -19,10 +20,12 @@ import { getFaqSchema } from '@/lib/seo'
  *   parte 2 — Now, Pillars, Content Bridge
  *   parte 3 — Club, Coming Soon, Partnerships, FAQ
  */
-export default function HomePage() {
+export default async function HomePage() {
+  const faq = await getFaqFromSanity()
+
   return (
     <>
-      <JsonLd data={getFaqSchema()} id="faq-schema" />
+      <JsonLd data={getFaqSchema(faq)} id="faq-schema" />
       <HeroSection />
       <ManifestoSection />
       <AboutSection />
@@ -32,7 +35,7 @@ export default function HomePage() {
       <ClubSection />
       <ComingSoonSection />
       <PartnershipsSection />
-      <FaqSection />
+      <FaqSection faq={faq} />
     </>
   )
 }

@@ -1,4 +1,5 @@
 import { groq } from 'next-sanity'
+import { cache } from 'react'
 import {
   about as aboutFallback,
   contentHighlights as contentFallback,
@@ -27,6 +28,10 @@ import { urlForImage } from './image'
 const fetchOptions = { next: { revalidate: 60 } } as const
 
 /* ---------------- Helpers genéricos ---------------- */
+
+function reportSanityFallback(section: string, error: unknown) {
+  console.error(`[Sanity] Falha ao carregar "${section}"; usando fallback local.`, error)
+}
 
 /** Escolhe a primeira string não-vazia (após trim). Usa fallback se Sanity não tem. */
 function pickString(primary: string | undefined | null, fallback: string): string
@@ -146,7 +151,7 @@ function mergeLayout(
    HERO
    ================================================================ */
 
-const HERO_QUERY = groq`*[_type == "hero"][0]{
+const HERO_QUERY = groq`*[_id == "hero-singleton"][0]{
   meta,
   titlePrefix,
   dynamicWords,
@@ -207,7 +212,8 @@ export async function getHeroFromSanity(): Promise<HeroContent> {
       coverImage,
       layout: mergeLayout({ contentWidth: raw.contentWidth }, heroFallback.layout),
     }
-  } catch {
+  } catch (error) {
+    reportSanityFallback('hero', error)
     return heroFallback
   }
 }
@@ -216,7 +222,7 @@ export async function getHeroFromSanity(): Promise<HeroContent> {
    ABOUT
    ================================================================ */
 
-const ABOUT_QUERY = groq`*[_type == "about"][0]{
+const ABOUT_QUERY = groq`*[_id == "about-singleton"][0]{
   meta,
   chapters[]{
     _key, number, title, body,
@@ -288,7 +294,8 @@ export async function getAboutFromSanity(): Promise<AboutContent> {
         aboutFallback.layout,
       ),
     }
-  } catch {
+  } catch (error) {
+    reportSanityFallback('about', error)
     return aboutFallback
   }
 }
@@ -297,7 +304,7 @@ export async function getAboutFromSanity(): Promise<AboutContent> {
    NOW
    ================================================================ */
 
-const NOW_QUERY = groq`*[_type == "now"][0]{
+const NOW_QUERY = groq`*[_id == "now-singleton"][0]{
   meta,
   city, state, country,
   date, period, dayCount, coordinates,
@@ -324,7 +331,7 @@ type RawNow = {
   imagePosition?: SectionLayout['imagePosition']
 }
 
-export async function getNowFromSanity(): Promise<NowContent> {
+export const getNowFromSanity = cache(async function getNowFromSanity(): Promise<NowContent> {
   if (!sanityClient) return nowFallback
   try {
     const raw = await sanityClient.fetch<RawNow | null>(NOW_QUERY, {}, fetchOptions)
@@ -358,16 +365,17 @@ export async function getNowFromSanity(): Promise<NowContent> {
         nowFallback.layout,
       ),
     }
-  } catch {
+  } catch (error) {
+    reportSanityFallback('now', error)
     return nowFallback
   }
-}
+})
 
 /* ================================================================
    CONTENT HIGHLIGHTS
    ================================================================ */
 
-const CONTENT_QUERY = groq`*[_type == "contentHighlights"][0]{
+const CONTENT_QUERY = groq`*[_id == "content-highlights-singleton"][0]{
   meta,
   pullQuote,
   highlights[]{
@@ -440,7 +448,8 @@ export async function getContentHighlightsFromSanity(): Promise<ContentBridgeCon
         contentFallback.layout,
       ),
     }
-  } catch {
+  } catch (error) {
+    reportSanityFallback('contentHighlights', error)
     return contentFallback
   }
 }
@@ -449,7 +458,7 @@ export async function getContentHighlightsFromSanity(): Promise<ContentBridgeCon
    FAQ
    ================================================================ */
 
-const FAQ_QUERY = groq`*[_type == "faq"][0]{
+const FAQ_QUERY = groq`*[_id == "faq-singleton"][0]{
   meta,
   items[]{ _key, question, answer }
 }`
@@ -489,7 +498,8 @@ export async function getFaqFromSanity(): Promise<FaqContent> {
       meta: mergeMeta(raw.meta, faqFallback.meta),
       items,
     }
-  } catch {
+  } catch (error) {
+    reportSanityFallback('faq', error)
     return faqFallback
   }
 }

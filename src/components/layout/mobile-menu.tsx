@@ -7,8 +7,13 @@ import { JourneyMarker } from '@/components/shared/journey-marker'
 import { buttonStyles } from '@/components/ui/button'
 import { siteConfig } from '@/content/site.config'
 import { cn } from '@/lib/utils'
+import type { NowContent } from '@/types/content'
 
-export function MobileMenu() {
+type MobileMenuProps = {
+  journey: Pick<NowContent, 'dayCount' | 'city' | 'period'>
+}
+
+export function MobileMenu({ journey }: MobileMenuProps) {
   const [open, setOpen] = useState(false)
 
   // Fechar com ESC + bloquear scroll do body
@@ -105,7 +110,7 @@ export function MobileMenu() {
                 {siteConfig.primaryCta.label}
               </Link>
               <div className="flex justify-center">
-                <JourneyMarker />
+                <JourneyMarker journey={journey} />
               </div>
             </motion.div>
           </motion.div>

@@ -11,6 +11,21 @@ import type { NextRequest } from 'next/server'
  * Nenhum outro arquivo precisa mudar.
  */
 export function proxy(req: NextRequest) {
+  if (req.nextUrl.pathname.startsWith('/portfolio/')) {
+    const configuredKey = process.env.PRIVATE_PORTFOLIO_SLUG ?? ''
+    const expectedPath = `/portfolio/${configuredKey}`
+
+    if (configuredKey.length < 24 || req.nextUrl.pathname !== expectedPath) {
+      return new NextResponse('Não encontrado', {
+        status: 404,
+        headers: {
+          'X-Robots-Tag': 'noindex, nofollow, noarchive, noimageindex',
+          'Cache-Control': 'private, no-store, max-age=0',
+        },
+      })
+    }
+  }
+
   // Toggle principal — se não tiver ENABLE_PASSWORD=true, libera tudo
   if (process.env.ENABLE_PASSWORD !== 'true') {
     return NextResponse.next()

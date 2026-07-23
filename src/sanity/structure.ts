@@ -15,6 +15,12 @@ const SINGLETONS: Array<{ id: string; type: string; title: string; emoji: string
     emoji: '🎞️',
   },
   { id: 'faq-singleton', type: 'faq', title: 'Seção FAQ', emoji: '❓' },
+  {
+    id: 'private-portfolio-singleton',
+    type: 'privatePortfolio',
+    title: 'Portfólio privado',
+    emoji: '🔒',
+  },
 ]
 
 export const structure: StructureResolver = (S) =>

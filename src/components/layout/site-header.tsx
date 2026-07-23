@@ -4,8 +4,11 @@ import { buttonStyles } from '@/components/ui/button'
 import { Container } from './container'
 import { MobileMenu } from './mobile-menu'
 import { Nav } from './nav'
+import { getNowFromSanity } from '@/sanity/queries'
 
-export function SiteHeader() {
+export async function SiteHeader() {
+  const journey = await getNowFromSanity()
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-subtle bg-background/85 backdrop-blur-md">
       <Container size="wide" className="flex h-16 items-center justify-between md:h-20">
@@ -26,7 +29,7 @@ export function SiteHeader() {
           </Link>
         </div>
 
-        <MobileMenu />
+        <MobileMenu journey={journey} />
       </Container>
     </header>
   )

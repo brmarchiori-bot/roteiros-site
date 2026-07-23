@@ -12,6 +12,7 @@ Site oficial e ecossistema digital da marca **Menos Roteiros** — diário públ
 - [React 19.2](https://react.dev)
 - [TypeScript 5](https://www.typescriptlang.org) — strict
 - [Tailwind CSS 4](https://tailwindcss.com) — CSS-only, sem `tailwind.config`
+- [Sanity CMS](https://www.sanity.io/) — seções integradas e portfólio privado
 - [pnpm](https://pnpm.io)
 - [Vercel Analytics](https://vercel.com/analytics) — Web Vitals + tráfego sem cookies
 
@@ -24,6 +25,7 @@ menos-roteiros-site/
 └── src/
     ├── app/                 ← App Router
     │   ├── (marketing)/     ← rotas públicas com header + footer
+    │   ├── portfolio/       ← apresentação privada por chave secreta
     │   ├── icon.tsx         ← favicon programático
     │   ├── apple-icon.tsx   ← Apple Touch Icon
     │   ├── opengraph-image.tsx  ← OG card pra compartilhamentos
@@ -37,6 +39,7 @@ menos-roteiros-site/
     │   ├── shared/          ← peças visuais reutilizáveis
     │   └── ui/              ← primitivos genéricos (Button)
     ├── content/             ← conteúdo editável (config + arquivos por seção)
+    ├── sanity/              ← client, schemas, queries e estrutura do Studio
     ├── hooks/               ← React hooks customizados
     ├── lib/                 ← utilitários (cn, fonts, seo, constants)
     ├── styles/              ← estilos compartilhados
@@ -71,14 +74,21 @@ Variáveis disponíveis:
 | `NEXT_PUBLIC_GOOGLE_VERIFICATION` | Não | Token do Google Search Console |
 | `NEXT_PUBLIC_BING_VERIFICATION` | Não | Token do Bing Webmaster |
 | `NEXT_PUBLIC_YANDEX_VERIFICATION` | Não | Token Yandex |
+| `NEXT_PUBLIC_SANITY_PROJECT_ID` | CMS | ID do projeto Sanity |
+| `NEXT_PUBLIC_SANITY_DATASET` | CMS | Dataset publicado |
+| `PRIVATE_PORTFOLIO_SLUG` | Portfólio | Chave aleatória com pelo menos 24 caracteres |
 | `RESEND_API_KEY` | Futuro | Quando integrar backend de email |
 | `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` | Não | Se preferir Plausible em vez de Vercel Analytics |
 
 ---
 
-## Como editar conteúdo (sem mexer em código)
+## Como editar conteúdo
 
-Toda copy/dado vive em `src/content/` em arquivos `.ts` tipados:
+Hero, Sobre, Agora, Conteúdo, FAQ e Portfólio Privado podem ser editados no Sanity Studio em
+`/studio`. Sem configuração do Sanity, as seções públicas usam os fallbacks tipados abaixo.
+O portfólio privado não usa conteúdo fictício nem fallback público.
+
+As demais seções e os fallbacks vivem em `src/content/`:
 
 | Arquivo | O que mexer |
 |---|---|
@@ -130,7 +140,17 @@ Ativa automaticamente após o primeiro deploy — sem precisar mexer em nada. Ac
 
 ---
 
-## Como editar o "Dia 47" semanal
+## Portfólio privado
+
+O portfólio não aparece na navegação nem no sitemap. Para ativá-lo:
+
+1. Defina `PRIVATE_PORTFOLIO_SLUG` com uma chave aleatória de pelo menos 24 caracteres.
+2. Publique o documento **Portfólio privado** no Sanity Studio.
+3. Compartilhe manualmente `/portfolio/VALOR_DA_CHAVE`.
+
+A rota usa `noindex`, `nofollow`, `no-store` e retorna 404 para chaves inválidas.
+
+## Como editar a jornada
 
 Toda semana, abre `src/content/now.ts` e edita:
 
@@ -206,4 +226,4 @@ Pasta [`docs/`](./docs/):
 - URLs sociais preenchidas em `siteConfig.social`
 - WhatsApp comercial em `siteConfig.contact.whatsapp`
 - Mídia kit PDF em `/public/midia-kit.pdf`
-- Backend de email (Resend ou Loops) — formulários hoje simulam sucesso
+- Backend de email — formulários permanecem desativados e informam que não coletam dados

@@ -9,6 +9,7 @@ const description =
 export const metadata: Metadata = {
   title,
   description,
+  robots: { index: false, follow: true },
   alternates: { canonical: '/parcerias' },
   openGraph: {
     type: 'website',

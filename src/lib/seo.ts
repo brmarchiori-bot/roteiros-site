@@ -1,5 +1,6 @@
 import { faq } from '@/content/faq'
 import { siteConfig } from '@/content/site.config'
+import type { FaqContent } from '@/types/content'
 import { SITE_URL } from './constants'
 
 /**
@@ -48,11 +49,11 @@ export function getWebSiteSchema() {
   }
 }
 
-export function getFaqSchema() {
+export function getFaqSchema(content: FaqContent = faq) {
   return {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
-    mainEntity: faq.items.map((item) => ({
+    mainEntity: content.items.map((item) => ({
       '@type': 'Question',
       name: item.question,
       acceptedAnswer: {

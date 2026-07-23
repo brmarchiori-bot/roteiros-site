@@ -1,22 +1,25 @@
 import { now } from '@/content/now'
 import { cn } from '@/lib/utils'
+import type { NowContent } from '@/types/content'
 
 type JourneyMarkerProps = {
   className?: string
   prefix?: string
   separator?: string
+  journey?: Pick<NowContent, 'dayCount' | 'city' | 'period'>
 }
 
 /**
  * Marcador da jornada — "Dia 47 · Piauí · Abril/2026".
- * Lê de src/content/now.ts. Atualiza-se em um lugar só.
+ * Recebe a jornada resolvida pelo servidor; usa o conteúdo local como fallback.
  */
 export function JourneyMarker({
   className,
   prefix = 'Dia',
   separator = ' · ',
+  journey = now,
 }: JourneyMarkerProps) {
-  const { dayCount, city, period } = now
+  const { dayCount, city, period } = journey
   const parts = [`${prefix} ${dayCount}`, city, period]
 
   return (

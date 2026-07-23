@@ -8,12 +8,12 @@ import { buttonStyles } from '@/components/ui/button'
 import { siteConfig } from '@/content/site.config'
 import { cn } from '@/lib/utils'
 import { toContainerSize, toImageStyle } from '@/lib/sanity-styles'
-import { getHeroFromSanity } from '@/sanity/queries'
+import { getHeroFromSanity, getNowFromSanity } from '@/sanity/queries'
 import type { HeroContent } from '@/types/content'
 import { HeroDynamicText } from './hero-dynamic-text'
 
 export async function HeroSection() {
-  const hero = await getHeroFromSanity()
+  const [hero, journey] = await Promise.all([getHeroFromSanity(), getNowFromSanity()])
   const containerSize = toContainerSize(hero.layout?.contentWidth)
 
   // Versão rotativa ativa só quando HÁ titlePrefix + pelo menos 2 frases válidas (≥ 3 chars)
@@ -121,7 +121,10 @@ export async function HeroSection() {
             </p>
           </Reveal>
           <Reveal delay={0.55}>
-            <JourneyMarker className="pointer-events-auto rounded-full bg-background/40 px-3 py-1 backdrop-blur-sm" />
+            <JourneyMarker
+              journey={journey}
+              className="pointer-events-auto rounded-full bg-background/40 px-3 py-1 backdrop-blur-sm"
+            />
           </Reveal>
         </Container>
       </div>

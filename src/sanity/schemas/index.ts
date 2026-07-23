@@ -4,6 +4,7 @@ import { controlledImageSchema } from './controlled-image'
 import { faqSchema } from './faq'
 import { heroSchema } from './hero'
 import { nowSchema } from './now'
+import { privatePortfolioSchema } from './private-portfolio'
 
 export const schemaTypes = [
   controlledImageSchema,
@@ -12,4 +13,5 @@ export const schemaTypes = [
   nowSchema,
   contentHighlightsSchema,
   faqSchema,
+  privatePortfolioSchema,
 ]
