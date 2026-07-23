@@ -100,8 +100,9 @@ Manifesto, Caderno e produtos futuros continuam preservados em `src/content`, ma
 renderizados enquanto não existem produtos reais. Os documentos públicos integrados têm
 fallback no mesmo diretório.
 
-Erros do Sanity são registrados no servidor e caem no fallback. O portfólio não tem conteúdo
-fictício: sem documento publicado, mostra uma apresentação vazia e honesta.
+Erros do Sanity são registrados no servidor e caem no fallback. Sem documento publicado, o
+portfólio mostra um **Preview Editorial** claramente identificado como demonstração fictícia.
+Assim que existe conteúdo real no Sanity, ele substitui o preview automaticamente.
 
 ### Rotina editorial
 
@@ -122,6 +123,10 @@ O portfólio suporta categorias ordenáveis e trabalhos com:
 - capa, imagens, Reels, YouTube e vídeos verticais/horizontais;
 - descrição, objetivo, serviços, resultado e depoimento;
 - links complementares e contato final.
+
+O conteúdo demonstrativo fica centralizado em `src/content/preview-content.ts`. Ele serve somente
+para validar a direção visual e nunca deve receber nomes, resultados ou depoimentos que possam
+ser confundidos com trabalho real.
 
 Configuração:
 

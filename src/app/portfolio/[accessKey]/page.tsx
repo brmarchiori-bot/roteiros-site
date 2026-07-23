@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { Container } from '@/components/layout/container'
+import { portfolioPreview } from '@/content/preview-content'
 import { siteConfig } from '@/content/site.config'
 import { toImageStyle } from '@/lib/sanity-styles'
 import { getPrivatePortfolio } from '@/sanity/portfolio'
@@ -40,7 +41,9 @@ export default async function PrivatePortfolioPage({
     notFound()
   }
 
-  const portfolio = await getPrivatePortfolio()
+  const publishedPortfolio = await getPrivatePortfolio()
+  const portfolio = publishedPortfolio ?? portfolioPreview
+  const isPreview = !publishedPortfolio
   const contactLabel = portfolio?.contactLabel || 'Conversar sobre um projeto'
   const contactUrl =
     portfolio?.contactUrl ||
@@ -61,23 +64,17 @@ export default async function PrivatePortfolioPage({
         </Container>
       </header>
 
-      {!portfolio ? (
-        <Container size="narrow" className="py-28 text-center md:py-40">
-          <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-primary">
-            Portfólio privado
-          </p>
-          <h1 className="mt-6 font-display text-4xl font-medium tracking-tight md:text-6xl">
-            Conteúdo ainda não publicado.
-          </h1>
-          <p className="mx-auto mt-6 max-w-xl leading-relaxed text-foreground/70">
-            Esta apresentação existe, mas ainda não recebeu trabalhos publicados no painel.
-          </p>
-        </Container>
-      ) : (
-        <>
+      <>
+          {isPreview && (
+            <div className="border-b border-primary/25 bg-primary px-6 py-3 text-center text-primary-foreground">
+              <p className="font-mono text-[9px] uppercase tracking-[0.2em] md:text-[10px]">
+                Preview Editorial · demonstração fictícia · nenhum cliente ou resultado real
+              </p>
+            </div>
+          )}
           <Container size="wide" className="py-20 md:py-28">
             <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-primary">
-              Trabalhos selecionados
+              {isPreview ? 'Preview Editorial' : 'Trabalhos selecionados'}
             </p>
             <h1 className="mt-6 max-w-5xl font-display text-5xl font-medium leading-[0.98] tracking-tight md:text-8xl">
               {portfolio.title}
@@ -285,8 +282,7 @@ export default async function PrivatePortfolioPage({
                 </a>
             </div>
           </Container>
-        </>
-      )}
+      </>
     </main>
   )
 }

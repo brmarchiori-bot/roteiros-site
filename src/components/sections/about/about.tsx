@@ -13,9 +13,9 @@ export async function AboutSection() {
   const imageOnRight = about.layout?.imagePosition === 'right'
 
   return (
-    <Section id="about" spacing="lg" size={containerSize}>
+    <Section id="about" spacing="xl" size={containerSize} className="overflow-hidden">
       {/* Header editorial: rótulo + título enorme + linha divisória */}
-      <header className="mb-12 md:mb-16">
+      <header className="mb-10 md:mb-14 md:ml-[42%]">
         <Reveal>
           <div className="flex items-center gap-3">
             <span aria-hidden="true" className="h-px w-8 bg-primary md:w-12" />
@@ -33,13 +33,13 @@ export async function AboutSection() {
         )}
       </header>
 
-      <div className="grid gap-10 md:grid-cols-12 md:gap-x-14">
+      <div className="grid gap-10 md:grid-cols-12 md:gap-x-12">
         {/* Coluna da foto — sticky no desktop */}
-        <div className={cn('md:col-span-5', imageOnRight && 'md:order-2')}>
+        <div className={cn('md:col-span-8 md:row-start-1 md:-ml-16', imageOnRight && 'md:order-2 md:-mr-16 md:ml-0')}>
           <div className="lg:sticky lg:top-28">
             <Reveal>
               {about.photo?.src ? (
-                <figure className="relative aspect-[4/5] w-full overflow-hidden bg-surface">
+                <figure className="relative aspect-[4/5] w-full overflow-hidden bg-surface md:aspect-[5/6]">
                   <Image
                     src={about.photo.src}
                     alt={about.photo.alt}
@@ -64,16 +64,16 @@ export async function AboutSection() {
         {/* Coluna dos capítulos */}
         <div
           className={cn(
-            'md:col-span-7 md:col-start-6',
-            imageOnRight && 'md:order-1 md:col-start-1',
+            'relative z-10 md:col-span-4 md:col-start-9 md:row-start-1 md:mt-16',
+            imageOnRight && 'md:order-1 md:col-start-1 md:ml-0',
           )}
         >
-          <ul className="space-y-12 md:space-y-14">
+          <ul className="space-y-3 md:space-y-0">
             {about.chapters.map((chapter, i) => (
               <Reveal key={chapter.number} delay={i * 0.06}>
-                <li className="relative">
+                <li className="relative px-5 py-8 md:px-0 md:py-9 md:[&:not(:first-child)]:border-t md:[&:not(:first-child)]:border-foreground/15">
                   {/* Numeração grande à esquerda, fora do fluxo */}
-                  <div className="grid grid-cols-[auto_1fr] gap-x-6 md:gap-x-10">
+                  <div className="grid grid-cols-[auto_1fr] gap-x-5 md:gap-x-8">
                     <p className="font-display text-5xl font-medium leading-none tracking-tight text-primary/80 md:text-7xl">
                       {String(i + 1).padStart(2, '0')}
                     </p>

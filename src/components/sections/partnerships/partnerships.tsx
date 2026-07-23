@@ -45,21 +45,21 @@ export async function PartnershipsSection() {
           Formatos
         </p>
       </Reveal>
-      <div className="mt-5 grid gap-px overflow-hidden bg-white/15 md:grid-cols-3">
+      <div className="mt-5 border-y border-white/20">
 
         {partnerships.formats.map((format, i) => (
           <Reveal key={format.id} delay={i * 0.08} className="h-full">
-            <article className="h-full bg-foreground p-7 md:p-8">
-              <div>
-                <p className="font-display text-4xl font-medium leading-none tracking-tight text-primary/80">
+            <article className="grid h-full gap-6 border-b border-white/15 py-10 last:border-b-0 md:grid-cols-12 md:items-start md:gap-10 md:py-14">
+              <div className="md:col-span-5">
+                <p className="font-display text-7xl font-medium italic leading-none tracking-[-0.05em] text-primary/80 md:text-9xl">
                   {format.number}
                 </p>
-                <h3 className="mt-5 font-display text-2xl font-medium leading-tight tracking-tight text-background">
+                <h3 className="mt-4 max-w-[12ch] font-display text-3xl font-medium leading-tight tracking-tight text-background md:text-5xl">
                   {format.name}
                 </h3>
               </div>
-              <div>
-                <p className="mt-5 text-sm leading-relaxed text-background/75 md:text-base">
+              <div className="md:col-span-6 md:col-start-7 md:pt-8">
+                <p className="text-base leading-relaxed text-background/75 md:text-lg">
                   {format.description}
                 </p>
                 <p className="mt-5 border-t border-white/15 pt-4 font-mono text-[9px] uppercase tracking-[0.18em] text-background/55 md:text-[10px]">

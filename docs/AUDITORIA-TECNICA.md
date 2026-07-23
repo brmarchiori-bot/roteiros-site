@@ -44,8 +44,9 @@ As sete seções públicas integradas possuem fallback em `src/content`. Erros d
 registrados no servidor e o site continua disponível com o fallback. FAQ visual e JSON-LD
 consomem a mesma resolução. O marcador da jornada também utiliza o documento `now` resolvido.
 
-O portfólio privado não possui conteúdo fictício nem fallback público. Sem documento publicado
-no Sanity, a URL autorizada informa que o conteúdo ainda não foi publicado.
+Sem documento publicado no Sanity, o portfólio privado mostra um Preview Editorial explicitamente
+marcado como demonstração fictícia. O conteúdo fica centralizado em
+`src/content/preview-content.ts` e é substituído automaticamente quando existe portfólio real.
 
 ## Segurança
 

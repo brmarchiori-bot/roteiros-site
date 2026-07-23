@@ -18,9 +18,16 @@ export async function ContentBridgeSection() {
   const containerSize = toContainerSize(contentHighlights.layout?.contentWidth)
 
   return (
-    <Section id="content" spacing="lg" size={containerSize}>
+    <Section
+      id="content"
+      spacing="xl"
+      size={containerSize}
+      className="bg-secondary"
+      containerClassName="relative bg-background py-12 shadow-[0_28px_80px_rgba(14,14,13,0.18)] md:px-20 md:py-20 lg:-rotate-[0.35deg]"
+      bordered={false}
+    >
       {/* Header editorial */}
-      <header className="mb-10 md:mb-14">
+      <header className="mb-10 border-b border-foreground/15 pb-10 md:mb-14 md:pb-14">
         <Reveal>
           <div className="flex items-center gap-3">
             <span aria-hidden="true" className="h-px w-8 bg-primary md:w-12" />

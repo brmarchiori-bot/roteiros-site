@@ -29,7 +29,7 @@ export async function HeroSection() {
   return (
     <section
       id="hero"
-      className="relative isolate flex min-h-[82svh] flex-col justify-end overflow-hidden border-b border-subtle pb-24 pt-28 md:min-h-[88svh] md:pb-28 md:pt-36"
+      className="relative isolate flex min-h-[94svh] flex-col justify-end overflow-hidden border-b border-subtle pb-24 pt-28 md:min-h-svh md:pb-24 md:pt-36"
     >
       <HeroBackground coverImage={hero.coverImage} />
 
@@ -54,11 +54,11 @@ export async function HeroSection() {
       </div>
 
       <Container size={containerSize} className="relative z-10">
-        <div className="max-w-6xl">
+        <div className="max-w-[92rem]">
           <h1
             aria-label={h1AriaLabel}
             className={cn(
-              'max-w-5xl font-display text-[46px] font-medium leading-[0.98] tracking-[-0.025em] sm:text-[58px] md:text-[88px] lg:text-[104px]',
+              'max-w-[11ch] font-display text-[52px] font-medium leading-[0.88] tracking-[-0.04em] sm:text-[68px] md:text-[112px] lg:text-[136px]',
               hasCover ? 'text-white [text-shadow:0_2px_28px_rgba(0,0,0,0.35)]' : 'text-foreground',
             )}
           >
@@ -78,8 +78,8 @@ export async function HeroSection() {
             )}
           </h1>
 
-          <div className="mt-10 grid gap-10 md:mt-14 md:grid-cols-12 md:gap-12">
-            <Reveal delay={0.18} className="md:col-span-6 md:col-start-1">
+          <div className="mt-9 grid gap-8 md:mt-12 md:grid-cols-12 md:gap-12">
+            <Reveal delay={0.18} className="md:col-span-4 md:col-start-1">
               <p className={cn(
                 'text-base leading-relaxed md:text-lg md:leading-[1.65]',
                 hasCover ? 'text-white/90' : 'text-foreground/75',
@@ -88,7 +88,7 @@ export async function HeroSection() {
               </p>
             </Reveal>
 
-            <Reveal delay={0.28} className="md:col-span-5 md:col-start-8 md:self-end">
+            <Reveal delay={0.28} className="md:col-span-4 md:col-start-9 md:self-end">
               <div className="flex flex-wrap items-center gap-4">
                 <Link
                   href={hero.ctas.primary.href}
@@ -164,7 +164,7 @@ function HeroBackground({ coverImage }: { coverImage?: HeroContent['coverImage']
           className="absolute inset-0"
           style={{
             background:
-              'linear-gradient(to bottom, rgba(14,14,13,0.48) 0%, rgba(14,14,13,0.28) 38%, rgba(14,14,13,0.68) 100%)',
+              'radial-gradient(circle at 68% 46%, rgba(14,14,13,0.02) 0%, rgba(14,14,13,0.16) 28%, rgba(14,14,13,0.46) 72%), linear-gradient(90deg, rgba(14,14,13,0.72) 0%, rgba(14,14,13,0.28) 52%, rgba(14,14,13,0.14) 100%), linear-gradient(to top, rgba(14,14,13,0.72), transparent 55%)',
           }}
         />
         <GrainOverlay opacity={0.08} />

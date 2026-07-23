@@ -106,7 +106,11 @@ test('portfólio rejeita chave inválida e protege chave válida', async ({
   expect(robots).toContain('noindex')
   expect(robots).toContain('nofollow')
   await expect(page.locator('link[rel="canonical"]')).toHaveCount(0)
-  await expect(page.getByText('Conteúdo ainda não publicado.')).toBeVisible()
+  await expect(page.getByText('Preview Editorial', { exact: true }).first()).toBeVisible()
+  await expect(
+    page.getByText(/demonstração fictícia · nenhum cliente ou resultado real/i),
+  ).toBeVisible()
+  await expect(page.getByText(/Exemplo demonstrativo/).first()).toBeVisible()
 })
 
 test('home não coleta dados enquanto formulários estão indisponíveis', async ({ page }) => {
