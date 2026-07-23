@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { JourneyMarker } from '@/components/shared/journey-marker'
 import { buttonStyles } from '@/components/ui/button'
@@ -13,6 +14,7 @@ type MobileMenuProps = {
 }
 
 export function MobileMenu({ journey }: MobileMenuProps) {
+  const pathname = usePathname()
   const [open, setOpen] = useState(false)
   const triggerRef = useRef<HTMLButtonElement>(null)
   const closeButtonRef = useRef<HTMLButtonElement>(null)
@@ -70,7 +72,12 @@ export function MobileMenu({ journey }: MobileMenuProps) {
         onClick={() => setOpen(true)}
         aria-label="Abrir menu"
         aria-expanded={open}
-        className="inline-flex min-h-11 min-w-11 items-center justify-center font-mono text-sm uppercase tracking-widest text-foreground/70 transition-colors hover:text-primary md:hidden"
+        className={cn(
+          'inline-flex min-h-11 min-w-11 items-center justify-center font-mono text-xs uppercase tracking-[0.18em] transition-colors md:hidden',
+          pathname === '/'
+            ? 'text-white/80 hover:text-white'
+            : 'text-foreground/70 hover:text-primary',
+        )}
       >
         Menu
       </button>

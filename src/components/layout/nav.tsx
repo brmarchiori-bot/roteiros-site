@@ -8,9 +8,10 @@ import { cn } from '@/lib/utils'
 type NavProps = {
   className?: string
   variant?: 'inline' | 'stacked'
+  tone?: 'default' | 'inverse'
 }
 
-export function Nav({ className, variant = 'inline' }: NavProps) {
+export function Nav({ className, variant = 'inline', tone = 'default' }: NavProps) {
   const pathname = usePathname()
 
   return (
@@ -30,8 +31,12 @@ export function Nav({ className, variant = 'inline' }: NavProps) {
             href={item.href}
             aria-current={active ? 'page' : undefined}
             className={cn(
-              'transition-colors',
-              active ? 'text-primary' : 'text-foreground/80 hover:text-primary',
+              'site-nav-link transition-colors',
+              active
+                ? 'text-primary'
+                : tone === 'inverse'
+                  ? 'text-white/75 hover:text-white'
+                  : 'text-foreground/80 hover:text-primary',
             )}
           >
             {item.label}

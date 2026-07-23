@@ -23,15 +23,21 @@ export const portfolioPreview: PrivatePortfolio = {
           id: 'preview-case-pousada',
           title: 'Uma pausa antes da próxima estrada',
           featured: true,
-          client: 'Exemplo demonstrativo · marca fictícia',
-          city: 'Local ilustrativo',
           format: 'Filme curto · fotografias · diário',
+          question:
+            'O que faz uma pausa deixar de ser intervalo e virar parte da viagem?',
+          context:
+            'Este trecho demonstra a abertura narrativa de um case. Não descreve uma hospedagem ou trabalho existente.',
           objective:
             'Demonstrar como uma hospedagem pode ser apresentada pela experiência vivida, sem transformar a narrativa em um catálogo de quartos.',
           description:
             'O capítulo começaria na chegada e terminaria na vontade de ficar mais um dia. Entre os dois pontos: o café cedo, a conversa com quem recebe, o som do lugar e os pequenos gestos que uma lista de comodidades não consegue contar.',
+          process:
+            'Espaço reservado para registrar a imersão, os bastidores e as escolhas de linguagem quando houver uma história real.',
           result:
             'Área reservada para resultado real, publicada somente depois de uma entrega comprovada.',
+          learning:
+            'O aprendizado permanece vazio até que uma experiência real possa sustentá-lo.',
           services: ['Direção narrativa', 'Vídeo vertical', 'Fotografia documental'],
           cover: {
             src: '/images/about/andressa-bruno.jpg',
@@ -42,30 +48,6 @@ export const portfolioPreview: PrivatePortfolio = {
           },
           links: [],
           media: [
-            {
-              id: 'preview-still-01',
-              kind: 'image',
-              title: 'Exemplo de galeria · enquadramento horizontal',
-              image: {
-                src: '/images/about/andressa-bruno.jpg',
-                alt: 'Andressa e Bruno conversando diante da paisagem',
-                caption: 'Still real do Menos Roteiros · uso demonstrativo.',
-                objectPosition: 'center',
-                fitMode: 'cover',
-              },
-            },
-            {
-              id: 'preview-still-02',
-              kind: 'image',
-              title: 'Exemplo de galeria · recorte de detalhe',
-              image: {
-                src: '/images/about/andressa-bruno.jpg',
-                alt: 'Recorte de Andressa e Bruno durante a jornada',
-                caption: 'A mesma fotografia real em outro ritmo editorial.',
-                objectPosition: 'right center',
-                fitMode: 'cover',
-              },
-            },
             {
               id: 'preview-reel-01',
               kind: 'reel',
@@ -86,23 +68,21 @@ export const portfolioPreview: PrivatePortfolio = {
           id: 'preview-case-experiencia',
           title: 'O lugar contado por quem vive nele',
           featured: false,
-          client: 'Exemplo demonstrativo · sem cliente real',
-          city: 'Local ilustrativo',
           format: 'Reel narrativo · sequência fotográfica',
+          question: 'Quem conta um lugar quando a câmera deixa de procurar cartões-postais?',
+          context:
+            'Estrutura editorial sem cliente, local ou resultado atribuído.',
           objective:
             'Visualizar uma narrativa que apresenta pessoas e contexto antes de apresentar o produto.',
           description:
             'A câmera acompanha o gesto, o preparo e a conversa. O negócio aparece porque faz parte da história — não porque interrompeu a história para anunciar.',
+          process:
+            'A futura documentação poderá reunir preparação, encontro, captação e montagem sem obrigar todos os casos a terem a mesma forma.',
           result:
             'Resultados, depoimentos e métricas permanecem ausentes até existirem dados verdadeiros.',
+          learning:
+            'Campo demonstrativo para aquilo que a equipe aprendeu ao atravessar a história.',
           services: ['Pesquisa de história', 'Captação', 'Edição'],
-          cover: {
-            src: '/images/about/andressa-bruno.jpg',
-            alt: 'Andressa e Bruno durante uma conversa ao ar livre',
-            caption: 'Preview editorial · não representa trabalho comercial.',
-            objectPosition: 'left center',
-            fitMode: 'cover',
-          },
           links: [],
           media: [],
         },

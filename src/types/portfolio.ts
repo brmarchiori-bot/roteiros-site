@@ -25,9 +25,13 @@ export type PortfolioProject = {
   city?: string
   date?: string
   format?: string
+  question?: string
+  context?: string
   objective?: string
   description?: string
+  process?: string
   result?: string
+  learning?: string
   services: string[]
   testimonial?: {
     quote: string

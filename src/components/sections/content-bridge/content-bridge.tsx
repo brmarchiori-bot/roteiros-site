@@ -22,8 +22,8 @@ export async function ContentBridgeSection() {
       id="content"
       spacing="xl"
       size={containerSize}
-      className="bg-secondary"
-      containerClassName="relative bg-background py-12 shadow-[0_28px_80px_rgba(14,14,13,0.18)] md:px-20 md:py-20 lg:-rotate-[0.35deg]"
+      className="bg-background"
+      containerClassName="relative border-y border-foreground/20 py-14 md:py-24"
       bordered={false}
     >
       {/* Header editorial */}

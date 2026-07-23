@@ -4,8 +4,6 @@ import { Container } from '@/components/layout/container'
 import { GrainOverlay } from '@/components/shared/grain-overlay'
 import { JourneyMarker } from '@/components/shared/journey-marker'
 import { Reveal } from '@/components/shared/reveal'
-import { buttonStyles } from '@/components/ui/button'
-import { siteConfig } from '@/content/site.config'
 import { cn } from '@/lib/utils'
 import { toContainerSize, toImageStyle } from '@/lib/sanity-styles'
 import { getHeroFromSanity, getNowFromSanity } from '@/sanity/queries'
@@ -92,27 +90,10 @@ export async function HeroSection() {
               <div className="flex flex-wrap items-center gap-4">
                 <Link
                   href={hero.ctas.primary.href}
-                  className={cn(
-                    buttonStyles({ variant: 'primary', size: 'lg' }),
-                    'shimmer-button glow-primary',
-                  )}
+                  className="group inline-flex min-h-12 items-center gap-4 border-b border-white/45 font-mono text-[11px] uppercase tracking-[0.2em] text-white transition-colors hover:border-primary hover:text-primary"
                 >
                   {hero.ctas.primary.label}
-                </Link>
-                <Link
-                  href={hero.ctas.secondary.href}
-                  className={cn(
-                    'group inline-flex min-h-11 items-center gap-2 font-mono text-[11px] uppercase tracking-[0.2em] transition-colors',
-                    hasCover ? 'text-white/85 hover:text-white' : 'text-foreground/70 hover:text-foreground',
-                  )}
-                >
-                  {hero.ctas.secondary.label}
-                  <span
-                    aria-hidden="true"
-                    className="transition-transform duration-300 group-hover:translate-x-1"
-                  >
-                    →
-                  </span>
+                  <span aria-hidden="true" className="transition-transform group-hover:translate-y-1">↓</span>
                 </Link>
               </div>
             </Reveal>
@@ -126,11 +107,7 @@ export async function HeroSection() {
           size={containerSize}
           className="flex items-end justify-between gap-6"
         >
-          <Reveal delay={0.45}>
-            <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-foreground/45 md:text-[11px]">
-              {siteConfig.shortTagline}
-            </p>
-          </Reveal>
+          <span aria-hidden="true" />
           <Reveal delay={0.55}>
             <JourneyMarker
               journey={journey}
@@ -156,7 +133,7 @@ function HeroBackground({ coverImage }: { coverImage?: HeroContent['coverImage']
           fill
           priority
           sizes="100vw"
-          className="object-cover"
+          className="documentary-image object-cover"
           style={toImageStyle(coverImage)}
         />
         {/* Gradiente cinema: escurece bordas, preserva o meio-baixo */}

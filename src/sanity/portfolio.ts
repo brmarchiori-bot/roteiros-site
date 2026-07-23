@@ -27,9 +27,13 @@ const PRIVATE_PORTFOLIO_QUERY = groq`*[_id == "private-portfolio-singleton"][0]{
       city,
       date,
       format,
+      question,
+      context,
       objective,
       description,
+      process,
       result,
+      learning,
       services,
       testimonial,
       cover{ image, alt, caption, focusHorizontal, focusVertical, fit },
@@ -71,9 +75,13 @@ type RawProject = {
   city?: string
   date?: string
   format?: string
+  question?: string
+  context?: string
   objective?: string
   description?: string
+  process?: string
   result?: string
+  learning?: string
   services?: string[]
   testimonial?: { quote?: string; author?: string; role?: string }
   cover?: RawControlledImage
@@ -165,9 +173,13 @@ function resolveProject(raw: RawProject): PortfolioProject | null {
     city: text(raw.city),
     date: text(raw.date),
     format: text(raw.format),
+    question: text(raw.question),
+    context: text(raw.context),
     objective: text(raw.objective),
     description: text(raw.description),
+    process: text(raw.process),
     result: text(raw.result),
+    learning: text(raw.learning),
     services: Array.isArray(raw.services)
       ? [...new Set(raw.services.map((service) => service.trim()).filter(Boolean))]
       : [],

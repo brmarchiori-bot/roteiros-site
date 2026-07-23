@@ -51,11 +51,13 @@ test('menu mobile contém o foco, fecha com Escape e devolve o foco', async ({ p
 test('não existe overflow horizontal nas larguras de lançamento', async ({ page }) => {
   const viewports = [
     { width: 320, height: 568 },
+    { width: 360, height: 800 },
     { width: 375, height: 812 },
     { width: 390, height: 844 },
-    { width: 430, height: 932 },
+    { width: 414, height: 896 },
     { width: 768, height: 1024 },
-    { width: 1366, height: 768 },
+    { width: 1024, height: 900 },
+    { width: 1280, height: 900 },
     { width: 1440, height: 900 },
     { width: 1920, height: 1080 },
   ]
@@ -110,7 +112,7 @@ test('portfólio rejeita chave inválida e protege chave válida', async ({
   await expect(
     page.getByText(/demonstração fictícia · nenhum cliente ou resultado real/i),
   ).toBeVisible()
-  await expect(page.getByText(/Exemplo demonstrativo/).first()).toBeVisible()
+  await expect(page.getByText(/não descreve uma hospedagem ou trabalho existente/i)).toBeVisible()
 })
 
 test('home não coleta dados enquanto formulários estão indisponíveis', async ({ page }) => {

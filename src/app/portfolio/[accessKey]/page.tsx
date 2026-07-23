@@ -128,18 +128,19 @@ export default async function PrivatePortfolioPage({
                       {category.projects.map((project, projectIndex) => (
                       <article
                         key={project.id}
-                        className="grid gap-10 border-t border-subtle pt-10 md:grid-cols-12 md:gap-12"
+                        className="border-t border-subtle pt-10"
                       >
+                        <div className="grid gap-10 md:grid-cols-12 md:gap-12">
                         <div className="md:col-span-4">
                           <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted">
-                            Trabalho {String(projectIndex + 1).padStart(2, '0')}
+                            História {String(projectIndex + 1).padStart(2, '0')}
                           </p>
                           <h3 className="mt-4 font-display text-3xl font-medium tracking-tight md:text-4xl">
                             {project.title}
                           </h3>
                           {project.featured && (
-                            <p className="mt-4 inline-flex rounded-full border border-primary/30 px-3 py-1 font-mono text-[9px] uppercase tracking-[0.2em] text-primary">
-                              Destaque
+                            <p className="mt-4 font-mono text-[9px] uppercase tracking-[0.2em] text-primary">
+                              História em primeiro plano
                             </p>
                           )}
                           {project.client && (
@@ -163,7 +164,12 @@ export default async function PrivatePortfolioPage({
                           )}
                         </div>
 
-                        <div className="space-y-8 md:col-span-8">
+                        <div className="space-y-10 md:col-span-8">
+                          {project.question && (
+                            <p className="max-w-3xl font-display text-3xl italic leading-[1.15] text-foreground md:text-5xl">
+                              {project.question}
+                            </p>
+                          )}
                           {project.cover && (
                             <figure>
                               <div className="relative aspect-[16/10] overflow-hidden bg-surface">
@@ -173,6 +179,7 @@ export default async function PrivatePortfolioPage({
                                   fill
                                   sizes="(min-width: 768px) 65vw, 100vw"
                                   style={toImageStyle(project.cover)}
+                                  className="documentary-image"
                                 />
                               </div>
                               {project.cover.caption && (
@@ -182,30 +189,28 @@ export default async function PrivatePortfolioPage({
                               )}
                             </figure>
                           )}
-                          <div className="grid gap-7 md:grid-cols-2">
-                            {project.objective && (
-                              <ProjectText label="Objetivo" text={project.objective} />
-                            )}
-                            {project.result && (
-                              <ProjectText label="Resultado" text={project.result} />
-                            )}
-                          </div>
+                          {project.context && (
+                            <ProjectText label="Antes de entrar" text={project.context} />
+                          )}
                           {project.description && (
                             <p className="max-w-3xl text-base leading-relaxed text-foreground/75 md:text-lg">
                               {project.description}
                             </p>
                           )}
+                          {project.process && (
+                            <ProjectText label="Imersão e processo" text={project.process} />
+                          )}
 
                           {project.services.length > 0 && (
                             <div>
                               <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-primary">
-                                Serviços executados
+                                O que tomou forma
                               </p>
-                              <ul className="mt-4 flex flex-wrap gap-2">
+                              <ul className="mt-4 border-y border-foreground/15">
                                 {project.services.map((service) => (
                                   <li
                                     key={service}
-                                    className="rounded-full border border-foreground/15 px-3 py-1.5 text-xs text-foreground/70"
+                                    className="border-b border-foreground/10 py-3 text-sm text-foreground/70 last:border-b-0"
                                   >
                                     {service}
                                   </li>
@@ -236,6 +241,19 @@ export default async function PrivatePortfolioPage({
                               ))}
                             </div>
                           )}
+                          {(project.objective || project.result) && (
+                            <div className="grid gap-7 border-t border-foreground/15 pt-8 md:grid-cols-2">
+                              {project.objective && (
+                                <ProjectText label="Intenção do trabalho" text={project.objective} />
+                              )}
+                              {project.result && (
+                                <ProjectText label="Evidência e resultado" text={project.result} />
+                              )}
+                            </div>
+                          )}
+                          {project.learning && (
+                            <ProjectText label="O que ficou" text={project.learning} />
+                          )}
 
                           {project.links.length > 0 && (
                             <ul className="flex flex-wrap gap-x-6 gap-y-3">
@@ -253,6 +271,7 @@ export default async function PrivatePortfolioPage({
                               ))}
                             </ul>
                           )}
+                        </div>
                         </div>
                       </article>
                       ))}
@@ -320,6 +339,7 @@ function PortfolioMediaCard({ media }: { media: PortfolioMedia }) {
             fill
             sizes="(min-width: 768px) 40vw, 100vw"
             style={toImageStyle(media.image)}
+            className="documentary-image"
           />
         </div>
         {(media.title || media.image.caption) && (

@@ -6,7 +6,8 @@ export function FaqSection({ faq }: { faq: FaqContent }) {
   return (
     <Section id="faq" spacing="xl" bordered={false}>
       {/* Header editorial consistente */}
-      <header className="mb-12 md:mb-16">
+      <div className="grid gap-12 md:grid-cols-12 md:gap-8">
+      <header className="md:col-span-4">
         <Reveal>
           <div className="flex items-center gap-3">
             <span aria-hidden="true" className="h-px w-8 bg-primary md:w-12" />
@@ -23,9 +24,12 @@ export function FaqSection({ faq }: { faq: FaqContent }) {
             </h2>
           </Reveal>
         )}
+        <p className="mt-8 max-w-xs text-sm leading-relaxed text-muted">
+          Perguntas que costumam aparecer quando a estrada vira conversa.
+        </p>
       </header>
 
-      <div>
+      <div className="md:col-span-7 md:col-start-6">
         {faq.items.map((item, i) => (
           <Reveal key={item.question} delay={i * 0.04}>
             <details
@@ -58,6 +62,7 @@ export function FaqSection({ faq }: { faq: FaqContent }) {
             </details>
           </Reveal>
         ))}
+      </div>
       </div>
     </Section>
   )

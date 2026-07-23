@@ -108,8 +108,27 @@ export const privatePortfolioSchema = defineType({
                       validation: (rule) => rule.max(100),
                     }),
                     defineField({
+                      name: 'question',
+                      title: 'Pergunta central',
+                      description:
+                        'A pergunta humana que conduz a história. Ex.: o que faz alguém querer ficar?',
+                      type: 'text',
+                      rows: 2,
+                      validation: (rule) => rule.max(240),
+                    }),
+                    defineField({
+                      name: 'context',
+                      title: 'Contexto',
+                      description:
+                        'O que o visitante precisa saber antes de entrar na história.',
+                      type: 'text',
+                      rows: 3,
+                      validation: (rule) => rule.max(600),
+                    }),
+                    defineField({
                       name: 'objective',
                       title: 'Objetivo',
+                      description: 'Use somente quando houver um objetivo de trabalho real.',
                       type: 'text',
                       rows: 3,
                       validation: (rule) => rule.max(500),
@@ -122,11 +141,31 @@ export const privatePortfolioSchema = defineType({
                       validation: (rule) => rule.max(1000),
                     }),
                     defineField({
+                      name: 'process',
+                      title: 'Imersão e processo',
+                      description:
+                        'Como a história foi encontrada, acompanhada e transformada em conteúdo.',
+                      type: 'text',
+                      rows: 4,
+                      validation: (rule) => rule.max(1000),
+                    }),
+                    defineField({
                       name: 'result',
                       title: 'Resultado',
+                      description:
+                        'Registre somente resultados comprováveis. Deixe vazio quando não houver.',
                       type: 'text',
                       rows: 3,
                       validation: (rule) => rule.max(500),
+                    }),
+                    defineField({
+                      name: 'learning',
+                      title: 'O que ficou',
+                      description:
+                        'Aprendizado, mudança de olhar ou consequência humana da história.',
+                      type: 'text',
+                      rows: 3,
+                      validation: (rule) => rule.max(600),
                     }),
                     defineField({
                       name: 'services',

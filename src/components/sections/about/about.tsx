@@ -11,6 +11,16 @@ export async function AboutSection() {
   const about = await getAboutFromSanity()
   const containerSize = toContainerSize(about.layout?.contentWidth)
   const imageOnRight = about.layout?.imagePosition === 'right'
+  const movementStyles = [
+    'md:-ml-24 md:bg-background/95 md:px-8 md:py-10',
+    'md:ml-10 md:py-14',
+    'md:-ml-10 md:border-l md:border-primary/50 md:py-10 md:pl-8',
+  ]
+  const titleStyles = [
+    'md:text-[42px]',
+    'md:text-[30px]',
+    'md:text-[38px] md:italic',
+  ]
 
   return (
     <Section id="about" spacing="xl" size={containerSize} className="overflow-hidden">
@@ -46,6 +56,7 @@ export async function AboutSection() {
                     fill
                     sizes="(min-width: 768px) 40vw, 100vw"
                     style={toImageStyle(about.photo)}
+                    className="documentary-image"
                     priority={false}
                   />
                 </figure>
@@ -68,36 +79,34 @@ export async function AboutSection() {
             imageOnRight && 'md:order-1 md:col-start-1 md:ml-0',
           )}
         >
-          <ul className="space-y-3 md:space-y-0">
+          <ul className="space-y-8 md:space-y-4">
             {about.chapters.map((chapter, i) => (
               <Reveal key={chapter.number} delay={i * 0.06}>
-                <li className="relative px-5 py-8 md:px-0 md:py-9 md:[&:not(:first-child)]:border-t md:[&:not(:first-child)]:border-foreground/15">
-                  {/* Numeração grande à esquerda, fora do fluxo */}
-                  <div className="grid grid-cols-[auto_1fr] gap-x-5 md:gap-x-8">
-                    <p className="font-display text-5xl font-medium leading-none tracking-tight text-primary/80 md:text-7xl">
-                      {String(i + 1).padStart(2, '0')}
+                <li className={cn('relative px-5 py-8 md:px-0', movementStyles[i % movementStyles.length])}>
+                  <div className="min-w-0">
+                    <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-primary md:text-[11px]">
+                      Movimento {chapter.number}
                     </p>
-                    <div className="min-w-0 pt-2 md:pt-3">
-                      <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted md:text-[11px]">
-                        {chapter.number}
-                      </p>
-                      <h3 className="mt-3 font-display text-[26px] font-medium leading-[1.15] tracking-tight text-foreground md:text-[34px]">
-                        {chapter.title}
-                      </h3>
-                      <p className="mt-4 text-base leading-relaxed text-foreground/80 md:leading-[1.7]">
-                        {chapter.body}
-                      </p>
-                    </div>
+                    <h3 className={cn(
+                      'mt-4 font-display text-[28px] font-medium leading-[1.08] tracking-tight text-foreground',
+                      titleStyles[i % titleStyles.length],
+                    )}>
+                      {chapter.title}
+                    </h3>
+                    <p className="mt-5 text-base leading-relaxed text-foreground/80 md:leading-[1.75]">
+                      {chapter.body}
+                    </p>
                   </div>
 
                   {chapter.image?.src && (
-                    <figure className="relative mt-8 aspect-[16/10] w-full overflow-hidden bg-surface md:mt-12">
+                    <figure className="relative mt-8 aspect-[16/10] w-full overflow-hidden bg-surface md:-ml-12 md:mt-12 md:w-[calc(100%+3rem)]">
                       <Image
                         src={chapter.image.src}
                         alt={chapter.image.alt}
                         fill
                         sizes="(min-width: 768px) 55vw, 100vw"
                         style={toImageStyle(chapter.image)}
+                        className="documentary-image"
                       />
                     </figure>
                   )}

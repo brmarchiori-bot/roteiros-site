@@ -18,6 +18,15 @@
   --primary-foreground: #f3eee5;
   --secondary: #3d4a2b; /* verde sertão — profundidade */
   --secondary-foreground: #f3eee5;
+
+  /* MATÉRIA — parentesco físico sem uma coleção de efeitos */
+  --paper: #f3eee5;
+  --paper-aged: #e8dfd0;
+  --charcoal: #0e0e0d;
+  --graphite: #252421;
+  --rust: #c4512a;
+  --field: #3d4a2b;
+  --dust: #8a8076;
 }
 
 @theme inline {
@@ -51,6 +60,39 @@
 html,
 body {
   height: 100%;
+}
+
+/* Na home, o cabeçalho pertence ao primeiro frame. Nas páginas internas,
+   permanece um cabeçalho convencional e legível. */
+body:has(#hero) .site-header {
+  position: absolute;
+  left: 0;
+  top: 0;
+  border-color: rgb(255 255 255 / 0.15);
+  background: transparent;
+  color: white;
+  backdrop-filter: none;
+}
+
+body:has(#hero) .site-header .site-nav-link:not([aria-current='page']),
+body:has(#hero) .site-header .site-header-cta {
+  color: rgb(255 255 255 / 0.75);
+}
+
+body:has(#hero) .site-header .site-nav-link:hover,
+body:has(#hero) .site-header .site-header-cta:hover {
+  color: white;
+}
+
+.material-paper {
+  background:
+    linear-gradient(92deg, rgb(14 14 13 / 0.025), transparent 18%, transparent 79%, rgb(14 14 13 / 0.02)),
+    radial-gradient(circle at 17% 24%, rgb(196 81 42 / 0.035), transparent 31%),
+    var(--paper);
+}
+
+.documentary-image {
+  filter: saturate(0.82) contrast(1.07) sepia(0.04);
 }
 
 html {

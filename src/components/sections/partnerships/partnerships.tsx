@@ -1,7 +1,6 @@
 import Link from 'next/link'
 import { Section } from '@/components/layout/section'
 import { Reveal } from '@/components/shared/reveal'
-import { buttonStyles } from '@/components/ui/button'
 import { getPartnershipsFromSanity } from '@/sanity/queries'
 
 export async function PartnershipsSection() {
@@ -42,7 +41,7 @@ export async function PartnershipsSection() {
       {/* 2. Formatos */}
       <Reveal>
         <p className="mt-12 font-mono text-[10px] uppercase tracking-[0.25em] text-background/55 md:mt-16 md:text-[11px]">
-          Formatos
+          Possibilidades narrativas
         </p>
       </Reveal>
       <div className="mt-5 border-y border-white/20">
@@ -51,9 +50,6 @@ export async function PartnershipsSection() {
           <Reveal key={format.id} delay={i * 0.08} className="h-full">
             <article className="grid h-full gap-6 border-b border-white/15 py-10 last:border-b-0 md:grid-cols-12 md:items-start md:gap-10 md:py-14">
               <div className="md:col-span-5">
-                <p className="font-display text-7xl font-medium italic leading-none tracking-[-0.05em] text-primary/80 md:text-9xl">
-                  {format.number}
-                </p>
                 <h3 className="mt-4 max-w-[12ch] font-display text-3xl font-medium leading-tight tracking-tight text-background md:text-5xl">
                   {format.name}
                 </h3>
@@ -107,19 +103,16 @@ export async function PartnershipsSection() {
         </div>
       )}
 
-      {/* 4. CTAs duplos */}
+      {/* Convite: links editoriais, sem aparência de funil. */}
       <div className="mt-12 border-t border-white/20 pt-8 md:mt-16">
         <Reveal>
-          <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:gap-4">
+          <div className="flex flex-col items-start gap-6 sm:flex-row sm:items-center sm:gap-10">
             <Link
               href={partnerships.ctas.mediaKit.href}
-              className={buttonStyles({
-                variant: 'primary',
-                size: 'lg',
-                className: 'w-full hover:bg-background hover:text-foreground sm:w-auto',
-              })}
+              className="group inline-flex min-h-11 items-center gap-4 border-b border-primary/70 font-mono text-[10px] uppercase tracking-[0.18em] text-background transition-colors hover:border-background"
             >
               {partnerships.ctas.mediaKit.label}
+              <span aria-hidden="true" className="text-primary transition-transform group-hover:translate-x-1">→</span>
             </Link>
             <Link
               href={partnerships.ctas.whatsapp.href}
@@ -129,14 +122,10 @@ export async function PartnershipsSection() {
                   ? 'noopener noreferrer'
                   : undefined
               }
-              className={buttonStyles({
-                variant: 'outline',
-                size: 'lg',
-                className:
-                  'w-full border-background text-background hover:bg-background hover:text-foreground sm:w-auto',
-              })}
+              className="group inline-flex min-h-11 items-center gap-4 border-b border-white/25 font-mono text-[10px] uppercase tracking-[0.18em] text-background/70 transition-colors hover:border-white hover:text-background"
             >
               {partnerships.ctas.whatsapp.label}
+              <span aria-hidden="true" className="transition-transform group-hover:translate-x-1">↗</span>
             </Link>
           </div>
         </Reveal>

@@ -3,10 +3,10 @@ import { sectionLayoutFields } from './shared'
 
 export const nowSchema = defineType({
   name: 'now',
-  title: 'Seção Agora — atualiza toda semana',
+  title: 'Agora — registro atual',
   type: 'document',
   description:
-    'Onde vocês estão agora. Número gigante de dias + cidade + foto da semana + diário curtinho. Troca toda semana.',
+    'O capítulo presente da jornada. Atualize somente quando a cidade, a etapa ou a história realmente mudar.',
   groups: [
     { name: 'conteudo', title: '📝 Conteúdo', default: true },
     { name: 'imagem', title: '🖼️ Imagem' },
@@ -39,18 +39,26 @@ export const nowSchema = defineType({
     }),
     defineField({
       name: 'dayCount',
-      title: 'Número do dia (ENORME na tela)',
+      title: 'Número do dia (opcional)',
       description:
-        '📍 Onde aparece: número gigante em destaque. Dias desde o início da jornada. 👉 Incremente a cada atualização semanal.',
+        'Exiba somente quando a contagem estiver confirmada. Deixe vazio para não mostrar.',
       group: 'conteudo',
       type: 'number',
-      validation: (r) => r.required().min(1),
+      validation: (r) => r.min(1),
+    }),
+    defineField({
+      name: 'journeyState',
+      title: 'Estado da jornada',
+      description: 'Uma nota factual curta. Ex.: em deslocamento, pausa ou nova etapa.',
+      group: 'conteudo',
+      type: 'string',
+      validation: (r) => r.max(80),
     }),
     defineField({
       name: 'caption',
-      title: 'Diário da semana',
+      title: 'Nota do capítulo atual',
       description:
-        '📍 Onde aparece: texto corrido abaixo do número do dia. Tom leve, primeira pessoa. 2 a 4 linhas. Recomendado até 300 caracteres.',
+        'Texto curto em primeira pessoa. Atualize quando houver algo que mereça registro.',
       group: 'conteudo',
       type: 'text',
       rows: 4,
@@ -132,11 +140,35 @@ export const nowSchema = defineType({
     }),
     defineField({
       name: 'imagemLocal',
-      title: 'Foto da semana',
+      title: 'Imagem documental principal',
       description:
-        '📍 Onde aparece: SÓ na seção Agora, ao lado do texto. 🔄 Troca toda semana junto com o diário.',
+        'Priorize pessoas, gestos e situações reais. A seção funciona também sem imagem.',
       group: 'imagem',
       type: 'controlledImage',
+    }),
+    defineField({
+      name: 'imagemSecundaria',
+      title: 'Imagem secundária (opcional)',
+      description:
+        'Use apenas quando um segundo detalhe acrescentar contexto. Evite repetir o mesmo enquadramento.',
+      group: 'imagem',
+      type: 'controlledImage',
+    }),
+    defineField({
+      name: 'atmosphere',
+      title: 'Atmosfera visual',
+      description: 'Escolha pela emoção do registro, não pela cor da fotografia.',
+      group: 'aparencia',
+      type: 'string',
+      initialValue: 'charcoal',
+      options: {
+        layout: 'radio',
+        list: [
+          { title: 'Carvão — denso e silencioso', value: 'charcoal' },
+          { title: 'Sertão — terroso e presente', value: 'field' },
+          { title: 'Papel — leve e contemplativo', value: 'paper' },
+        ],
+      },
     }),
     ...sectionLayoutFields({ hasImageText: true }).map((f) => ({ ...f, group: 'aparencia' })),
   ],

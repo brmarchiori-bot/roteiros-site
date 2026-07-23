@@ -311,10 +311,11 @@ export async function getAboutFromSanity(): Promise<AboutContent> {
 const NOW_QUERY = groq`*[_id == "now-singleton"][0]{
   meta,
   city, state, country,
-  date, period, dayCount, coordinates,
+  date, period, dayCount, coordinates, journeyState, atmosphere,
   caption,
   cta,
   "imagemLocal": imagemLocal${IMAGE_PROJ},
+  "imagemSecundaria": imagemSecundaria${IMAGE_PROJ},
   contentWidth,
   imagePosition
 }`
@@ -327,10 +328,13 @@ type RawNow = {
   date?: string
   period?: string
   dayCount?: number
+  journeyState?: string
+  atmosphere?: NowContent['atmosphere']
   coordinates?: string
   caption?: string
   cta?: Partial<Cta>
   imagemLocal?: RawControlledImage | null
+  imagemSecundaria?: RawControlledImage | null
   contentWidth?: SectionLayout['contentWidth']
   imagePosition?: SectionLayout['imagePosition']
 }
@@ -350,6 +354,15 @@ export const getNowFromSanity = cache(async function getNowFromSanity(): Promise
           ...localImg.controls,
         }
       : nowFallback.photo
+    const secondaryImg = resolveImage(raw.imagemSecundaria, 1200)
+    const secondaryPhoto = secondaryImg
+      ? {
+          src: secondaryImg.src,
+          alt: secondaryImg.alt,
+          caption: secondaryImg.caption || '',
+          ...secondaryImg.controls,
+        }
+      : undefined
 
     return {
       meta: mergeMeta(raw.meta, nowFallback.meta),
@@ -359,11 +372,14 @@ export const getNowFromSanity = cache(async function getNowFromSanity(): Promise
       date: pickString(raw.date, nowFallback.date),
       period: pickString(raw.period, nowFallback.period),
       dayCount: typeof raw.dayCount === 'number' ? raw.dayCount : nowFallback.dayCount,
+      journeyState: pickString(raw.journeyState, nowFallback.journeyState),
+      atmosphere: raw.atmosphere ?? nowFallback.atmosphere,
       coordinates: pickString(raw.coordinates, nowFallback.coordinates),
       caption: pickString(raw.caption, nowFallback.caption),
       cta: mergeOptionalCta(raw.cta, nowFallback.cta),
       link: nowFallback.link,
       photo,
+      secondaryPhoto,
       layout: mergeLayout(
         { contentWidth: raw.contentWidth, imagePosition: raw.imagePosition },
         nowFallback.layout,

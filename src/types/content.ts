@@ -101,10 +101,17 @@ export type NowContent = {
   period: string
   /** Nulo no fallback quando a contagem atual ainda não foi confirmada editorialmente. */
   dayCount: number | null
+  journeyState?: string
+  atmosphere?: 'charcoal' | 'field' | 'paper'
   /** Coordenadas opcionais como detalhe tátil (ex: "−5.09° S · −42.80° W") */
   coordinates?: string
   /** Foto da semana — quando src vazio, renderiza PhotoPlaceholder */
   photo?: {
+    src?: string
+    alt: string
+    caption: string
+  } & PhotoControls
+  secondaryPhoto?: {
     src?: string
     alt: string
     caption: string

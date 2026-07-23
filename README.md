@@ -226,3 +226,5 @@ Consulte também:
 - [`docs/ETAPA-01-ESTRATEGIA.md`](./docs/ETAPA-01-ESTRATEGIA.md)
 - [`docs/AUDITORIA-TECNICA.md`](./docs/AUDITORIA-TECNICA.md)
 - [`docs/HOME-EDITORIAL.md`](./docs/HOME-EDITORIAL.md)
+- [`docs/PHASE-X-LIVING-DOCUMENT.md`](./docs/PHASE-X-LIVING-DOCUMENT.md) — auditoria visual,
+  storyboard e decisões do sistema documental.

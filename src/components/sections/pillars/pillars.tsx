@@ -4,6 +4,18 @@ import { getPillarsFromSanity } from '@/sanity/queries'
 
 export async function PillarsSection() {
   const pillars = await getPillarsFromSanity()
+  const itemLayouts = [
+    'lg:col-span-5 lg:col-start-1',
+    'lg:col-span-4 lg:col-start-8 lg:mt-24',
+    'lg:col-span-4 lg:col-start-2',
+    'lg:col-span-5 lg:col-start-7 lg:-mt-10',
+  ]
+  const titleLayouts = [
+    'md:text-5xl',
+    'md:text-3xl md:italic',
+    'md:text-4xl',
+    'md:text-[42px]',
+  ]
   return (
     <Section id="pillars" spacing="xl" className="bg-surface/70" bordered={false}>
       {/* Header editorial */}
@@ -26,23 +38,19 @@ export async function PillarsSection() {
         )}
       </header>
 
-      <ul className="grid gap-x-12 gap-y-2 border-y border-foreground/20 py-6 sm:grid-cols-2 lg:grid-cols-4 lg:gap-x-8">
+      <ul className="grid gap-x-8 gap-y-8 border-y border-foreground/20 py-8 sm:grid-cols-2 lg:grid-cols-12 lg:gap-y-16 lg:py-14">
         {pillars.items.map((pillar, i) => (
-          <Reveal key={pillar.id} delay={i * 0.07}>
-            <li className="relative flex h-full min-h-[210px] flex-col border-b border-foreground/15 px-2 py-8 last:border-b-0 sm:border-b-0 lg:min-h-[260px] lg:px-4 lg:py-10">
-              {/* Numeração gigante como marca d'água */}
-              <p
-                aria-hidden="true"
-                className="pointer-events-none absolute right-1 top-5 font-display text-6xl font-medium italic leading-none tracking-tight text-primary/20 md:text-7xl"
-              >
-                {String(i + 1).padStart(2, '0')}
-              </p>
-
+          <Reveal
+            key={pillar.id}
+            delay={i * 0.07}
+            className={itemLayouts[i % itemLayouts.length]}
+          >
+            <li className="relative flex h-full flex-col border-t border-foreground/25 px-1 py-7">
               <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-primary md:text-[11px]">
-                Nota {String(i + 1).padStart(2, '0')}
+                Forma de olhar · {String(i + 1).padStart(2, '0')}
               </p>
 
-              <h3 className="mt-auto max-w-[12ch] pt-12 font-display text-[24px] font-medium leading-tight tracking-tight text-foreground md:text-[28px]">
+              <h3 className={`max-w-[13ch] pt-10 font-display text-[28px] font-medium leading-[1.05] tracking-tight text-foreground ${titleLayouts[i % titleLayouts.length]}`}>
                 {pillar.title}
               </h3>
 
