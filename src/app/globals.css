@@ -95,6 +95,12 @@ body:has(#hero) .site-header .site-header-cta:hover {
   color: white;
 }
 
+body:has(#hero) .site-header .site-header-cta {
+  min-height: 30px;
+  border: 1px solid rgb(196 81 42 / 0.65);
+  padding: 5px 12px;
+}
+
 .material-paper {
   background:
     linear-gradient(92deg, rgb(14 14 13 / 0.025), transparent 18%, transparent 79%, rgb(14 14 13 / 0.02)),
@@ -284,6 +290,36 @@ body:has(#hero) .site-header .site-header-cta:hover {
   transform: rotate(14deg);
 }
 
+#about > div {
+  position: relative;
+}
+
+#about > div::after {
+  content: '';
+  position: absolute;
+  z-index: 10;
+  bottom: -98px;
+  left: 50%;
+  width: 100vw;
+  height: 32px;
+  background: url('../assets/menos-roteiro/edges/torn-edge-light-bottom.svg') center / 100% 100% no-repeat;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+#about header::before {
+  content: '';
+  position: absolute;
+  z-index: 2;
+  right: -32vw;
+  top: 155px;
+  width: 190px;
+  aspect-ratio: 250 / 230;
+  background: url('../assets/menos-roteiro/notes/story-paper-note.svg') center / contain no-repeat;
+  transform: rotate(-3deg);
+  filter: drop-shadow(8px 10px 7px rgb(42 35 29 / 0.13));
+}
+
 #about figure {
   filter: drop-shadow(8px 11px 0 rgb(55 47 39 / 0.12));
 }
@@ -307,15 +343,15 @@ body:has(#hero) .site-header .site-header-cta:hover {
 }
 
 #pillars {
-  padding-block: 78px !important;
+  padding-block: 58px !important;
 }
 
 #pillars header {
-  margin-bottom: 32px;
+  margin-bottom: 24px;
 }
 
 #pillars li {
-  min-height: 220px;
+  min-height: 180px;
 }
 
 #pillars::before {
@@ -354,7 +390,7 @@ body:has(#hero) .site-header .site-header-cta:hover {
 }
 
 #content {
-  padding-block: 78px !important;
+  padding-block: 55px !important;
 }
 
 #content > div {
@@ -367,16 +403,17 @@ body:has(#hero) .site-header .site-header-cta:hover {
 }
 
 #content a[class*='min-h-'] {
-  min-height: 190px;
-  padding: 30px;
+  min-height: 160px;
+  padding: 24px 30px;
+  background: transparent;
 }
 
 #content::before {
   content: '';
   position: absolute;
-  left: -100px;
+  left: -160px;
   top: 18%;
-  width: 350px;
+  width: 270px;
   aspect-ratio: 360 / 210;
   background: url('../assets/menos-roteiro/frames/film-strip-frame.svg') center / contain no-repeat;
   transform: rotate(-4deg);
@@ -402,7 +439,7 @@ body:has(#hero) .site-header .site-header-cta:hover {
 }
 
 #partnerships {
-  padding-block: 76px !important;
+  padding-block: 56px !important;
 }
 
 #partnerships h2 {
@@ -426,7 +463,7 @@ body:has(#hero) .site-header .site-header-cta:hover {
 }
 
 #faq {
-  padding-block: 72px !important;
+  padding-block: 58px !important;
 }
 
 #faq header {
@@ -503,6 +540,7 @@ footer::after {
   }
 
   .now-master::after,
+  #about header::before,
   #about header::after,
   #content::before,
   #content::after,

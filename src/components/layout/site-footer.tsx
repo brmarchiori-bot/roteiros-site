@@ -17,7 +17,7 @@ export async function SiteFooter() {
     .filter(([, url]) => Boolean(url))
 
   return (
-    <footer className="border-t border-white/10 bg-foreground py-12 text-background md:py-14">
+    <footer className="shrink-0 border-t border-white/10 bg-foreground py-12 text-background md:py-14">
       <Container size="wide">
         {/* Marca e contexto — sem formulário enquanto não existe coleta real. */}
         <div className="grid gap-12 md:grid-cols-12">
