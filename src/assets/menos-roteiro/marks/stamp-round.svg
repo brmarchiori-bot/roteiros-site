@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 140">
+  <g fill="none" stroke="#594f44" opacity=".34">
+    <circle cx="70" cy="70" r="56" stroke-width="2"/>
+    <circle cx="70" cy="70" r="48" stroke-dasharray="2 4"/>
+    <path d="M35 69h70M43 80h54"/>
+  </g>
+  <text x="70" y="43" text-anchor="middle" font-family="monospace" font-size="8" letter-spacing="2" fill="#594f44" opacity=".45">MENOS ROTEIRO</text>
+  <text x="70" y="102" text-anchor="middle" font-family="monospace" font-size="7" letter-spacing="2" fill="#594f44" opacity=".45">EM MOVIMENTO</text>
+</svg>

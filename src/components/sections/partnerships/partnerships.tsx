@@ -8,11 +8,17 @@ export async function PartnershipsSection() {
   const publishedNumbers = partnerships.numbers.items.filter(
     (item) => item.value.trim() && item.value !== '—',
   )
+  const principles = [
+    { number: '01', title: 'Propósito', body: 'A história precisa fazer sentido dentro do caminho.' },
+    { number: '02', title: 'Conexão', body: 'Pessoas, lugares e marcas entram pela relação verdadeira.' },
+    { number: '03', title: 'Impacto', body: 'O conteúdo continua útil depois que a publicação termina.' },
+  ]
 
   return (
     <Section id="partnerships" spacing="lg" className="bg-foreground text-background" bordered={false}>
-      {/* Header editorial */}
-      <header className="mb-10 md:mb-14">
+      <div className="grid gap-12 md:grid-cols-12 md:gap-10">
+      <div className="md:col-span-5">
+      <header className="mb-10">
         <Reveal>
           <div className="flex items-center gap-3">
             <span aria-hidden="true" className="h-px w-8 bg-primary md:w-12" />
@@ -33,39 +39,27 @@ export async function PartnershipsSection() {
 
       {/* 1. Filosofia — filtro silencioso */}
       <Reveal delay={0.1}>
-        <p className="max-w-3xl text-lg leading-relaxed text-background/75 md:text-xl">
+        <p className="max-w-xl text-base leading-relaxed text-background/70">
           “{partnerships.philosophy}”
         </p>
       </Reveal>
-
-      {/* 2. Formatos */}
-      <Reveal>
-        <p className="mt-12 font-mono text-[10px] uppercase tracking-[0.25em] text-background/55 md:mt-16 md:text-[11px]">
-          Possibilidades narrativas
-        </p>
-      </Reveal>
-      <div className="mt-5 border-y border-white/20">
-
-        {partnerships.formats.map((format, i) => (
-          <Reveal key={format.id} delay={i * 0.08} className="h-full">
-            <article className="grid h-full gap-6 border-b border-white/15 py-10 last:border-b-0 md:grid-cols-12 md:items-start md:gap-10 md:py-14">
-              <div className="md:col-span-5">
-                <h3 className="mt-4 max-w-[12ch] font-display text-3xl font-medium leading-tight tracking-tight text-background md:text-5xl">
-                  {format.name}
-                </h3>
-              </div>
-              <div className="md:col-span-6 md:col-start-7 md:pt-8">
-                <p className="text-base leading-relaxed text-background/75 md:text-lg">
-                  {format.description}
-                </p>
-                <p className="mt-5 border-t border-white/15 pt-4 font-mono text-[9px] uppercase tracking-[0.18em] text-background/55 md:text-[10px]">
-                  Para: <span className="text-background/75">{format.audience}</span>
-                </p>
-              </div>
-            </article>
+      </div>
+      <ol className="grid gap-0 border-y border-white/20 md:col-span-7 md:grid-cols-3">
+        {principles.map((principle, i) => (
+          <Reveal key={principle.number} delay={i * 0.08} className="h-full">
+            <li className="h-full border-b border-white/15 px-6 py-9 md:border-r md:border-b-0">
+              <p className="font-mono text-[10px] tracking-[0.2em] text-primary">{principle.number}</p>
+              <h3 className="mt-7 font-display text-2xl text-background">{principle.title}</h3>
+              <p className="mt-4 text-sm leading-relaxed text-background/60">{principle.body}</p>
+            </li>
           </Reveal>
         ))}
+      </ol>
       </div>
+
+      <p className="mt-10 font-mono text-[9px] uppercase tracking-[0.2em] text-background/40">
+        {partnerships.formats.map((format) => format.name).join(' · ')}
+      </p>
 
       {/* 3. Números — grade escalonada, cada número enorme */}
       {publishedNumbers.length > 0 && (

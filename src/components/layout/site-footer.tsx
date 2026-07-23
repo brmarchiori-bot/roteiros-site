@@ -17,33 +17,29 @@ export async function SiteFooter() {
     .filter(([, url]) => Boolean(url))
 
   return (
-    <footer className="border-t border-white/10 bg-foreground pb-16 pt-24 text-background md:pt-32">
+    <footer className="border-t border-white/10 bg-foreground py-12 text-background md:py-14">
       <Container size="wide">
         {/* Marca e contexto — sem formulário enquanto não existe coleta real. */}
         <div className="grid gap-12 md:grid-cols-12">
           <div className="space-y-5 md:col-span-7">
-            <p className="max-w-3xl font-display text-4xl font-medium leading-[1.02] tracking-tight text-background md:text-7xl">
-              A estrada continua depois que a tela termina.
-            </p>
-            <p className="max-w-md text-sm leading-relaxed text-background/55">
-              {siteConfig.tagline}
+            <p className="font-display text-2xl font-medium tracking-tight text-background">
+              {siteConfig.name}
             </p>
             <JourneyMarker journey={journey} className="text-primary" />
           </div>
 
           <div className="space-y-4 md:col-span-4 md:col-start-9">
             <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-background/45">
-              Próximo capítulo
+              Acompanhar a jornada
             </p>
             <p className="max-w-md text-sm leading-relaxed text-background/70">
-              A viagem continua nos canais. O site guarda o essencial e muda quando existe algo
-              que vale a pena registrar.
+              A viagem continua nos canais e muda quando existe algo que vale a pena registrar.
             </p>
           </div>
         </div>
 
         {/* Bloco 2 — Nav + Canais (condicional) + Contato — flex auto-distribuído */}
-        <div className="mt-20 flex flex-col gap-12 border-t border-white/15 pt-12 md:flex-row md:flex-wrap md:gap-x-16 md:gap-y-12">
+        <div className="mt-10 flex flex-col gap-9 border-t border-white/15 pt-9 md:flex-row md:flex-wrap md:gap-x-16">
           <nav aria-label="Rodapé" className="space-y-4 md:flex-1 md:min-w-[180px]">
             <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-muted">
               Navegar
@@ -111,7 +107,7 @@ export async function SiteFooter() {
         </div>
 
         {/* Bloco 3 — Copyright + assinatura */}
-        <div className="mt-16 flex flex-col gap-3 border-t border-white/15 pt-8 font-mono text-[11px] uppercase tracking-[0.2em] text-background/40 md:flex-row md:items-center md:justify-between">
+        <div className="mt-10 flex flex-col gap-3 border-t border-white/15 pt-6 font-mono text-[9px] uppercase tracking-[0.2em] text-background/40 md:flex-row md:items-center md:justify-between">
           <p>
             © {siteConfig.legal.copyrightYear} {siteConfig.name} — um diário em construção
           </p>

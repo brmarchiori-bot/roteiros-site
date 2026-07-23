@@ -12,7 +12,6 @@ export async function NowSection() {
   const ctaLabel = now.cta?.label ?? 'Ver no Instagram'
   const hasPhoto = Boolean(now.photo?.src)
   const imageOnRight = now.layout?.imagePosition === 'right'
-  const locationLine = [now.state, now.country].filter(Boolean).join(' · ')
   const atmosphereClass =
     now.atmosphere === 'field'
       ? 'bg-secondary text-secondary-foreground'
@@ -24,127 +23,101 @@ export async function NowSection() {
   return (
     <Section
       id="now"
-      spacing="lg"
+      spacing="sm"
       size={toContainerSize(now.layout?.contentWidth)}
-      className={`relative overflow-hidden ${atmosphereClass} before:absolute before:inset-0 before:bg-[radial-gradient(circle_at_80%_20%,rgba(196,81,42,0.13),transparent_32%),linear-gradient(115deg,rgba(255,255,255,0.025),transparent_45%)]`}
+      className={`now-master relative overflow-visible ${atmosphereClass}`}
       bordered={false}
     >
-      <header className="relative mb-14 md:mb-20 md:grid md:grid-cols-12">
-        <Reveal>
-          <div className="flex items-center gap-3 md:col-span-3">
-            <span aria-hidden="true" className="h-px w-8 bg-primary md:w-12" />
-            <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-primary md:text-[11px]">
+      <div className="relative grid gap-12 py-10 md:min-h-[500px] md:grid-cols-12 md:items-center md:gap-10 md:py-16">
+        <div className={cn('md:col-span-4', imageOnRight && 'md:order-1')}>
+          <Reveal>
+            <p className="font-mono text-[9px] uppercase tracking-[0.25em] text-primary">
               {now.meta.kicker}
             </p>
-          </div>
-        </Reveal>
-        {now.meta.title && (
-          <Reveal delay={0.08}>
-            <h2 className={`mt-8 max-w-3xl font-display text-4xl font-medium leading-[0.98] tracking-tight md:col-span-8 md:col-start-5 md:mt-0 md:text-7xl ${inverse ? 'text-white' : 'text-foreground'}`}>
-              {now.meta.title}
-            </h2>
-          </Reveal>
-        )}
-      </header>
-
-      <div className="relative grid gap-10 md:grid-cols-12 md:gap-14">
-        {hasPhoto && now.photo?.src && (
-          <div className={cn('md:col-span-6', imageOnRight && 'md:order-2')}>
-            <Reveal>
-              <figure className="relative aspect-[4/3] w-full overflow-hidden bg-black/15">
-                <Image
-                  src={now.photo.src}
-                  alt={now.photo.alt}
-                  fill
-                  sizes="(min-width: 768px) 48vw, 100vw"
-                  style={toImageStyle(now.photo)}
-                  className="documentary-image"
-                />
-              </figure>
-            </Reveal>
-          </div>
-        )}
-
-        <div
-          className={cn(
-            hasPhoto ? 'md:col-span-6' : 'md:col-span-9',
-            imageOnRight && 'md:order-1',
-          )}
-        >
-          <Reveal>
-            <dl className={`grid grid-cols-[auto_1fr] gap-x-8 gap-y-4 border-t pt-5 font-mono text-[10px] uppercase tracking-[0.2em] md:text-[11px] ${inverse ? 'border-white/25 text-white/55' : 'border-foreground/20 text-muted'}`}>
-              <dt>Registro</dt>
-              <dd className={`text-right ${inverse ? 'text-white' : 'text-foreground'}`}>{now.period}</dd>
-              <dt>Presente</dt>
-              <dd className={`text-right ${inverse ? 'text-white' : 'text-foreground'}`}>{locationLine || now.country}</dd>
-            </dl>
-          </Reveal>
-          {now.journeyState && (
-            <p className={`mt-6 font-mono text-[10px] uppercase tracking-[0.2em] ${inverse ? 'text-white/60' : 'text-muted'}`}>
-              {now.journeyState}
-            </p>
-          )}
-
-          {now.dayCount !== null && <Reveal delay={0.12}>
-            <div className="mt-8 border-t border-white/25 pt-7">
-              <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-primary md:text-[11px]">
-                Dia da jornada
+            {now.meta.title && (
+              <h2 className={`mt-5 font-display text-4xl font-medium leading-[1.02] tracking-tight md:text-5xl ${inverse ? 'text-white' : 'text-foreground'}`}>
+                {now.meta.title}
+              </h2>
+            )}
+            <div className={`mt-8 border-y py-6 ${inverse ? 'border-white/15' : 'border-foreground/15'}`}>
+              <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-white/45">
+                Local atual
               </p>
-              <p className="mt-2 font-display text-[76px] font-medium leading-[0.9] tracking-[-0.03em] text-white md:text-[112px]">
-                {now.dayCount}
+              <p className={`mt-3 font-display text-3xl ${inverse ? 'text-white' : 'text-foreground'}`}>
+                {now.city}
+              </p>
+              <p className={`mt-4 max-w-sm text-sm leading-relaxed ${inverse ? 'text-white/70' : 'text-foreground/70'}`}>
+                {now.caption}
               </p>
             </div>
-          </Reveal>}
-
-          <Reveal delay={0.18}>
-            <p className={`mt-10 font-display text-5xl font-medium leading-[0.95] tracking-tight md:text-7xl ${inverse ? 'text-white' : 'text-foreground'}`}>
-              {now.city}
-            </p>
-            <p className={`mt-6 max-w-2xl text-base leading-relaxed md:text-lg md:leading-[1.7] ${inverse ? 'text-white/80' : 'text-foreground/75'}`}>
-              {now.caption}
-            </p>
+            {ctaHref && (
+              <Link
+                href={ctaHref}
+                target={ctaHref.startsWith('http') ? '_blank' : undefined}
+                rel={ctaHref.startsWith('http') ? 'noopener noreferrer' : undefined}
+                className="mt-6 inline-flex min-h-11 items-center gap-3 font-mono text-[9px] uppercase tracking-[0.2em] text-primary"
+              >
+                {ctaLabel} <span aria-hidden="true">→</span>
+              </Link>
+            )}
           </Reveal>
+        </div>
 
-          {now.secondaryPhoto?.src && (
-            <Reveal delay={0.22}>
-              <figure className="mt-10 ml-auto w-3/4 md:w-2/3">
-                <div className="relative aspect-[4/3] overflow-hidden bg-black/20">
+        <div className="md:col-span-5">
+          <Reveal>
+            <figure className="now-evidence-frame relative mx-auto w-[82%] max-w-[390px] bg-[#e8dfd0] p-5 pb-14">
+              <span aria-hidden="true" className="now-evidence-tape" />
+              {hasPhoto && now.photo?.src ? (
+                <div className="relative aspect-square w-full overflow-hidden bg-black/20">
                   <Image
-                    src={now.secondaryPhoto.src}
-                    alt={now.secondaryPhoto.alt}
+                    src={now.photo.src}
+                    alt={now.photo.alt}
                     fill
-                    sizes="(min-width: 768px) 28vw, 75vw"
-                    style={toImageStyle(now.secondaryPhoto)}
+                    sizes="390px"
+                    style={toImageStyle(now.photo)}
                     className="documentary-image"
                   />
                 </div>
-                {now.secondaryPhoto.caption && (
-                  <figcaption className={`mt-3 text-xs leading-relaxed ${inverse ? 'text-white/55' : 'text-muted'}`}>
-                    {now.secondaryPhoto.caption}
-                  </figcaption>
-                )}
-              </figure>
-            </Reveal>
-          )}
-
-          {ctaHref && (
-            <Reveal delay={0.24}>
-              <div className="mt-8 border-t border-white/20 pt-5">
-                <Link
-                  href={ctaHref}
-                  target={ctaHref.startsWith('http') ? '_blank' : undefined}
-                  rel={ctaHref.startsWith('http') ? 'noopener noreferrer' : undefined}
-                  className="group inline-flex min-h-11 items-center gap-3 font-mono text-[11px] uppercase tracking-[0.2em] text-primary transition-colors hover:text-white"
-                >
-                  {ctaLabel}
-                  <span aria-hidden="true" className="transition-transform group-hover:translate-x-1">
-                    →
-                  </span>
-                </Link>
-              </div>
-            </Reveal>
-          )}
+              ) : (
+                <div className="flex aspect-square w-full items-center justify-center bg-[#191b17] px-8 text-center">
+                  <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-white/45">
+                    Imagem do registro ainda não publicada
+                  </p>
+                </div>
+              )}
+              <figcaption className="absolute bottom-5 left-6 font-display text-sm italic text-foreground/70">
+                {now.photo?.caption || 'em movimento'}
+              </figcaption>
+            </figure>
+          </Reveal>
         </div>
+
+        <aside className="md:col-span-3">
+          <Reveal delay={0.12}>
+            <dl className="space-y-7 font-mono text-[9px] uppercase tracking-[0.2em]">
+              <div>
+                <dt className="text-white/40">Atualização</dt>
+                <dd className="mt-2 text-white/80">{now.period || 'pendente'}</dd>
+              </div>
+              <div>
+                <dt className="text-white/40">País</dt>
+                <dd className="mt-2 text-white/80">{now.country}</dd>
+              </div>
+              {now.journeyState && (
+                <div>
+                  <dt className="text-primary">Estado</dt>
+                  <dd className="mt-2 text-white/80">{now.journeyState}</dd>
+                </div>
+              )}
+              {now.dayCount !== null && (
+                <div>
+                  <dt className="text-primary">Dia da jornada</dt>
+                  <dd className="mt-2 text-white/80">{now.dayCount}</dd>
+                </div>
+              )}
+            </dl>
+          </Reveal>
+        </aside>
       </div>
     </Section>
   )

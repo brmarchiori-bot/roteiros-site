@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 230 350">
+  <path fill="#c9bda5" d="m13 9 207 5-4 326-205-3L5 24Z"/>
+  <path fill="none" stroke="#3d352c" stroke-opacity=".35" d="M29 34h166v278H29zM46 54h132v44H46zM46 118h132M46 139h132M46 160h132M46 181h132M46 202h132"/>
+  <text x="112" y="84" text-anchor="middle" font-family="monospace" font-size="24" fill="#3d352c" opacity=".55">28</text>
+  <text x="112" y="260" text-anchor="middle" font-family="monospace" font-size="11" letter-spacing="3" fill="#3d352c" opacity=".55">EM MOVIMENTO</text>
+</svg>

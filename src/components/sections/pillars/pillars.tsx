@@ -4,18 +4,6 @@ import { getPillarsFromSanity } from '@/sanity/queries'
 
 export async function PillarsSection() {
   const pillars = await getPillarsFromSanity()
-  const itemLayouts = [
-    'lg:col-span-5 lg:col-start-1',
-    'lg:col-span-4 lg:col-start-8 lg:mt-24',
-    'lg:col-span-4 lg:col-start-2',
-    'lg:col-span-5 lg:col-start-7 lg:-mt-10',
-  ]
-  const titleLayouts = [
-    'md:text-5xl',
-    'md:text-3xl md:italic',
-    'md:text-4xl',
-    'md:text-[42px]',
-  ]
   return (
     <Section id="pillars" spacing="xl" className="bg-surface/70" bordered={false}>
       {/* Header editorial */}
@@ -38,19 +26,20 @@ export async function PillarsSection() {
         )}
       </header>
 
-      <ul className="grid gap-x-8 gap-y-8 border-y border-foreground/20 py-8 sm:grid-cols-2 lg:grid-cols-12 lg:gap-y-16 lg:py-14">
+      <ul className="grid gap-0 border-y border-white/20 py-4 sm:grid-cols-2 lg:grid-cols-4">
         {pillars.items.map((pillar, i) => (
           <Reveal
             key={pillar.id}
             delay={i * 0.07}
-            className={itemLayouts[i % itemLayouts.length]}
+            className="h-full"
           >
-            <li className="relative flex h-full flex-col border-t border-foreground/25 px-1 py-7">
+            <li className="relative flex h-full min-h-[270px] flex-col border-b border-white/15 px-6 py-8 sm:border-r lg:border-b-0">
+              <PillarMark index={i} />
               <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-primary md:text-[11px]">
                 Forma de olhar · {String(i + 1).padStart(2, '0')}
               </p>
 
-              <h3 className={`max-w-[13ch] pt-10 font-display text-[28px] font-medium leading-[1.05] tracking-tight text-foreground ${titleLayouts[i % titleLayouts.length]}`}>
+              <h3 className="mt-auto max-w-[13ch] pt-10 font-display text-[26px] font-medium leading-[1.05] tracking-tight text-foreground">
                 {pillar.title}
               </h3>
 
@@ -62,5 +51,19 @@ export async function PillarsSection() {
         ))}
       </ul>
     </Section>
+  )
+}
+
+function PillarMark({ index }: { index: number }) {
+  const paths = [
+    'M12 36c8-18 28-26 44-14 14 11 11 34-4 43-17 10-41-2-40-29Zm22 30v16',
+    'M13 25h52v42H13zM22 18h34l5 7M29 67l-5 15m31-15 5 15',
+    'M20 13h40v66H20zM28 25h24M28 37h24M28 49h16m28-4c10 8 10 20 0 28',
+    'M40 17c9 0 15 7 15 16 13-3 21 6 18 18 10 5 9 19-2 23H12C1 70 1 56 10 51 7 39 16 30 28 33c0-9 5-16 12-16Z',
+  ]
+  return (
+    <svg aria-hidden="true" viewBox="0 0 88 88" className="h-12 w-12 text-background/65">
+      <path d={paths[index % paths.length]} fill="none" stroke="currentColor" strokeWidth="1.5" />
+    </svg>
   )
 }

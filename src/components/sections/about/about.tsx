@@ -11,21 +11,11 @@ export async function AboutSection() {
   const about = await getAboutFromSanity()
   const containerSize = toContainerSize(about.layout?.contentWidth)
   const imageOnRight = about.layout?.imagePosition === 'right'
-  const movementStyles = [
-    'md:-ml-24 md:bg-background/95 md:px-8 md:py-10',
-    'md:ml-10 md:py-14',
-    'md:-ml-10 md:border-l md:border-primary/50 md:py-10 md:pl-8',
-  ]
-  const titleStyles = [
-    'md:text-[42px]',
-    'md:text-[30px]',
-    'md:text-[38px] md:italic',
-  ]
 
   return (
-    <Section id="about" spacing="xl" size={containerSize} className="overflow-hidden">
+    <Section id="about" spacing="lg" size={containerSize} className="overflow-hidden">
       {/* Header editorial: rótulo + título enorme + linha divisória */}
-      <header className="mb-10 md:mb-14 md:ml-[42%]">
+      <header className="relative mb-10 md:mb-12 md:ml-[8%]">
         <Reveal>
           <div className="flex items-center gap-3">
             <span aria-hidden="true" className="h-px w-8 bg-primary md:w-12" />
@@ -43,13 +33,13 @@ export async function AboutSection() {
         )}
       </header>
 
-      <div className="grid gap-10 md:grid-cols-12 md:gap-x-12">
+      <div className="grid gap-10 md:grid-cols-12 md:gap-x-10">
         {/* Coluna da foto — sticky no desktop */}
-        <div className={cn('md:col-span-8 md:row-start-1 md:-ml-16', imageOnRight && 'md:order-2 md:-mr-16 md:ml-0')}>
-          <div className="lg:sticky lg:top-28">
+        <div className={cn('md:col-span-4 md:col-start-2 md:row-start-1', imageOnRight && 'md:order-2 md:col-start-8')}>
+          <div>
             <Reveal>
               {about.photo?.src ? (
-                <figure className="relative aspect-[4/5] w-full overflow-hidden bg-surface md:aspect-[5/6]">
+                <figure className="relative aspect-[4/5] w-full overflow-hidden bg-surface">
                   <Image
                     src={about.photo.src}
                     alt={about.photo.alt}
@@ -75,22 +65,22 @@ export async function AboutSection() {
         {/* Coluna dos capítulos */}
         <div
           className={cn(
-            'relative z-10 md:col-span-4 md:col-start-9 md:row-start-1 md:mt-16',
+            'relative z-10 md:col-span-6 md:col-start-7 md:row-start-1',
             imageOnRight && 'md:order-1 md:col-start-1 md:ml-0',
           )}
         >
-          <ul className="space-y-8 md:space-y-4">
+          <ul className="space-y-2">
             {about.chapters.map((chapter, i) => (
               <Reveal key={chapter.number} delay={i * 0.06}>
-                <li className={cn('relative px-5 py-8 md:px-0', movementStyles[i % movementStyles.length])}>
+                <li className="relative grid grid-cols-[3rem_1fr] gap-5 border-b border-foreground/15 px-2 py-6 last:border-b-0 md:grid-cols-[4rem_1fr]">
+                  <p className="font-display text-4xl leading-none text-foreground/75 md:text-5xl">
+                    {String(i + 1).padStart(2, '0')}
+                  </p>
                   <div className="min-w-0">
                     <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-primary md:text-[11px]">
                       Movimento {chapter.number}
                     </p>
-                    <h3 className={cn(
-                      'mt-4 font-display text-[28px] font-medium leading-[1.08] tracking-tight text-foreground',
-                      titleStyles[i % titleStyles.length],
-                    )}>
+                    <h3 className="mt-2 font-display text-2xl font-medium leading-[1.08] tracking-tight text-foreground md:text-3xl">
                       {chapter.title}
                     </h3>
                     <p className="mt-5 text-base leading-relaxed text-foreground/80 md:leading-[1.75]">
@@ -99,7 +89,7 @@ export async function AboutSection() {
                   </div>
 
                   {chapter.image?.src && (
-                    <figure className="relative mt-8 aspect-[16/10] w-full overflow-hidden bg-surface md:-ml-12 md:mt-12 md:w-[calc(100%+3rem)]">
+                    <figure className="relative col-span-2 mt-8 aspect-[16/10] w-full overflow-hidden bg-surface">
                       <Image
                         src={chapter.image.src}
                         alt={chapter.image.alt}

@@ -27,36 +27,19 @@ export async function HeroSection() {
   return (
     <section
       id="hero"
-      className="relative isolate flex min-h-[94svh] flex-col justify-end overflow-hidden border-b border-subtle pb-24 pt-28 md:min-h-svh md:pb-24 md:pt-36"
+      className="hero-master relative isolate flex min-h-[94svh] flex-col justify-end overflow-hidden pb-24 pt-28 md:min-h-[760px] md:pb-20 md:pt-32"
     >
       <HeroBackground coverImage={hero.coverImage} />
 
-      {/* Rótulo fixo topo-esquerdo — sensação de capa de caderno */}
-      <div className="pointer-events-none absolute left-0 right-0 top-12 z-10 sm:top-20 md:top-40">
-        <Container size={containerSize}>
-          <Reveal>
-            <div className="flex items-center gap-3">
-              <span
-                aria-hidden="true"
-                className={cn('h-px w-8 md:w-12', hasCover ? 'bg-white/60' : 'bg-foreground/30')}
-              />
-              <p className={cn(
-                'font-mono text-[10px] uppercase tracking-[0.25em] md:text-[11px]',
-                hasCover ? 'text-white/80' : 'text-foreground/55',
-              )}>
-                {hero.meta.kicker}
-              </p>
-            </div>
-          </Reveal>
-        </Container>
-      </div>
-
       <Container size={containerSize} className="relative z-10">
-        <div className="max-w-[92rem]">
+        <div className="hero-master-copy">
+          <p className="mb-4 font-mono text-[9px] uppercase tracking-[0.24em] text-white/55">
+            {hero.meta.kicker}
+          </p>
           <h1
             aria-label={h1AriaLabel}
             className={cn(
-              'max-w-[11ch] font-display text-[52px] font-medium leading-[0.88] tracking-[-0.04em] sm:text-[68px] md:text-[112px] lg:text-[136px]',
+              'hero-master-title max-w-[11ch] font-display text-[52px] font-medium leading-[0.92] tracking-[-0.035em] sm:text-[68px] md:text-[76px]',
               hasCover ? 'text-white [text-shadow:0_2px_28px_rgba(0,0,0,0.35)]' : 'text-foreground',
             )}
           >
@@ -76,21 +59,21 @@ export async function HeroSection() {
             )}
           </h1>
 
-          <div className="mt-9 grid gap-8 md:mt-12 md:grid-cols-12 md:gap-12">
-            <Reveal delay={0.18} className="md:col-span-4 md:col-start-1">
+          <div className="mt-7 max-w-md">
+            <Reveal delay={0.18}>
               <p className={cn(
-                'text-base leading-relaxed md:text-lg md:leading-[1.65]',
+                'font-display text-sm italic leading-relaxed md:text-base',
                 hasCover ? 'text-white/90' : 'text-foreground/75',
               )}>
                 {hero.subheadline}
               </p>
             </Reveal>
 
-            <Reveal delay={0.28} className="md:col-span-4 md:col-start-9 md:self-end">
-              <div className="flex flex-wrap items-center gap-4">
+            <Reveal delay={0.28}>
+              <div className="mt-6 flex flex-wrap items-center gap-4">
                 <Link
                   href={hero.ctas.primary.href}
-                  className="group inline-flex min-h-12 items-center gap-4 border-b border-white/45 font-mono text-[11px] uppercase tracking-[0.2em] text-white transition-colors hover:border-primary hover:text-primary"
+                  className="group inline-flex min-h-11 items-center gap-3 bg-primary px-5 py-2.5 font-mono text-[9px] uppercase tracking-[0.18em] text-primary-foreground transition-colors hover:bg-[#dd6437]"
                 >
                   {hero.ctas.primary.label}
                   <span aria-hidden="true" className="transition-transform group-hover:translate-y-1">↓</span>
@@ -111,10 +94,7 @@ export async function HeroSection() {
           <Reveal delay={0.55}>
             <JourneyMarker
               journey={journey}
-              className={cn(
-                'pointer-events-auto rounded-full px-3 py-1 backdrop-blur-sm',
-                hasCover ? 'bg-black/35 text-white' : 'bg-background/40',
-              )}
+              className={cn('pointer-events-auto text-white/55')}
             />
           </Reveal>
         </Container>
@@ -133,7 +113,7 @@ function HeroBackground({ coverImage }: { coverImage?: HeroContent['coverImage']
           fill
           priority
           sizes="100vw"
-          className="documentary-image object-cover"
+          className="hero-master-photo object-cover"
           style={toImageStyle(coverImage)}
         />
         {/* Gradiente cinema: escurece bordas, preserva o meio-baixo */}
