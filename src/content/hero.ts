@@ -15,13 +15,8 @@ export const hero: HeroContent = {
   meta: {
     kicker: '01 · Hero',
   },
-  titlePrefix: 'Viajando o mundo e',
-  dynamicWords: [
-    'vivendo sem roteiro',
-    'errando de verdade',
-    'aprendendo na prática',
-    'recomeçando longe de casa',
-  ],
+  titlePrefix: '',
+  dynamicWords: [],
   headline: 'Onde o roteiro acaba, a gente começa.',
   subheadline:
     'A gente largou 10 anos de bar pra viver viajando, trabalhando remoto e mostrando tudo como realmente é.',
@@ -34,5 +29,11 @@ export const hero: HeroContent = {
     videoSrc: '/videos/hero/loop.mp4',
     posterSrc: '/images/og/hero-poster.jpg',
     alt: 'Estrada de chão no sertão do Piauí ao entardecer',
+  },
+  coverImage: {
+    src: '/images/about/andressa-bruno.jpg',
+    alt: 'Andressa e Bruno juntos durante a jornada do Menos Roteiros',
+    objectPosition: 'center',
+    fitMode: 'cover',
   },
 }

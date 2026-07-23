@@ -1,12 +1,13 @@
 import { Section } from '@/components/layout/section'
 import { Reveal } from '@/components/shared/reveal'
-import { pillars } from '@/content'
+import { getPillarsFromSanity } from '@/sanity/queries'
 
-export function PillarsSection() {
+export async function PillarsSection() {
+  const pillars = await getPillarsFromSanity()
   return (
-    <Section id="pillars" spacing="xl" className="bg-surface/60" bordered={false}>
+    <Section id="pillars" spacing="lg" className="bg-surface/60" bordered={false}>
       {/* Header editorial */}
-      <header className="mb-16 md:mb-24">
+      <header className="mb-10 md:mb-14">
         <Reveal>
           <div className="flex items-center gap-3">
             <span aria-hidden="true" className="h-px w-8 bg-primary md:w-12" />
@@ -18,7 +19,7 @@ export function PillarsSection() {
 
         {pillars.meta.title && (
           <Reveal delay={0.08}>
-            <h2 className="mt-8 max-w-4xl font-display text-3xl font-medium leading-[1.05] tracking-[-0.01em] text-foreground md:text-5xl lg:text-[56px]">
+            <h2 className="mt-6 max-w-4xl font-display text-3xl font-medium leading-[1.05] tracking-[-0.01em] text-foreground md:text-5xl">
               {pillars.meta.title}
             </h2>
           </Reveal>
@@ -28,7 +29,7 @@ export function PillarsSection() {
       <ul className="grid gap-px overflow-hidden bg-foreground/15 sm:grid-cols-2 lg:grid-cols-4">
         {pillars.items.map((pillar, i) => (
           <Reveal key={pillar.id} delay={i * 0.07}>
-            <li className="relative flex h-full min-h-[240px] flex-col bg-background p-8 md:min-h-[300px] md:p-10">
+            <li className="relative flex h-full min-h-[210px] flex-col bg-background p-7 md:min-h-[240px] md:p-8">
               {/* Numeração gigante como marca d'água */}
               <p
                 aria-hidden="true"

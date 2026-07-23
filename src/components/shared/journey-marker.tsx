@@ -20,7 +20,7 @@ export function JourneyMarker({
   journey = now,
 }: JourneyMarkerProps) {
   const { dayCount, city, period } = journey
-  const parts = [`${prefix} ${dayCount}`, city, period]
+  const parts = [dayCount ? `${prefix} ${dayCount}` : 'Em movimento', city, period]
 
   return (
     <span
@@ -28,7 +28,11 @@ export function JourneyMarker({
         'inline-flex items-center font-mono text-[11px] uppercase tracking-[0.2em] text-muted',
         className,
       )}
-      aria-label={`Dia ${dayCount} da jornada, em ${city}, ${period}`}
+      aria-label={
+        dayCount
+          ? `Dia ${dayCount} da jornada, em ${city}, ${period}`
+          : `Jornada em movimento, ${city}, ${period}`
+      }
     >
       {parts.join(separator)}
     </span>

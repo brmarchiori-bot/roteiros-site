@@ -6,6 +6,8 @@ import {
   faq as faqFallback,
   hero as heroFallback,
   now as nowFallback,
+  partnerships as partnershipsFallback,
+  pillars as pillarsFallback,
 } from '@/content'
 import type {
   AboutContent,
@@ -17,7 +19,9 @@ import type {
   FaqItem,
   HeroContent,
   NowContent,
+  PartnershipsContent,
   PhotoControls,
+  PillarsContent,
   SectionLayout,
   SectionMeta,
 } from '@/types/content'
@@ -379,7 +383,7 @@ const CONTENT_QUERY = groq`*[_id == "content-highlights-singleton"][0]{
   meta,
   pullQuote,
   highlights[]{
-    _key, platform, url, title,
+    _key, platform, url, title, isVisible,
     "imagemCapa": imagemCapa${IMAGE_PROJ}
   },
   channels,
@@ -391,6 +395,7 @@ type RawHighlight = {
   platform?: ContentHighlight['platform']
   url?: string
   title?: string
+  isVisible?: boolean
   imagemCapa?: RawControlledImage | null
 }
 
@@ -412,6 +417,7 @@ export async function getContentHighlightsFromSanity(): Promise<ContentBridgeCon
     if (!raw) return contentFallback
 
     const validHighlights = (raw.highlights ?? [])
+      .filter((h) => h.isVisible !== false)
       .filter(
         (h): h is RawHighlight & {
           _key: string
@@ -420,6 +426,7 @@ export async function getContentHighlightsFromSanity(): Promise<ContentBridgeCon
           title: string
         } => !!h._key && !!h.platform && !!h.url?.trim() && !!h.title?.trim(),
       )
+      .slice(0, 3)
       .map((h) => {
         const cover = resolveImage(h.imagemCapa, 800)
         return {
@@ -451,6 +458,115 @@ export async function getContentHighlightsFromSanity(): Promise<ContentBridgeCon
   } catch (error) {
     reportSanityFallback('contentHighlights', error)
     return contentFallback
+  }
+}
+
+/* ================================================================
+   PILLARS
+   ================================================================ */
+
+const PILLARS_QUERY = groq`*[_id == "pillars-singleton"][0]{
+  meta,
+  items[]{ _key, title, description, href }
+}`
+
+export async function getPillarsFromSanity(): Promise<PillarsContent> {
+  if (!sanityClient) return pillarsFallback
+  try {
+    const raw = await sanityClient.fetch<{
+      meta?: { kicker?: string; title?: string }
+      items?: Array<{ _key?: string; title?: string; description?: string; href?: string }>
+    } | null>(PILLARS_QUERY, {}, fetchOptions)
+    if (!raw) return pillarsFallback
+
+    const items = (raw.items ?? [])
+      .filter((item) => item._key && item.title?.trim() && item.description?.trim())
+      .slice(0, 4)
+      .map((item) => ({
+        id: item._key as string,
+        title: item.title!.trim(),
+        description: item.description!.trim(),
+        href: pickString(item.href, undefined),
+      }))
+
+    return {
+      meta: mergeMeta(raw.meta, pillarsFallback.meta),
+      items: items.length > 0 ? items : pillarsFallback.items,
+    }
+  } catch (error) {
+    reportSanityFallback('pillars', error)
+    return pillarsFallback
+  }
+}
+
+/* ================================================================
+   PARTNERSHIPS
+   ================================================================ */
+
+const PARTNERSHIPS_QUERY = groq`*[_id == "partnerships-singleton"][0]{
+  meta, philosophy, contactEmail, whatsappUrl,
+  formats[]{ _key, name, description, audience }
+}`
+
+export async function getPartnershipsFromSanity(): Promise<PartnershipsContent> {
+  if (!sanityClient) return partnershipsFallback
+  try {
+    const raw = await sanityClient.fetch<{
+      meta?: { kicker?: string; title?: string }
+      philosophy?: string
+      contactEmail?: string
+      whatsappUrl?: string
+      formats?: Array<{
+        _key?: string
+        name?: string
+        description?: string
+        audience?: string
+      }>
+    } | null>(PARTNERSHIPS_QUERY, {}, fetchOptions)
+    if (!raw) return partnershipsFallback
+
+    const formats = (raw.formats ?? [])
+      .filter(
+        (item) =>
+          item._key &&
+          item.name?.trim() &&
+          item.description?.trim() &&
+          item.audience?.trim(),
+      )
+      .slice(0, 3)
+      .map((item, index) => ({
+        id: item._key as string,
+        number: String(index + 1).padStart(2, '0'),
+        name: item.name!.trim(),
+        description: item.description!.trim(),
+        audience: item.audience!.trim(),
+      }))
+
+    const email = raw.contactEmail?.trim()
+    const whatsapp = raw.whatsappUrl?.trim()
+
+    return {
+      meta: mergeMeta(raw.meta, partnershipsFallback.meta),
+      philosophy: pickString(raw.philosophy, partnershipsFallback.philosophy),
+      formats: formats.length > 0 ? formats : partnershipsFallback.formats,
+      numbers: partnershipsFallback.numbers,
+      ctas: {
+        mediaKit: email
+          ? {
+              label: partnershipsFallback.ctas.mediaKit.label,
+              href: `mailto:${email}?subject=${encodeURIComponent(
+                'Quero conhecer o trabalho do Menos Roteiros',
+              )}`,
+            }
+          : partnershipsFallback.ctas.mediaKit,
+        whatsapp: whatsapp
+          ? { label: partnershipsFallback.ctas.whatsapp.label, href: whatsapp }
+          : partnershipsFallback.ctas.whatsapp,
+      },
+    }
+  } catch (error) {
+    reportSanityFallback('partnerships', error)
+    return partnershipsFallback
   }
 }
 

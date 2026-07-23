@@ -13,9 +13,9 @@ export async function AboutSection() {
   const imageOnRight = about.layout?.imagePosition === 'right'
 
   return (
-    <Section id="about" spacing="xl" size={containerSize}>
+    <Section id="about" spacing="lg" size={containerSize}>
       {/* Header editorial: rótulo + título enorme + linha divisória */}
-      <header className="mb-16 md:mb-24">
+      <header className="mb-12 md:mb-16">
         <Reveal>
           <div className="flex items-center gap-3">
             <span aria-hidden="true" className="h-px w-8 bg-primary md:w-12" />
@@ -26,14 +26,14 @@ export async function AboutSection() {
         </Reveal>
         {about.meta.title && (
           <Reveal delay={0.08}>
-            <h2 className="mt-8 max-w-4xl font-display text-4xl font-medium leading-[1.02] tracking-[-0.01em] text-foreground md:text-[64px] lg:text-[80px]">
+            <h2 className="mt-6 max-w-4xl font-display text-4xl font-medium leading-[1.02] tracking-[-0.01em] text-foreground md:text-[60px]">
               {about.meta.title}
             </h2>
           </Reveal>
         )}
       </header>
 
-      <div className="grid gap-12 md:grid-cols-12 md:gap-x-16 md:gap-y-20">
+      <div className="grid gap-10 md:grid-cols-12 md:gap-x-14">
         {/* Coluna da foto — sticky no desktop */}
         <div className={cn('md:col-span-5', imageOnRight && 'md:order-2')}>
           <div className="lg:sticky lg:top-28">
@@ -68,7 +68,7 @@ export async function AboutSection() {
             imageOnRight && 'md:order-1 md:col-start-1',
           )}
         >
-          <ul className="space-y-16 md:space-y-24">
+          <ul className="space-y-12 md:space-y-14">
             {about.chapters.map((chapter, i) => (
               <Reveal key={chapter.number} delay={i * 0.06}>
                 <li className="relative">
@@ -84,7 +84,7 @@ export async function AboutSection() {
                       <h3 className="mt-3 font-display text-[26px] font-medium leading-[1.15] tracking-tight text-foreground md:text-[34px]">
                         {chapter.title}
                       </h3>
-                      <p className="mt-5 text-base leading-relaxed text-foreground/80 md:text-lg md:leading-[1.75]">
+                      <p className="mt-4 text-base leading-relaxed text-foreground/80 md:leading-[1.7]">
                         {chapter.body}
                       </p>
                     </div>
@@ -108,7 +108,7 @@ export async function AboutSection() {
 
           {about.closingCta && (
             <Reveal delay={0.3}>
-              <div className="mt-20 border-t border-foreground/15 pt-10 md:mt-28">
+              <div className="mt-14 border-t border-foreground/15 pt-8">
                 <Link
                   href={about.closingCta.href}
                   className="group inline-flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.25em] text-primary transition-colors hover:text-foreground"

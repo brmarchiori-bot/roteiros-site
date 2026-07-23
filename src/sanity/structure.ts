@@ -8,11 +8,18 @@ const SINGLETONS: Array<{ id: string; type: string; title: string; emoji: string
   { id: 'hero-singleton', type: 'hero', title: 'Capa / Hero', emoji: '🎬' },
   { id: 'about-singleton', type: 'about', title: 'Seção Sobre', emoji: '👤' },
   { id: 'now-singleton', type: 'now', title: 'Seção Agora', emoji: '📍' },
+  { id: 'pillars-singleton', type: 'pillars', title: 'Pilares de conteúdo', emoji: '🧭' },
   {
     id: 'content-highlights-singleton',
     type: 'contentHighlights',
     title: 'Seção Conteúdo',
     emoji: '🎞️',
+  },
+  {
+    id: 'partnerships-singleton',
+    type: 'partnerships',
+    title: 'Seção Parcerias',
+    emoji: '🤝',
   },
   { id: 'faq-singleton', type: 'faq', title: 'Seção FAQ', emoji: '❓' },
   {

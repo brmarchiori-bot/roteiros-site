@@ -21,6 +21,7 @@ export async function HeroSection() {
     .map((w) => w.trim())
     .filter((w) => w.length >= 3)
   const useRotator = Boolean(hero.titlePrefix?.trim()) && words.length >= 2
+  const hasCover = Boolean(hero.coverImage?.src)
   const h1AriaLabel = useRotator
     ? `${hero.titlePrefix} ${words[0]}`
     : hero.headline
@@ -28,7 +29,7 @@ export async function HeroSection() {
   return (
     <section
       id="hero"
-      className="relative isolate flex min-h-svh flex-col justify-end overflow-hidden border-b border-subtle pb-20 pt-28 md:pb-24 md:pt-40"
+      className="relative isolate flex min-h-[82svh] flex-col justify-end overflow-hidden border-b border-subtle pb-24 pt-28 md:min-h-[88svh] md:pb-28 md:pt-36"
     >
       <HeroBackground coverImage={hero.coverImage} />
 
@@ -39,9 +40,12 @@ export async function HeroSection() {
             <div className="flex items-center gap-3">
               <span
                 aria-hidden="true"
-                className="h-px w-8 bg-foreground/30 md:w-12"
+                className={cn('h-px w-8 md:w-12', hasCover ? 'bg-white/60' : 'bg-foreground/30')}
               />
-              <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-foreground/55 md:text-[11px]">
+              <p className={cn(
+                'font-mono text-[10px] uppercase tracking-[0.25em] md:text-[11px]',
+                hasCover ? 'text-white/80' : 'text-foreground/55',
+              )}>
                 {hero.meta.kicker}
               </p>
             </div>
@@ -53,7 +57,10 @@ export async function HeroSection() {
         <div className="max-w-6xl">
           <h1
             aria-label={h1AriaLabel}
-            className="font-display text-[48px] font-medium leading-[0.98] tracking-[-0.02em] text-foreground md:text-[96px] lg:text-[112px]"
+            className={cn(
+              'max-w-5xl font-display text-[46px] font-medium leading-[0.98] tracking-[-0.025em] sm:text-[58px] md:text-[88px] lg:text-[104px]',
+              hasCover ? 'text-white [text-shadow:0_2px_28px_rgba(0,0,0,0.35)]' : 'text-foreground',
+            )}
           >
             {useRotator ? (
               <span aria-hidden="true">
@@ -73,7 +80,10 @@ export async function HeroSection() {
 
           <div className="mt-10 grid gap-10 md:mt-14 md:grid-cols-12 md:gap-12">
             <Reveal delay={0.18} className="md:col-span-6 md:col-start-1">
-              <p className="text-base leading-relaxed text-foreground/75 md:text-lg md:leading-[1.65]">
+              <p className={cn(
+                'text-base leading-relaxed md:text-lg md:leading-[1.65]',
+                hasCover ? 'text-white/90' : 'text-foreground/75',
+              )}>
                 {hero.subheadline}
               </p>
             </Reveal>
@@ -91,7 +101,10 @@ export async function HeroSection() {
                 </Link>
                 <Link
                   href={hero.ctas.secondary.href}
-                  className="group inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.25em] text-foreground/70 transition-colors hover:text-foreground"
+                  className={cn(
+                    'group inline-flex min-h-11 items-center gap-2 font-mono text-[11px] uppercase tracking-[0.2em] transition-colors',
+                    hasCover ? 'text-white/85 hover:text-white' : 'text-foreground/70 hover:text-foreground',
+                  )}
                 >
                   {hero.ctas.secondary.label}
                   <span
@@ -121,7 +134,10 @@ export async function HeroSection() {
           <Reveal delay={0.55}>
             <JourneyMarker
               journey={journey}
-              className="pointer-events-auto rounded-full bg-background/40 px-3 py-1 backdrop-blur-sm"
+              className={cn(
+                'pointer-events-auto rounded-full px-3 py-1 backdrop-blur-sm',
+                hasCover ? 'bg-black/35 text-white' : 'bg-background/40',
+              )}
             />
           </Reveal>
         </Container>
@@ -148,7 +164,7 @@ function HeroBackground({ coverImage }: { coverImage?: HeroContent['coverImage']
           className="absolute inset-0"
           style={{
             background:
-              'linear-gradient(to bottom, rgba(14,14,13,0.25) 0%, rgba(14,14,13,0.1) 40%, rgba(243,238,229,0.55) 100%)',
+              'linear-gradient(to bottom, rgba(14,14,13,0.48) 0%, rgba(14,14,13,0.28) 38%, rgba(14,14,13,0.68) 100%)',
           }}
         />
         <GrainOverlay opacity={0.08} />

@@ -99,7 +99,8 @@ export type NowContent = {
   date: string
   /** Display ("Abril/2026") — pro JourneyMarker */
   period: string
-  dayCount: number
+  /** Nulo no fallback quando a contagem atual ainda não foi confirmada editorialmente. */
+  dayCount: number | null
   /** Coordenadas opcionais como detalhe tátil (ex: "−5.09° S · −42.80° W") */
   coordinates?: string
   /** Foto da semana — quando src vazio, renderiza PhotoPlaceholder */

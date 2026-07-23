@@ -4,7 +4,7 @@
 
 ## Estado atual
 
-O projeto é um site editorial em Next.js 16 com uma home pública, cinco páginas futuras,
+O projeto é um site editorial em Next.js 16 com uma home pública de sete capítulos, cinco páginas futuras,
 Sanity Studio e um portfólio privado. A home funciona sem Sanity por meio de conteúdo local
 tipado; quando o CMS está configurado, as seções integradas usam os documentos publicados.
 
@@ -36,9 +36,11 @@ Os documentos Sanity são singletons com IDs determinísticos:
 - `now-singleton`
 - `content-highlights-singleton`
 - `faq-singleton`
+- `pillars-singleton`
+- `partnerships-singleton`
 - `private-portfolio-singleton`
 
-As cinco seções públicas integradas possuem fallback em `src/content`. Erros de leitura são
+As sete seções públicas integradas possuem fallback em `src/content`. Erros de leitura são
 registrados no servidor e o site continua disponível com o fallback. FAQ visual e JSON-LD
 consomem a mesma resolução. O marcador da jornada também utiliza o documento `now` resolvido.
 
@@ -80,8 +82,8 @@ enquanto não há provedor, rate limit persistente e política de privacidade pu
 ## Testes automatizados
 
 - Vitest: validação dos leads, FAQ JSON-LD e Proxy/Basic Auth.
-- Playwright: home, navegação, menu mobile/foco, cinco larguras, `noindex`, sitemap, portfólio,
-  formulários e estado do Studio sem configuração.
+- Playwright: home, navegação, menu mobile/foco, oito larguras, mídia, links externos, `noindex`,
+  sitemap, portfólio, ausência de coleta e estado do Studio sem configuração.
 - Os E2E executam contra `next build` + `next start`, evitando diferenças do modo dev em CSP e
   cache.
 

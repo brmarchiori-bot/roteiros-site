@@ -1,11 +1,9 @@
 import Link from 'next/link'
 import { JourneyMarker } from '@/components/shared/journey-marker'
 import { SocialIcon, type SocialPlatform } from '@/components/shared/social-icon'
-import { club } from '@/content/club'
 import { siteConfig } from '@/content/site.config'
 import { getNowFromSanity } from '@/sanity/queries'
 import { Container } from './container'
-import { NewsletterForm } from './newsletter-form'
 
 const SOCIAL_LABELS: Record<SocialPlatform, string> = {
   instagram: 'Instagram',
@@ -21,9 +19,9 @@ export async function SiteFooter() {
   return (
     <footer className="mt-32 border-t border-subtle bg-background pb-16 pt-20 md:pt-24">
       <Container size="wide">
-        {/* Bloco 1 — Marca + Caderno inline */}
+        {/* Marca e contexto — sem formulário enquanto não existe coleta real. */}
         <div className="grid gap-12 md:grid-cols-12">
-          <div className="space-y-5 md:col-span-6">
+          <div className="space-y-5 md:col-span-7">
             <p className="font-display text-3xl font-medium tracking-tight md:text-4xl">
               {siteConfig.name}
             </p>
@@ -33,15 +31,14 @@ export async function SiteFooter() {
             <JourneyMarker journey={journey} />
           </div>
 
-          <div className="space-y-4 md:col-span-6">
+          <div className="space-y-4 md:col-span-4 md:col-start-9">
             <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-muted">
-              {club.name}
+              Por aqui
             </p>
             <p className="max-w-md text-sm leading-relaxed text-foreground/80">
-              {club.promise}
+              A viagem continua nos canais. O site guarda o essencial e muda quando existe algo
+              que vale a pena registrar.
             </p>
-            <NewsletterForm />
-            <p className="text-xs text-muted">{club.rule}</p>
           </div>
         </div>
 

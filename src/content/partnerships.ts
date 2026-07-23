@@ -8,35 +8,35 @@ import { siteConfig } from './site.config'
  */
 export const partnerships: PartnershipsContent = {
   meta: {
-    kicker: '09 · Parcerias',
-    title: 'Trabalhamos com poucas marcas. E com as certas.',
+    kicker: '06 · Parcerias',
+    title: 'Uma boa história também pode ser parceria.',
   },
   philosophy:
-    'A gente trata cada parceria como trata um destino: com cuidado, com verdade, e só quando faz sentido. Não fazemos publipost solto, permuta sem contexto, nem conteúdo fora da nossa linha editorial. Quando a gente fecha com uma marca, é porque acreditamos no que ela faz — e ela acredita no jeito que a gente conta.',
+    'A gente trabalha com negócios que cabem de verdade no caminho. A proposta é simples: viver a experiência, entender o lugar e contar a história sem transformar tudo em anúncio.',
   formats: [
     {
       id: 'pousada-de-alma',
       number: '01',
-      name: 'Pousada de alma',
+      name: 'Hospedagem',
       description:
-        'Hospedagem em troca de cobertura editorial completa: Reels narrativo, sequência de Stories, fotos cinematográficas em pacote, menção no Caderno de Viagem.',
-      audience: 'Pousadas, hostels, hotéis-boutique e casas de temporada com identidade própria.',
+        'Conteúdo sobre a estadia, os bastidores e aquilo que faz o lugar ter personalidade.',
+      audience: 'Pousadas, hotéis, hostels e casas de temporada.',
     },
     {
       id: 'experiencia-contada',
       number: '02',
-      name: 'Experiência contada',
+      name: 'Comida e experiência',
       description:
-        'Um passeio, uma comida, uma travessia — traduzida em formato editorial. Vídeo curto + Story sequence + post longo.',
-      audience: 'Gastronomia, passeios guiados, experiências locais e agências boutique.',
+        'Uma mesa, um passeio ou um encontro local contado no ritmo em que aconteceu.',
+      audience: 'Restaurantes, cafeterias, eventos, passeios e negócios locais.',
     },
     {
       id: 'roteiro-patrocinado',
       number: '03',
-      name: 'Roteiro patrocinado',
+      name: 'Marca no caminho',
       description:
-        'Marca integrada a um trajeto maior — 3 a 7 dias contados do começo ao fim. Vídeo longo no YouTube + cobertura completa nas redes + Caderno dedicado.',
-      audience: 'Destinos, secretarias de turismo, marcas com jornada longa, lançamentos.',
+        'Produtos e serviços inseridos na jornada quando existe contexto e uso real.',
+      audience: 'Marcas, destinos e projetos ligados à vida em movimento.',
     },
   ],
   numbers: {

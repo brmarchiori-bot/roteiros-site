@@ -2,17 +2,18 @@ import Link from 'next/link'
 import { Section } from '@/components/layout/section'
 import { Reveal } from '@/components/shared/reveal'
 import { buttonStyles } from '@/components/ui/button'
-import { partnerships } from '@/content'
+import { getPartnershipsFromSanity } from '@/sanity/queries'
 
-export function PartnershipsSection() {
+export async function PartnershipsSection() {
+  const partnerships = await getPartnershipsFromSanity()
   const publishedNumbers = partnerships.numbers.items.filter(
     (item) => item.value.trim() && item.value !== '—',
   )
 
   return (
-    <Section id="partnerships" spacing="xl">
+    <Section id="partnerships" spacing="lg" className="bg-foreground text-background" bordered={false}>
       {/* Header editorial */}
-      <header className="mb-16 md:mb-24">
+      <header className="mb-10 md:mb-14">
         <Reveal>
           <div className="flex items-center gap-3">
             <span aria-hidden="true" className="h-px w-8 bg-primary md:w-12" />
@@ -24,7 +25,7 @@ export function PartnershipsSection() {
 
         {partnerships.meta.title && (
           <Reveal delay={0.08}>
-            <h2 className="mt-8 max-w-4xl font-display text-4xl font-medium leading-[1.02] tracking-[-0.01em] text-foreground md:text-[64px] lg:text-[76px]">
+            <h2 className="mt-6 max-w-4xl font-display text-4xl font-medium leading-[1.02] tracking-[-0.01em] text-background md:text-[60px]">
               {partnerships.meta.title}
             </h2>
           </Reveal>
@@ -33,36 +34,36 @@ export function PartnershipsSection() {
 
       {/* 1. Filosofia — filtro silencioso */}
       <Reveal delay={0.1}>
-        <p className="max-w-3xl font-display text-2xl italic leading-snug text-foreground/80 md:text-[30px] md:leading-[1.4]">
+        <p className="max-w-3xl text-lg leading-relaxed text-background/75 md:text-xl">
           “{partnerships.philosophy}”
         </p>
       </Reveal>
 
       {/* 2. Formatos */}
-      <div className="mt-24 space-y-16 md:mt-32 md:space-y-20">
-        <Reveal>
-          <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted md:text-[11px]">
-            Formatos
-          </p>
-        </Reveal>
+      <Reveal>
+        <p className="mt-12 font-mono text-[10px] uppercase tracking-[0.25em] text-background/55 md:mt-16 md:text-[11px]">
+          Formatos
+        </p>
+      </Reveal>
+      <div className="mt-5 grid gap-px overflow-hidden bg-white/15 md:grid-cols-3">
 
         {partnerships.formats.map((format, i) => (
-          <Reveal key={format.id} delay={i * 0.08}>
-            <article className="grid gap-8 border-t border-foreground/20 pt-10 md:grid-cols-12 md:gap-12 md:pt-14">
-              <div className="md:col-span-4">
-                <p className="font-display text-5xl font-medium leading-none tracking-tight text-primary/80 md:text-7xl">
+          <Reveal key={format.id} delay={i * 0.08} className="h-full">
+            <article className="h-full bg-foreground p-7 md:p-8">
+              <div>
+                <p className="font-display text-4xl font-medium leading-none tracking-tight text-primary/80">
                   {format.number}
                 </p>
-                <h3 className="mt-5 font-display text-[26px] font-medium leading-tight tracking-tight text-foreground md:text-[32px]">
+                <h3 className="mt-5 font-display text-2xl font-medium leading-tight tracking-tight text-background">
                   {format.name}
                 </h3>
               </div>
-              <div className="md:col-span-8">
-                <p className="text-base leading-relaxed text-foreground/80 md:text-lg md:leading-[1.75]">
+              <div>
+                <p className="mt-5 text-sm leading-relaxed text-background/75 md:text-base">
                   {format.description}
                 </p>
-                <p className="mt-6 border-t border-foreground/10 pt-4 font-mono text-[10px] uppercase tracking-[0.25em] text-muted md:text-[11px]">
-                  Indicado para: <span className="text-foreground/70">{format.audience}</span>
+                <p className="mt-5 border-t border-white/15 pt-4 font-mono text-[9px] uppercase tracking-[0.18em] text-background/55 md:text-[10px]">
+                  Para: <span className="text-background/75">{format.audience}</span>
                 </p>
               </div>
             </article>
@@ -107,7 +108,7 @@ export function PartnershipsSection() {
       )}
 
       {/* 4. CTAs duplos */}
-      <div className="mt-24 border-t border-foreground/20 pt-10 md:mt-32 md:pt-14">
+      <div className="mt-12 border-t border-white/20 pt-8 md:mt-16">
         <Reveal>
           <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:gap-4">
             <Link
@@ -115,7 +116,7 @@ export function PartnershipsSection() {
               className={buttonStyles({
                 variant: 'primary',
                 size: 'lg',
-                className: 'w-full sm:w-auto',
+                className: 'w-full hover:bg-background hover:text-foreground sm:w-auto',
               })}
             >
               {partnerships.ctas.mediaKit.label}
@@ -131,7 +132,8 @@ export function PartnershipsSection() {
               className={buttonStyles({
                 variant: 'outline',
                 size: 'lg',
-                className: 'w-full sm:w-auto',
+                className:
+                  'w-full border-background text-background hover:bg-background hover:text-foreground sm:w-auto',
               })}
             >
               {partnerships.ctas.whatsapp.label}

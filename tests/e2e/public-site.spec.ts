@@ -10,15 +10,17 @@ test('home abre, mantém conteúdo essencial e FAQ consistente com JSON-LD', asy
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
   await expect(page.locator('#about')).toBeVisible()
   await expect(page.locator('#now')).toBeVisible()
+  await expect(page.locator('#content')).toBeVisible()
   await expect(page.locator('#partnerships')).toBeVisible()
+  await expect(page.locator('main > section')).toHaveCount(7)
 
   const questions = await page.locator('#faq details h3').allTextContents()
   const schema = JSON.parse(await page.locator('#faq-schema').textContent() ?? '{}')
   expect(schema.mainEntity.map((item: { name: string }) => item.name)).toEqual(questions)
 
-  const journey = (await page.locator('#hero').getByText(/^Dia \d+/).first().textContent()) ?? ''
-  const currentDay = (await page.locator('#now').getByText(/^\d+$/).first().textContent()) ?? ''
-  expect(journey).toContain(`Dia ${currentDay.trim()}`)
+  const journey = await page.locator('#hero').getByText(/^(Dia \d+|Em movimento)/).first()
+    .textContent()
+  expect(journey?.trim()).toBeTruthy()
 })
 
 test('navegação principal aponta para seções existentes', async ({ page }) => {
@@ -49,9 +51,12 @@ test('menu mobile contém o foco, fecha com Escape e devolve o foco', async ({ p
 test('não existe overflow horizontal nas larguras de lançamento', async ({ page }) => {
   const viewports = [
     { width: 320, height: 568 },
+    { width: 375, height: 812 },
     { width: 390, height: 844 },
+    { width: 430, height: 932 },
     { width: 768, height: 1024 },
     { width: 1366, height: 768 },
+    { width: 1440, height: 900 },
     { width: 1920, height: 1080 },
   ]
 
@@ -104,12 +109,32 @@ test('portfólio rejeita chave inválida e protege chave válida', async ({
   await expect(page.getByText('Conteúdo ainda não publicado.')).toBeVisible()
 })
 
-test('formulários indisponíveis não coletam dados nem simulam sucesso', async ({ page }) => {
+test('home não coleta dados enquanto formulários estão indisponíveis', async ({ page }) => {
   await page.goto('/')
 
   await expect(page.locator('input[type="email"]')).toHaveCount(0)
-  await expect(page.getByText(/Inscrições ainda não estão abertas/).first()).toBeVisible()
-  await expect(page.getByText(/Nenhum dado está sendo coletado/)).toBeVisible()
+  await expect(page.locator('form')).toHaveCount(0)
+  await expect(page.getByText(/cadastro concluído|inscrição confirmada/i)).toHaveCount(0)
+})
+
+test('mídia ausente não produz imagem quebrada e links externos são seguros', async ({
+  page,
+}) => {
+  await page.goto('/')
+
+  const failedImages = await page.locator('img').evaluateAll((images) =>
+    (images as HTMLImageElement[]).filter(
+      (image) => !image.complete || image.naturalWidth === 0,
+    ).length,
+  )
+  expect(failedImages).toBe(0)
+
+  const unsafeBlankLinks = await page.locator('a[target="_blank"]').evaluateAll((links) =>
+    (links as HTMLAnchorElement[]).filter(
+      (link) => !link.rel.split(/\s+/).includes('noopener'),
+    ).length,
+  )
+  expect(unsafeBlankLinks).toBe(0)
 })
 
 test('contato de parceiros não aponta para mídia kit inexistente', async ({ page }) => {

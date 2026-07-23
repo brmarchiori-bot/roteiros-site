@@ -2,7 +2,7 @@ import type { ContentBridgeContent } from '@/types/content'
 
 /**
  * CONTEÚDO EM MOVIMENTO — ponte para YouTube + Instagram.
- * URLs e thumbnails são placeholders por enquanto — substituir conforme postar.
+ * Sem cards fictícios no fallback. Destaques reais entram manualmente pelo Studio.
  */
 export const contentHighlights: ContentBridgeContent = {
   meta: {
@@ -11,36 +11,7 @@ export const contentHighlights: ContentBridgeContent = {
   },
   pullQuote:
     'A gente não produz highlights. A gente escreve a viagem enquanto acontece — no ritmo de quem tá vivendo, não de quem tá performando.',
-  highlights: [
-    {
-      id: 'h1',
-      platform: 'instagram',
-      url: 'https://instagram.com/menosroteiros',
-      title: 'O ônibus quebrou no meio do nada. Foi a melhor parte da semana.',
-      thumbnail: '/images/content/01.jpg',
-    },
-    {
-      id: 'h2',
-      platform: 'instagram',
-      url: 'https://instagram.com/menosroteiros',
-      title: 'Quanto custou viver 7 dias no Piauí — a conta aberta.',
-      thumbnail: '/images/content/02.jpg',
-    },
-    {
-      id: 'h3',
-      platform: 'youtube',
-      url: 'https://youtube.com/@menosroteiros',
-      title: 'A primeira semana fora de casa: o que ninguém te conta.',
-      thumbnail: '/images/content/03.jpg',
-    },
-    {
-      id: 'h4',
-      platform: 'instagram',
-      url: 'https://instagram.com/menosroteiros',
-      title: 'Trabalhar em movimento: 4 erros que a gente cometeu e como resolveu.',
-      thumbnail: '/images/content/04.jpg',
-    },
-  ],
+  highlights: [],
   channels: {
     instagram: {
       url: 'https://instagram.com/menosroteiros',

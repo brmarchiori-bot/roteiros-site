@@ -6,7 +6,7 @@ import type { FaqContent } from '@/types/content'
  */
 export const faq: FaqContent = {
   meta: {
-    kicker: '10 · Perguntas',
+    kicker: '07 · Perguntas',
     title: 'O básico que tira dúvida.',
   },
   items: [
@@ -18,17 +18,12 @@ export const faq: FaqContent = {
     {
       question: 'Como vocês se sustentam?',
       answer:
-        'Hoje: parcerias, conteúdo, e um pouco do que sobrou da vida anterior. Daqui pra frente: clube, roteiros, comunidade.',
+        'Trabalho, produção de conteúdo e parcerias que fazem sentido para a história. A conta real também faz parte do que a gente escolhe contar.',
     },
     {
       question: 'Vocês viajam o tempo todo?',
       answer:
         'Não. Tem semana que a gente fica num lugar só. A vida em movimento tem mais segunda-feira do que parece.',
-    },
-    {
-      question: 'Posso viajar com vocês?',
-      answer:
-        'Por enquanto, não. Mas a gente tá construindo encontros e viagens em grupo — tem como avisar você quando sair.',
     },
     {
       question: 'Sou marca. Como funciona?',

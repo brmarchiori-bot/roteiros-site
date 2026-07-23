@@ -8,8 +8,9 @@ genérico.
 
 ## Estado do produto
 
-- Home editorial completa e estática.
-- Hero, Sobre, Agora, Conteúdo e FAQ editáveis pelo Sanity, com fallback local tipado.
+- Home editorial enxuta, visual e estática, organizada em sete capítulos.
+- Hero, Agora, Sobre, Pilares, Conteúdo, Parcerias e FAQ editáveis pelo Sanity, com fallback
+  local tipado.
 - Sanity Studio em `/studio`.
 - Portfólio privado dinâmico, fora da navegação e protegido por chave.
 - Cinco páginas futuras preservadas como `noindex` e fora do sitemap.
@@ -89,24 +90,26 @@ Abra `/studio` e publique os singletons:
 | Capa / Hero | Primeira tela |
 | Seção Sobre | História e imagens |
 | Seção Agora | Local, dia, diário e marcador global |
+| Pilares de conteúdo | Os quatro assuntos centrais do projeto |
 | Seção Conteúdo | Destaques e canais |
+| Seção Parcerias | Posicionamento, categorias e contatos comerciais |
 | Seção FAQ | Acordeão e JSON-LD |
 | Portfólio privado | Apresentação manual para parceiros |
 
-Manifesto, Pilares, Caderno, Em construção, Parcerias e configurações globais ainda ficam em
-`src/content`. Os documentos públicos integrados têm fallback no mesmo diretório.
+Manifesto, Caderno e produtos futuros continuam preservados em `src/content`, mas não são
+renderizados enquanto não existem produtos reais. Os documentos públicos integrados têm
+fallback no mesmo diretório.
 
 Erros do Sanity são registrados no servidor e caem no fallback. O portfólio não tem conteúdo
 fictício: sem documento publicado, mostra uma apresentação vazia e honesta.
 
 ### Rotina editorial
 
-1. Atualizar o documento **Seção Agora** com data, local, dia, texto e imagem.
-2. Conferir alt text e enquadramento das imagens.
-3. Revisar CTAs antes de publicar.
-4. Abrir a home em mobile e desktop.
+1. Atualizar **Seção Agora** quando a cidade ou a etapa mudar.
+2. Trocar até três **Destaques de conteúdo** quando existir um trabalho relevante.
+3. Cadastrar novos trabalhos no portfólio quando forem produzidos.
+4. Conferir alt text, enquadramento e links; abrir a home em mobile e desktop.
 5. Rodar `pnpm lint`, `pnpm typecheck`, `pnpm test` e `pnpm build`.
-6. Publicar no Sanity somente quando a prévia estiver coerente.
 
 Se o Sanity não estiver disponível, atualize `src/content/now.ts`; ele é o fallback da jornada.
 
@@ -217,3 +220,4 @@ Consulte também:
 
 - [`docs/ETAPA-01-ESTRATEGIA.md`](./docs/ETAPA-01-ESTRATEGIA.md)
 - [`docs/AUDITORIA-TECNICA.md`](./docs/AUDITORIA-TECNICA.md)
+- [`docs/HOME-EDITORIAL.md`](./docs/HOME-EDITORIAL.md)

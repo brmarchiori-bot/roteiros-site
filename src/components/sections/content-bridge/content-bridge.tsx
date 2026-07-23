@@ -1,7 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { Section } from '@/components/layout/section'
-import { PhotoPlaceholder } from '@/components/shared/photo-placeholder'
 import { Reveal } from '@/components/shared/reveal'
 import { SocialIcon, type SocialPlatform } from '@/components/shared/social-icon'
 import { toContainerSize, toImageStyle } from '@/lib/sanity-styles'
@@ -19,9 +18,9 @@ export async function ContentBridgeSection() {
   const containerSize = toContainerSize(contentHighlights.layout?.contentWidth)
 
   return (
-    <Section id="content" spacing="xl" size={containerSize}>
+    <Section id="content" spacing="lg" size={containerSize}>
       {/* Header editorial */}
-      <header className="mb-14 md:mb-20">
+      <header className="mb-10 md:mb-14">
         <Reveal>
           <div className="flex items-center gap-3">
             <span aria-hidden="true" className="h-px w-8 bg-primary md:w-12" />
@@ -33,7 +32,7 @@ export async function ContentBridgeSection() {
 
         {contentHighlights.meta.title && (
           <Reveal delay={0.08}>
-            <h2 className="mt-8 max-w-4xl font-display text-4xl font-medium leading-[1.02] tracking-[-0.01em] text-foreground md:text-[64px] lg:text-[80px]">
+            <h2 className="mt-6 max-w-4xl font-display text-4xl font-medium leading-[1.02] tracking-[-0.01em] text-foreground md:text-[60px]">
               {contentHighlights.meta.title}
             </h2>
           </Reveal>
@@ -41,7 +40,7 @@ export async function ContentBridgeSection() {
 
         {contentHighlights.pullQuote && (
           <Reveal delay={0.18}>
-            <p className="mt-10 max-w-3xl font-display text-2xl italic leading-snug text-foreground/75 md:text-[28px] md:leading-[1.45]">
+            <p className="mt-7 max-w-3xl font-display text-xl italic leading-snug text-foreground/75 md:text-2xl md:leading-[1.4]">
               “{contentHighlights.pullQuote}”
             </p>
           </Reveal>
@@ -49,8 +48,9 @@ export async function ContentBridgeSection() {
       </header>
 
       {/* Grade de cards com moldura editorial */}
-      <ul className="grid gap-8 sm:grid-cols-2 md:gap-10 lg:grid-cols-4">
-        {contentHighlights.highlights.map((highlight, i) => (
+      {contentHighlights.highlights.length > 0 && (
+      <ul className="grid gap-8 sm:grid-cols-2 md:gap-10 lg:grid-cols-3">
+        {contentHighlights.highlights.slice(0, 3).map((highlight, i) => (
           <Reveal key={highlight.id} delay={i * 0.06}>
             <li>
               <Link
@@ -70,9 +70,7 @@ export async function ContentBridgeSection() {
                       style={toImageStyle(highlight.thumbnailControls)}
                     />
                   </figure>
-                ) : (
-                  <PhotoPlaceholder aspect="aspect-[3/4]" caption={highlight.title} />
-                )}
+                ) : null}
 
                 {/* Linha de metadados editorial: nº + ícone + rede */}
                 <div className="mt-5 flex items-center justify-between border-t border-foreground/15 pt-4">
@@ -93,9 +91,12 @@ export async function ContentBridgeSection() {
           </Reveal>
         ))}
       </ul>
+      )}
 
       {/* ChannelBlocks — dois blocos com frase de destaque em itálico */}
-      <div className="mt-24 grid gap-px overflow-hidden bg-foreground/15 md:mt-32 md:grid-cols-2">
+      <div className={contentHighlights.highlights.length > 0
+        ? 'mt-16 grid gap-px overflow-hidden bg-foreground/15 md:mt-20 md:grid-cols-2'
+        : 'grid gap-px overflow-hidden bg-foreground/15 md:grid-cols-2'}>
         <ChannelBlock
           platform="instagram"
           channel={contentHighlights.channels.instagram}
@@ -127,7 +128,7 @@ function ChannelBlock({
         target="_blank"
         rel="noopener noreferrer"
         aria-label={`${PLATFORM_LABEL[platform]} — ${channel.cta}`}
-        className="group relative flex h-full min-h-[280px] flex-col gap-8 bg-background p-10 transition-colors hover:bg-surface md:min-h-[340px] md:p-16"
+        className="group relative flex h-full min-h-[220px] flex-col gap-6 bg-background p-8 transition-colors hover:bg-surface md:min-h-[260px] md:p-12"
       >
         {/* Cabeçalho: ícone + rótulo da rede */}
         <div className="flex items-center gap-3">

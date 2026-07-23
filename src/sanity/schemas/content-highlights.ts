@@ -51,7 +51,7 @@ export const contentHighlightsSchema = defineType({
       name: 'highlights',
       title: 'Cards de conteúdo (arraste pra reordenar)',
       description:
-        '📍 Onde aparecem: em grade, após a citação. Cada card = imagem de capa + título + link. De 1 a 8 cards. Cada card tem a SUA imagem — nenhuma é compartilhada.',
+        '📍 Onde aparecem: em grade, após a citação. Escolha até 3 trabalhos que ainda representem bem o projeto; não precisa atualizar toda semana.',
       group: 'imagem',
       type: 'array',
       of: [
@@ -59,6 +59,12 @@ export const contentHighlightsSchema = defineType({
           type: 'object',
           name: 'highlight',
           fields: [
+            defineField({
+              name: 'isVisible',
+              title: 'Mostrar este conteúdo na home',
+              type: 'boolean',
+              initialValue: true,
+            }),
             defineField({
               name: 'platform',
               title: 'Rede social',
@@ -94,9 +100,9 @@ export const contentHighlightsSchema = defineType({
             defineField({
               name: 'imagemCapa',
               title: 'Imagem de capa do card',
-              description: '📍 Onde aparece: SÓ neste card. Recomendado: foto quadrada.',
+              description:
+                'Opcional. Recomendado: vertical 3:4, ao menos 1200px. Sem imagem, o card usa uma composição textual compacta.',
               type: 'controlledImage',
-              validation: (r) => r.required(),
             }),
           ],
           preview: {
@@ -113,7 +119,7 @@ export const contentHighlightsSchema = defineType({
           },
         },
       ],
-      validation: (r) => r.min(1).max(8),
+      validation: (r) => r.max(3),
     }),
     defineField({
       name: 'channels',
