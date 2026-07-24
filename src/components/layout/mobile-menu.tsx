@@ -73,7 +73,7 @@ export function MobileMenu({ journey }: MobileMenuProps) {
         aria-label="Abrir menu"
         aria-expanded={open}
         className={cn(
-          'inline-flex min-h-11 min-w-11 items-center justify-center font-mono text-[10px] uppercase tracking-[0.18em] transition-colors',
+          'inline-flex min-h-11 min-w-11 items-center justify-center font-mono text-[10px] uppercase tracking-[0.18em] transition-colors md:hidden',
           pathname === '/'
             ? 'text-white/80 hover:text-white'
             : 'text-foreground/70 hover:text-primary',

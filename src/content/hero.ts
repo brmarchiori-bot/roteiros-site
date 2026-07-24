@@ -19,7 +19,7 @@ export const hero: HeroContent = {
   dynamicWords: [],
   headline: 'Onde o roteiro acaba, a gente começa.',
   subheadline:
-    'A gente largou 10 anos de bar pra viver viajando, trabalhando remoto e mostrando tudo como realmente é.',
+    'A gente largou a vida que tinha para viver uma história em movimento.',
   ctas: {
     primary: { label: 'Ver onde a gente tá', href: '#now' },
     secondary: { label: 'Conhecer nossa história', href: '#about' },
