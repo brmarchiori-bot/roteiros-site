@@ -17,12 +17,13 @@ Todos os capítulos posteriores permaneceram intactos.
 
 O código mais avançado está na branch local
 `creative/documentary-direction`. Essa branch contém toda a evolução do Sanity,
-Portfólio privado, hardening técnico e direção documental. Antes deste handoff,
-ela ainda não existia no GitHub e suas alterações mais recentes ainda não
-estavam commitadas.
+Portfólio privado, hardening técnico e direção documental. As alterações desta
+entrega estão commitadas localmente, mas o envio ao GitHub ficou bloqueado pela
+ausência de uma credencial válida nesta máquina.
 
-A produção existente na Vercel é antiga, de 21 de abril de 2026. O domínio
-principal já responde pela Vercel, mas ainda serve essa revisão antiga.
+A produção oficial foi atualizada em 24 de julho de 2026. O domínio principal
+já serve o novo Header + Hero aprovado, com os fallbacks locais protegendo a
+Home contra o conteúdo antigo encontrado no dataset remoto.
 
 O Sanity já está implementado no código e a Vercel já possui as variáveis
 `NEXT_PUBLIC_SANITY_PROJECT_ID` e `NEXT_PUBLIC_SANITY_DATASET` nos ambientes de
@@ -175,11 +176,26 @@ main
 A branch atual é descendente linear de `main` e de `feat/sanity-cms`. Não são
 projetos divergentes; a branch atual representa a evolução completa.
 
-### Estado antes do commit desta entrega
+### Commits desta entrega
 
-- branch `creative/documentary-direction` ainda local;
-- alterações de Header + Hero ainda sem commit;
-- produção e GitHub ainda não continham essa revisão.
+- `d975966` — `refine documentary hero and document project handoff`;
+- `af95d24` — `guard published content until Sanity migration`.
+
+O working tree estava limpo após esses commits.
+
+### Estado do envio ao GitHub
+
+A branch continua apenas local. Foram tentados os dois meios disponíveis:
+
+- HTTPS: token salvo inválido ou expirado;
+- SSH: nenhuma chave autorizada pelo GitHub nesta máquina.
+
+Nenhum histórico remoto foi reescrito e nenhum push parcial foi realizado.
+Para concluir, é necessário autenticar o GitHub e executar:
+
+```bash
+git push -u origin creative/documentary-direction
+```
 
 ## 6. Estado da Vercel
 
@@ -201,6 +217,17 @@ projetos divergentes; a branch atual representa a evolução completa.
 - status: Ready;
 - URL: `https://roteiros-site.vercel.app`.
 
+### Produção atual
+
+- deployment: `dpl_2ueTJdbpT2cxfRweNJWfmbj4fTNi`;
+- criado em 24 de julho de 2026;
+- target: Production;
+- status: Ready;
+- URL técnica:
+  `https://roteiros-site-6b8cmui2q-brmarchiori-bots-projects.vercel.app`;
+- aliases confirmados:
+  `https://menosroteiros.com.br` e `https://roteiros-site.vercel.app`.
+
 ### Domínio
 
 `https://menosroteiros.com.br`:
@@ -214,7 +241,9 @@ projetos divergentes; a branch atual representa a evolução completa.
 
 - resolve para infraestrutura Vercel;
 - antes desta entrega apresentava incompatibilidade de certificado;
-- precisa ser associado ao projeto ou redirecionado corretamente.
+- foi associado ao projeto `roteiros-site` em 24 de julho de 2026;
+- a emissão/propagação do certificado deve ser confirmada após a atualização da
+  borda da Vercel.
 
 ### Variáveis encontradas
 
@@ -350,13 +379,18 @@ Viewports verificados:
 
 ### Fase 1 — Confirmar produção
 
-1. verificar deployment Ready;
-2. abrir `menosroteiros.com.br`;
-3. validar Header e Hero em desktop;
-4. validar em mobile real;
-5. validar o rasgo entre Hero e Agora;
-6. confirmar que capítulos posteriores não mudaram;
-7. corrigir o host `www`.
+Concluído nesta entrega:
+
+1. deployment confirmado como Ready;
+2. `menosroteiros.com.br` aberto em produção;
+3. Header e Hero validados em desktop;
+4. Hero validado em 390 × 844;
+5. bilhete, CTA e rasgo inferior confirmados;
+6. capítulos posteriores preservados;
+7. host `www` associado ao projeto.
+
+Resta confirmar a propagação do certificado do `www` em uma verificação
+posterior.
 
 ### Fase 2 — Ativar Sanity localmente
 
@@ -397,8 +431,8 @@ Trabalhar um capítulo por vez, começando sempre por auditoria. Não iniciar um
 
 ### Alta prioridade
 
-- confirmar que o deployment novo serve `menosroteiros.com.br`;
-- corrigir `www.menosroteiros.com.br`;
+- autenticar o GitHub e enviar a branch já commitada;
+- confirmar o certificado de `www.menosroteiros.com.br` após a propagação;
 - confirmar acesso ao projeto Sanity;
 - verificar se o dataset já contém conteúdo;
 - impedir que conteúdo antigo no Sanity sobrescreva o visual/copy aprovado.
