@@ -1,5 +1,6 @@
 import { draftMode } from 'next/headers'
 import { notFound } from 'next/navigation'
+import { VisualEditing } from 'next-sanity/visual-editing'
 import { HomeComposition } from '@/components/home/home-composition'
 import { EditorialPreviewSourceMarker } from '@/components/editorial/editorial-preview-source-marker'
 import { resolveEditorialPillars } from '@/sanity/editorial/pillars'
@@ -16,6 +17,7 @@ export default async function EditorialHomePage() {
     <>
       <EditorialPreviewSourceMarker source={pillars.source} />
       <HomeComposition pillars={pillars.content} />
+      <VisualEditing />
     </>
   )
 }

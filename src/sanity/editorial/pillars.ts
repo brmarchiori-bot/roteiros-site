@@ -1,8 +1,7 @@
 import 'server-only'
 
-import { createClient } from 'next-sanity'
 import { pillars as pillarsFallback } from '@/content'
-import { editorialPreviewServerEnv } from '@/lib/editorial-preview.server'
+import { createEditorialClient } from '@/sanity/editorial/client.server'
 import type { PillarsContent } from '@/types/content'
 
 export const EDITORIAL_PILLARS_SINGLETON_ID = 'pillars-singleton'
@@ -80,24 +79,8 @@ export async function resolveEditorialPillars(
 }
 
 function createEditorialPillarsFetch(): EditorialFetch | null {
-  const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID?.trim()
-  const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET?.trim()
-  const apiVersion = editorialPreviewServerEnv.apiVersion?.trim() || '2025-01-01'
-  const token = editorialPreviewServerEnv.readToken?.trim()
-
-  if (!isValidProjectId(projectId) || !isValidDataset(dataset) || !isValidApiVersion(apiVersion) || !token) {
-    return null
-  }
-
-  const client = createClient({
-    projectId,
-    dataset,
-    apiVersion,
-    token,
-    perspective: 'drafts',
-    useCdn: false,
-    stega: false,
-  })
+  const client = createEditorialClient({ stega: true })
+  if (!client) return null
 
   return (query) =>
     client.fetch<RawPillars | null>(query, {}, {
@@ -151,18 +134,6 @@ function validatePillars(raw: RawPillars): PillarsContent | null {
 
 function isNonEmptyString(value: unknown): value is string {
   return typeof value === 'string' && value.trim().length > 0
-}
-
-function isValidProjectId(value: string | undefined): value is string {
-  return !!value && /^[a-z0-9-]+$/.test(value)
-}
-
-function isValidDataset(value: string | undefined): value is string {
-  return !!value && /^[a-zA-Z0-9_-]+$/.test(value)
-}
-
-function isValidApiVersion(value: string): boolean {
-  return /^\d{4}-\d{2}-\d{2}$/.test(value)
 }
 
 function fallbackResult(reason: EditorialPillarsResult['reason']): EditorialPillarsResult {

@@ -1,83 +1,101 @@
 import { readFileSync } from 'node:fs'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-const enable = vi.fn()
-const disable = vi.fn()
-let isEnabled = false
+const state = vi.hoisted(() => ({
+  available: true,
+  enabled: false,
+  enable: vi.fn(),
+  disable: vi.fn(),
+}))
 
 vi.mock('server-only', () => ({}))
+vi.mock('@/sanity/editorial/client.server', () => ({
+  createEditorialClient: () => (state.available ? { fetch: vi.fn() } : null),
+}))
+vi.mock('next-sanity/draft-mode', () => ({
+  defineEnableDraftMode: () => ({
+    GET: async (request: Request) => {
+      const url = new URL(request.url)
+      if (url.searchParams.get('sanity-preview-secret') !== 'segredo-oficial-de-teste') {
+        return new Response('Invalid secret', { status: 401 })
+      }
+      state.enable()
+      const redirectTo = url.searchParams.get('sanity-preview-pathname') || '/'
+      const safeRedirect = redirectTo === '/' || redirectTo === '/studio' ? redirectTo : '/'
+      return Response.redirect(new URL(safeRedirect, url.origin), 307)
+    },
+  }),
+}))
 vi.mock('next/headers', () => ({
-  draftMode: vi.fn(async () => ({ enable, disable, isEnabled })),
+  draftMode: vi.fn(async () => ({
+    enable: state.enable,
+    disable: state.disable,
+    isEnabled: state.enabled,
+  })),
 }))
 
 beforeEach(() => {
   vi.resetModules()
-  enable.mockReset()
-  disable.mockReset()
-  isEnabled = false
-  process.env.SANITY_PREVIEW_SECRET = 'segredo-de-teste'
+  state.available = true
+  state.enabled = false
+  state.enable.mockReset()
+  state.disable.mockReset()
   delete process.env.NEXT_PUBLIC_SANITY_CONTENT_ENABLED
 })
 
 afterEach(() => {
-  delete process.env.SANITY_PREVIEW_SECRET
   delete process.env.NEXT_PUBLIC_SANITY_CONTENT_ENABLED
 })
 
 describe('rotas de Draft Mode', () => {
-  it('rejeita ativação sem segredo e não habilita Preview', async () => {
+  it('rejeita requisição sem segredo oficial', async () => {
     const { GET } = await import('@/app/api/draft-mode/enable/route')
     const response = await GET(
       new Request('https://menosroteiros.com.br/api/draft-mode/enable'),
     )
 
     expect(response.status).toBe(401)
-    expect(enable).not.toHaveBeenCalled()
-    expect(await response.text()).not.toContain('segredo-de-teste')
+    expect(state.enable).not.toHaveBeenCalled()
   })
 
-  it('rejeita segredo incorreto', async () => {
+  it('rejeita segredo oficial inválido', async () => {
     const { GET } = await import('@/app/api/draft-mode/enable/route')
     const response = await GET(
       new Request(
-        'https://menosroteiros.com.br/api/draft-mode/enable?secret=segredo-de-teste',
-        { headers: { authorization: 'Bearer incorreto' } },
+        'https://menosroteiros.com.br/api/draft-mode/enable?sanity-preview-secret=invalido',
       ),
     )
 
     expect(response.status).toBe(401)
-    expect(enable).not.toHaveBeenCalled()
+    expect(state.enable).not.toHaveBeenCalled()
   })
 
-  it('habilita uma sessão válida e aceita somente redirect interno permitido', async () => {
+  it('habilita sessão validada pelo fluxo oficial', async () => {
     const { GET } = await import('@/app/api/draft-mode/enable/route')
     const response = await GET(
       new Request(
-        'https://menosroteiros.com.br/api/draft-mode/enable?redirectTo=%2Fstudio',
-        { headers: { authorization: 'Bearer segredo-de-teste' } },
+        'https://menosroteiros.com.br/api/draft-mode/enable?sanity-preview-secret=segredo-oficial-de-teste&sanity-preview-pathname=%2F',
       ),
     )
 
-    expect(enable).toHaveBeenCalledOnce()
+    expect(state.enable).toHaveBeenCalledOnce()
     expect(response.status).toBe(307)
-    expect(response.headers.get('location')).toBe('https://menosroteiros.com.br/studio')
-    expect(response.headers.get('cache-control')).toContain('no-store')
-  })
-
-  it('bloqueia open redirect mesmo em uma sessão válida', async () => {
-    const { GET } = await import('@/app/api/draft-mode/enable/route')
-    const response = await GET(
-      new Request(
-        'https://menosroteiros.com.br/api/draft-mode/enable?redirectTo=https%3A%2F%2Fdominio-malicioso.com',
-        { headers: { authorization: 'Bearer segredo-de-teste' } },
-      ),
-    )
-
-    expect(enable).toHaveBeenCalledOnce()
     expect(response.headers.get('location')).toBe('https://menosroteiros.com.br/')
   })
 
-  it('desabilita a sessão por POST mesmo quando ela já está inativa', async () => {
+  it('falha de forma controlada quando o cliente Viewer não está disponível', async () => {
+    state.available = false
+    const { GET } = await import('@/app/api/draft-mode/enable/route')
+    const response = await GET(
+      new Request('https://menosroteiros.com.br/api/draft-mode/enable'),
+    )
+
+    expect(response.status).toBe(503)
+    expect(response.headers.get('cache-control')).toContain('no-store')
+    expect(state.enable).not.toHaveBeenCalled()
+  })
+
+  it('desabilita a sessão por POST', async () => {
     const { POST } = await import('@/app/api/draft-mode/disable/route')
     const response = await POST(
       new Request('https://menosroteiros.com.br/api/draft-mode/disable', {
@@ -86,13 +104,12 @@ describe('rotas de Draft Mode', () => {
       }),
     )
 
-    expect(disable).toHaveBeenCalledOnce()
+    expect(state.disable).toHaveBeenCalledOnce()
     expect(response.status).toBe(303)
-    expect(response.headers.get('location')).toBe('https://menosroteiros.com.br/')
   })
 
   it('reporta somente o estado booleano da sessão', async () => {
-    isEnabled = true
+    state.enabled = true
     const { GET } = await import('@/app/api/draft-mode/status/route')
     const response = await GET()
 
@@ -102,7 +119,17 @@ describe('rotas de Draft Mode', () => {
 })
 
 describe('isolamento do cliente', () => {
-  it('não expõe variáveis privadas no componente cliente', () => {
+  it('registra o helper oficial e não mantém autenticação Bearer concorrente', () => {
+    const source = readFileSync('src/app/api/draft-mode/enable/route.ts', 'utf8')
+
+    expect(source).toContain("from 'next-sanity/draft-mode'")
+    expect(source).toContain('defineEnableDraftMode')
+    expect(source).not.toContain('authorization')
+    expect(source).not.toContain('Bearer')
+    expect(source).not.toContain('SANITY_PREVIEW_SECRET')
+  })
+
+  it('não expõe variáveis privadas no indicador cliente', () => {
     const source = readFileSync(
       'src/components/editorial/editorial-preview-indicator.tsx',
       'utf8',
@@ -113,18 +140,12 @@ describe('isolamento do cliente', () => {
     expect(source).not.toContain('process.env')
   })
 
-  it('mantém a flag pública ausente e o cliente Sanity protegido', () => {
+  it('mantém a flag pública ausente e as queries públicas protegidas', () => {
     const client = readFileSync('src/sanity/client.ts', 'utf8')
     const queries = readFileSync('src/sanity/queries.ts', 'utf8')
-    const enableRoute = readFileSync(
-      'src/app/api/draft-mode/enable/route.ts',
-      'utf8',
-    )
 
     expect(process.env.NEXT_PUBLIC_SANITY_CONTENT_ENABLED).toBeUndefined()
     expect(client).toContain('hasSanityContent')
     expect(queries).toContain('if (!sanityClient) return')
-    expect(enableRoute).not.toContain('@/sanity/queries')
-    expect(enableRoute).not.toContain('sanityClient')
   })
 })

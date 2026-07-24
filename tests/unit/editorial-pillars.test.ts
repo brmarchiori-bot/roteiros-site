@@ -114,12 +114,14 @@ describe('isolamento e contrato da camada editorial', () => {
     expect(source).toMatch(/\n\s+_key,/)
   })
 
-  it('configura drafts, sem CDN, sem stega e sem cache apenas no cliente editorial', () => {
+  it('configura drafts, sem CDN, com stega e sem cache apenas no cliente editorial', () => {
     const source = readFileSync('src/sanity/editorial/pillars.ts', 'utf8')
+    const client = readFileSync('src/sanity/editorial/client.server.ts', 'utf8')
 
-    expect(source).toContain("perspective: 'drafts'")
-    expect(source).toContain('useCdn: false')
-    expect(source).toContain('stega: false')
+    expect(client).toContain("perspective: 'drafts'")
+    expect(client).toContain('useCdn: false')
+    expect(client).toContain('enabled: true')
+    expect(source).toContain('createEditorialClient({ stega: true })')
     expect(source).toContain("cache: 'no-store'")
   })
 
