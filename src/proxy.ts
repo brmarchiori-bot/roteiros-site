@@ -28,7 +28,7 @@ export function proxy(req: NextRequest) {
 
   // Toggle principal — se não tiver ENABLE_PASSWORD=true, libera tudo
   if (process.env.ENABLE_PASSWORD !== 'true') {
-    return secureResponse(NextResponse.next())
+    return routeEditorialPreview(req)
   }
 
   const expectedUser = process.env.BASIC_AUTH_USER ?? ''
@@ -52,7 +52,7 @@ export function proxy(req: NextRequest) {
           constantTimeEqual(user, expectedUser) &&
           constantTimeEqual(password, expectedPassword)
         ) {
-          return secureResponse(NextResponse.next())
+          return routeEditorialPreview(req)
         }
       }
     } catch {
@@ -61,6 +61,37 @@ export function proxy(req: NextRequest) {
   }
 
   return secureResponse(unauthorized())
+}
+
+function routeEditorialPreview(req: NextRequest) {
+  if (req.nextUrl.pathname.startsWith('/editorial-internal/')) {
+    if (req.headers.get('x-editorial-internal-rewrite') === '1') {
+      const response = NextResponse.next()
+      response.headers.set('Cache-Control', 'private, no-store, max-age=0')
+      response.headers.set('CDN-Cache-Control', 'no-store')
+      response.headers.set('Vercel-CDN-Cache-Control', 'no-store')
+      response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive')
+      return secureResponse(response)
+    }
+    return secureResponse(new NextResponse('Não encontrado', { status: 404 }))
+  }
+
+  if (req.nextUrl.pathname === '/' && req.cookies.has('__prerender_bypass')) {
+    const destination = req.nextUrl.clone()
+    destination.pathname = '/editorial-internal/home'
+    const requestHeaders = new Headers(req.headers)
+    requestHeaders.set('x-editorial-internal-rewrite', '1')
+    const response = NextResponse.rewrite(destination, {
+      request: { headers: requestHeaders },
+    })
+    response.headers.set('Cache-Control', 'private, no-store, max-age=0')
+    response.headers.set('CDN-Cache-Control', 'no-store')
+    response.headers.set('Vercel-CDN-Cache-Control', 'no-store')
+    response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive')
+    return secureResponse(response)
+  }
+
+  return secureResponse(NextResponse.next())
 }
 
 function unauthorized() {

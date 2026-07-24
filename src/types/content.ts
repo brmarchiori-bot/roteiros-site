@@ -127,6 +127,7 @@ export type NowContent = {
 /* ---------- Pillars ---------- */
 
 export type Pillar = {
+  _key?: string
   id: string
   title: string
   description: string
@@ -134,6 +135,8 @@ export type Pillar = {
 }
 
 export type PillarsContent = {
+  _id?: string
+  _type?: 'pillars'
   meta: SectionMeta
   items: Pillar[]
 }

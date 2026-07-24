@@ -1,9 +1,9 @@
 import { Section } from '@/components/layout/section'
 import { Reveal } from '@/components/shared/reveal'
-import { getPillarsFromSanity } from '@/sanity/queries'
+import { pillars as pillarsFallback } from '@/content'
+import type { PillarsContent } from '@/types/content'
 
-export async function PillarsSection() {
-  const pillars = await getPillarsFromSanity()
+export function PillarsSection({ content = pillarsFallback }: { content?: PillarsContent }) {
   return (
     <Section id="pillars" spacing="xl" className="bg-surface/70" bordered={false}>
       {/* Header editorial */}
@@ -12,22 +12,22 @@ export async function PillarsSection() {
           <div className="flex items-center gap-3">
             <span aria-hidden="true" className="h-px w-8 bg-primary md:w-12" />
             <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-primary md:text-[11px]">
-              {pillars.meta.kicker}
+              {content.meta.kicker}
             </p>
           </div>
         </Reveal>
 
-        {pillars.meta.title && (
+        {content.meta.title && (
           <Reveal delay={0.08}>
             <h2 className="mt-6 max-w-4xl font-display text-3xl font-medium leading-[1.05] tracking-[-0.01em] text-foreground md:text-5xl">
-              {pillars.meta.title}
+              {content.meta.title}
             </h2>
           </Reveal>
         )}
       </header>
 
       <ul className="grid gap-0 border-y border-white/20 py-4 sm:grid-cols-2 lg:grid-cols-4">
-        {pillars.items.map((pillar, i) => (
+        {content.items.map((pillar, i) => (
           <Reveal
             key={pillar.id}
             delay={i * 0.07}

@@ -70,6 +70,41 @@ describe('proxy', () => {
 
     expect(response.status).toBe(200)
   })
+
+  it('mantém o visitante comum na Home pública', () => {
+    process.env.ENABLE_PASSWORD = 'false'
+
+    const response = proxy(new NextRequest('https://menosroteiros.com.br/'))
+
+    expect(response.status).toBe(200)
+    expect(response.headers.get('x-middleware-rewrite')).toBeNull()
+  })
+
+  it('encaminha apenas a Home com cookie de Draft Mode para a fronteira editorial', () => {
+    process.env.ENABLE_PASSWORD = 'false'
+
+    const response = proxy(
+      new NextRequest('https://menosroteiros.com.br/', {
+        headers: { cookie: '__prerender_bypass=valor-opaco-de-teste' },
+      }),
+    )
+
+    expect(response.headers.get('x-middleware-rewrite')).toBe(
+      'https://menosroteiros.com.br/editorial-internal/home',
+    )
+    expect(response.headers.get('cache-control')).toContain('no-store')
+    expect(response.headers.get('x-robots-tag')).toContain('noindex')
+  })
+
+  it('bloqueia acesso direto à rota editorial interna', () => {
+    process.env.ENABLE_PASSWORD = 'false'
+
+    const response = proxy(
+      new NextRequest('https://menosroteiros.com.br/editorial-internal/home'),
+    )
+
+    expect(response.status).toBe(404)
+  })
 })
 
 function restore(key: string, value: string | undefined) {
