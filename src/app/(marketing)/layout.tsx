@@ -1,5 +1,6 @@
 import { SiteFooter } from '@/components/layout/site-footer'
 import { SiteHeader } from '@/components/layout/site-header'
+import { EditorialPreviewIndicator } from '@/components/editorial/editorial-preview-indicator'
 
 export default function MarketingLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -15,6 +16,7 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
         {children}
       </main>
       <SiteFooter />
+      <EditorialPreviewIndicator />
     </>
   )
 }
