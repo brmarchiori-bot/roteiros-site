@@ -3,14 +3,14 @@ import { sectionLayoutFields } from './shared'
 
 export const aboutSchema = defineType({
   name: 'about',
-  title: 'Seção Sobre — história de Andressa + Bruno',
+  title: 'Nossa história',
   type: 'document',
   description:
     'Aparece após a capa. Foto principal do casal + blocos de história (capítulos). Cada bloco pode ter uma foto própria.',
   groups: [
-    { name: 'conteudo', title: '📝 Conteúdo', default: true },
-    { name: 'imagem', title: '🖼️ Imagem' },
-    { name: 'aparencia', title: '🎨 Aparência' },
+    { name: 'conteudo', title: 'Conteúdo principal', default: true },
+    { name: 'imagem', title: 'Fotografia' },
+    { name: 'aparencia', title: 'Enquadramento' },
   ],
   fields: [
     defineField({
@@ -39,7 +39,7 @@ export const aboutSchema = defineType({
     }),
     defineField({
       name: 'chapters',
-      title: 'Blocos de história (arraste pra reordenar)',
+      title: 'Capítulos da nossa história',
       description:
         '📍 Onde aparecem: um abaixo do outro, após o título. Cada bloco vira um parágrafo com número + título + texto + foto opcional. De 1 a 5 blocos.',
       group: 'conteudo',
@@ -120,7 +120,7 @@ export const aboutSchema = defineType({
     }),
     defineField({
       name: 'imagemPrincipal',
-      title: 'Foto principal da seção Sobre',
+      title: 'Fotografia principal',
       description:
         '📍 Onde aparece: SÓ na seção Sobre, ao lado dos textos. Não afeta capa nem outras seções. Recomendado: foto vertical ou quadrada.',
       group: 'imagem',
@@ -135,8 +135,8 @@ export const aboutSchema = defineType({
       media: 'imagemPrincipal.image',
     },
     prepare: ({ title, kicker, media }) => ({
-      title: title || '⚠️ Seção Sobre sem título',
-      subtitle: kicker ? `Home · ${kicker}` : 'Home · Seção Sobre',
+      title: 'Nossa história',
+      subtitle: title || kicker || 'Capítulos de Andressa e Bruno',
       media,
     }),
   },

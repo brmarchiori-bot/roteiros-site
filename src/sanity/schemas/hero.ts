@@ -4,14 +4,14 @@ import { sectionLayoutFields } from './shared'
 
 export const heroSchema = defineType({
   name: 'hero',
-  title: 'Capa / Hero — topo da home',
+  title: 'Capa e abertura',
   type: 'document',
   description:
     'Primeira tela do site: título grande + frase de apoio + dois botões + imagem de fundo opcional.',
   groups: [
-    { name: 'conteudo', title: '📝 Conteúdo', default: true },
-    { name: 'imagem', title: '🖼️ Imagem' },
-    { name: 'aparencia', title: '🎨 Aparência' },
+    { name: 'conteudo', title: 'Conteúdo principal', default: true },
+    { name: 'imagem', title: 'Fotografia' },
+    { name: 'aparencia', title: 'Enquadramento' },
   ],
   fields: [
     defineField({
@@ -45,7 +45,7 @@ export const heroSchema = defineType({
     /* ----- Título em 3 campos (2 com animação, 1 fallback) ----- */
     defineField({
       name: 'titlePrefix',
-      title: 'Texto fixo do título',
+      title: 'Início do título',
       description: 'Parte inicial da frase. Ex: "Viajando o mundo e"',
       group: 'conteudo',
       type: 'string',
@@ -53,7 +53,7 @@ export const heroSchema = defineType({
     }),
     defineField({
       name: 'dynamicWords',
-      title: 'Palavras que trocam (animação)',
+      title: 'Frases animadas',
       description:
         'Essas frases vão aparecer uma por vez no final do título.\n\nExemplo:\n- vivendo sem roteiro\n- errando de verdade\n\nMínimo: 2 frases para ativar animação\nMáximo: 8 frases',
       group: 'conteudo',
@@ -68,7 +68,7 @@ export const heroSchema = defineType({
     }),
     defineField({
       name: 'headline',
-      title: 'Título completo (sem animação)',
+      title: 'Título principal',
       description:
         'Use esse campo se quiser um título fixo, sem animação.\nSe preencher "Palavras que trocam", esse campo será ignorado.',
       group: 'conteudo',
@@ -80,7 +80,7 @@ export const heroSchema = defineType({
     /* ----- Resto do conteúdo ----- */
     defineField({
       name: 'subheadline',
-      title: 'Subtítulo',
+      title: 'Frase de apoio',
       description:
         '📍 Onde aparece: logo abaixo do título. Frase de apoio, 1 ou 2 linhas. Recomendado até 180 caracteres.',
       group: 'conteudo',
@@ -93,7 +93,7 @@ export const heroSchema = defineType({
     }),
     defineField({
       name: 'primaryCta',
-      title: 'Botão principal (cor sólida)',
+      title: 'Convite principal',
       description:
         '📍 Onde aparece: abaixo do subtítulo, estilo destaque. Deixe sem texto pra esconder.',
       group: 'conteudo',
@@ -117,7 +117,7 @@ export const heroSchema = defineType({
     }),
     defineField({
       name: 'secondaryCta',
-      title: 'Botão secundário (estilo discreto, com seta)',
+      title: 'Convite secundário',
       description: '📍 Onde aparece: ao lado do botão principal. Opcional.',
       group: 'conteudo',
       type: 'object',
@@ -139,7 +139,7 @@ export const heroSchema = defineType({
     }),
     defineField({
       name: 'imagemFundo',
-      title: 'Imagem de fundo da capa (opcional)',
+      title: 'Fotografia principal',
       description:
         '📍 Onde aparece: fundo da capa, com o texto sobreposto. ⚠️ Se vazio, a capa mantém o gradiente padrão. Recomendado: foto horizontal, pelo menos 2000px de largura. Afeta SÓ a capa.',
       group: 'imagem',
@@ -169,11 +169,11 @@ export const heroSchema = defineType({
 
       const display = hasRotator
         ? `${titlePrefix} [${validWords.join(' · ')}]`
-        : headline || '⚠️ Capa sem título'
+        : headline
 
       return {
-        title: display,
-        subtitle: subtitle ? `Home · ${subtitle.substring(0, 60)}` : 'Home · Seção 1',
+        title: 'Capa e abertura',
+        subtitle: display || subtitle?.substring(0, 60) || 'Primeira cena da Home',
         media,
       }
     },

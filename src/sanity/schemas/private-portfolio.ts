@@ -11,7 +11,7 @@ const mediaKinds = [
 
 export const privatePortfolioSchema = defineType({
   name: 'privatePortfolio',
-  title: 'Portfólio privado',
+  title: 'Portfólio',
   type: 'document',
   description:
     'Conteúdo enviado manualmente a parceiros. Não aparece no menu, sitemap ou mecanismos de busca.',
@@ -358,9 +358,9 @@ export const privatePortfolioSchema = defineType({
     }),
   ],
   preview: {
-    select: { title: 'title', categories: 'categories' },
-    prepare: ({ title, categories }) => ({
-      title: title || 'Portfólio privado',
+    select: { categories: 'categories' },
+    prepare: ({ categories }) => ({
+      title: 'Portfólio',
       subtitle: `${Array.isArray(categories) ? categories.length : 0} categoria(s)`,
     }),
   },

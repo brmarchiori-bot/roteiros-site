@@ -6,10 +6,15 @@ export const partnershipsSchema = defineType({
   type: 'document',
   description:
     'Apresentação pública curta. O portfólio detalhado continua privado e nunca é ligado pela home.',
+  groups: [
+    { name: 'conteudo', title: 'Conteúdo principal', default: true },
+    { name: 'contato', title: 'Contato' },
+  ],
   fields: [
     defineField({
       name: 'meta',
       title: 'Título da seção',
+      group: 'conteudo',
       type: 'object',
       fields: [
         defineField({ name: 'kicker', title: 'Rótulo pequeno', type: 'string', validation: (r) => r.max(30) }),
@@ -19,13 +24,15 @@ export const partnershipsSchema = defineType({
     defineField({
       name: 'philosophy',
       title: 'Como vocês escolhem parcerias',
+      group: 'conteudo',
       type: 'text',
       rows: 3,
       validation: (r) => r.required().max(320),
     }),
     defineField({
       name: 'formats',
-      title: 'Tipos de parceria',
+      title: 'Formas de parceria',
+      group: 'conteudo',
       description: 'No máximo três categorias amplas. Evite prometer entregas fixas aqui.',
       type: 'array',
       of: [{
@@ -42,20 +49,22 @@ export const partnershipsSchema = defineType({
     defineField({
       name: 'contactEmail',
       title: 'Email para apresentação',
+      group: 'contato',
       description: 'Somente o endereço, sem mailto:.',
       type: 'email',
     }),
     defineField({
       name: 'whatsappUrl',
       title: 'Link do WhatsApp (opcional)',
+      group: 'contato',
       type: 'url',
     }),
   ],
   preview: {
     select: { title: 'meta.title', formats: 'formats' },
     prepare: ({ title, formats }) => ({
-      title: title || 'Parcerias',
-      subtitle: `${Array.isArray(formats) ? formats.length : 0} categorias · Home`,
+      title: 'Parcerias',
+      subtitle: title || `${Array.isArray(formats) ? formats.length : 0} formas de parceria`,
     }),
   },
 })

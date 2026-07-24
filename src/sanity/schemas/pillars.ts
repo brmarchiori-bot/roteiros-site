@@ -2,14 +2,16 @@ import { defineField, defineType } from 'sanity'
 
 export const pillarsSchema = defineType({
   name: 'pillars',
-  title: 'O que você encontra aqui',
+  title: 'O que você vai encontrar',
   type: 'document',
   description:
     'Os quatro assuntos que ajudam uma pessoa nova a entender o Menos Roteiros. Só mude quando a linha editorial mudar.',
+  groups: [{ name: 'conteudo', title: 'Conteúdo principal', default: true }],
   fields: [
     defineField({
       name: 'meta',
       title: 'Título da seção',
+      group: 'conteudo',
       type: 'object',
       fields: [
         defineField({ name: 'kicker', title: 'Rótulo pequeno', type: 'string', validation: (r) => r.max(30) }),
@@ -18,8 +20,9 @@ export const pillarsSchema = defineType({
     }),
     defineField({
       name: 'items',
-      title: 'Pilares (arraste para ordenar)',
-      description: 'Use quatro itens curtos. Não é necessário adicionar link.',
+      title: 'O que a pessoa encontra',
+      description: 'A seção utiliza quatro itens no layout aprovado.',
+      group: 'conteudo',
       type: 'array',
       of: [{
         type: 'object',
@@ -36,8 +39,8 @@ export const pillarsSchema = defineType({
   preview: {
     select: { title: 'meta.title', items: 'items' },
     prepare: ({ title, items }) => ({
-      title: title || 'O que você encontra aqui',
-      subtitle: `${Array.isArray(items) ? items.length : 0} pilares · Home`,
+      title: 'O que você vai encontrar',
+      subtitle: title || `${Array.isArray(items) ? items.length : 0} itens`,
     }),
   },
 })

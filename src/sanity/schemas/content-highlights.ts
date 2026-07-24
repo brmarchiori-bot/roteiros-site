@@ -3,14 +3,14 @@ import { sectionLayoutFields } from './shared'
 
 export const contentHighlightsSchema = defineType({
   name: 'contentHighlights',
-  title: 'Seção Conteúdo — destaques e canais',
+  title: 'Continuidade',
   type: 'document',
   description:
     'Grade de cards com posts/vídeos + blocos convidando a seguir Instagram e YouTube.',
   groups: [
-    { name: 'conteudo', title: '📝 Conteúdo', default: true },
-    { name: 'imagem', title: '🖼️ Imagem' },
-    { name: 'aparencia', title: '🎨 Aparência' },
+    { name: 'conteudo', title: 'Conteúdo principal', default: true },
+    { name: 'imagem', title: 'Fotografias e capas' },
+    { name: 'aparencia', title: 'Enquadramento' },
   ],
   fields: [
     defineField({
@@ -49,7 +49,7 @@ export const contentHighlightsSchema = defineType({
     }),
     defineField({
       name: 'highlights',
-      title: 'Cards de conteúdo (arraste pra reordenar)',
+      title: 'Histórias em destaque',
       description:
         '📍 Onde aparecem: em grade, após a citação. Escolha até 3 trabalhos que ainda representem bem o projeto; não precisa atualizar toda semana.',
       group: 'imagem',
@@ -123,7 +123,7 @@ export const contentHighlightsSchema = defineType({
     }),
     defineField({
       name: 'channels',
-      title: 'Blocos "siga nossos canais"',
+      title: 'Canais',
       description: '📍 Onde aparecem: abaixo dos cards, convidando a seguir os canais.',
       group: 'conteudo',
       type: 'object',
@@ -187,11 +187,11 @@ export const contentHighlightsSchema = defineType({
     ...sectionLayoutFields().map((f) => ({ ...f, group: 'aparencia' })),
   ],
   preview: {
-    select: { title: 'meta.title', kicker: 'meta.kicker', cards: 'highlights' },
-    prepare: ({ title, kicker, cards }) => {
+    select: { kicker: 'meta.kicker', cards: 'highlights' },
+    prepare: ({ kicker, cards }) => {
       const count = Array.isArray(cards) ? cards.length : 0
       return {
-        title: title || '⚠️ Seção Conteúdo sem título',
+        title: 'Continuidade',
         subtitle: `${kicker ? `Home · ${kicker} · ` : 'Home · '}${count} card${count === 1 ? '' : 's'}`,
       }
     },

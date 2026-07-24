@@ -3,14 +3,14 @@ import { sectionLayoutFields } from './shared'
 
 export const nowSchema = defineType({
   name: 'now',
-  title: 'Agora — registro atual',
+  title: 'Agora',
   type: 'document',
   description:
     'O capítulo presente da jornada. Atualize somente quando a cidade, a etapa ou a história realmente mudar.',
   groups: [
-    { name: 'conteudo', title: '📝 Conteúdo', default: true },
-    { name: 'imagem', title: '🖼️ Imagem' },
-    { name: 'aparencia', title: '🎨 Aparência' },
+    { name: 'conteudo', title: 'Conteúdo principal', default: true },
+    { name: 'imagem', title: 'Fotografia' },
+    { name: 'aparencia', title: 'Enquadramento' },
   ],
   fields: [
     defineField({
@@ -181,8 +181,10 @@ export const nowSchema = defineType({
       media: 'imagemLocal.image',
     },
     prepare: ({ day, city, country, period, media }) => ({
-      title: `Dia ${day ?? '—'} · ${city ?? '—'}${country ? `, ${country}` : ''}`,
-      subtitle: period ? `Agora · ${period}` : 'Agora',
+      title: 'Agora',
+      subtitle:
+        [day ? `Dia ${day}` : '', city, country, period].filter(Boolean).join(' · ') ||
+        'Registro atual da jornada',
       media,
     }),
   },

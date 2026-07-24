@@ -2,11 +2,11 @@ import { defineField, defineType } from 'sanity'
 
 export const faqSchema = defineType({
   name: 'faq',
-  title: 'Seção FAQ — perguntas frequentes',
+  title: 'Perguntas frequentes',
   type: 'document',
   description:
     'Perguntas e respostas que aparecem no acordeão do rodapé da home.',
-  groups: [{ name: 'conteudo', title: '📝 Conteúdo', default: true }],
+  groups: [{ name: 'conteudo', title: 'Conteúdo principal', default: true }],
   fields: [
     defineField({
       name: 'meta',
@@ -33,7 +33,7 @@ export const faqSchema = defineType({
     }),
     defineField({
       name: 'items',
-      title: 'Perguntas e respostas (arraste pra reordenar)',
+      title: 'Perguntas e respostas',
       description:
         '📍 Onde aparecem: uma abaixo da outra, em acordeão. Até 15 perguntas. Se deixar vazio, o site usa o conteúdo padrão do código.',
       group: 'conteudo',
@@ -82,11 +82,11 @@ export const faqSchema = defineType({
     }),
   ],
   preview: {
-    select: { title: 'meta.title', kicker: 'meta.kicker', items: 'items' },
-    prepare: ({ title, kicker, items }) => {
+    select: { kicker: 'meta.kicker', items: 'items' },
+    prepare: ({ kicker, items }) => {
       const count = Array.isArray(items) ? items.length : 0
       return {
-        title: title || '⚠️ Seção FAQ sem título',
+        title: 'Perguntas frequentes',
         subtitle: `${kicker ? `Home · ${kicker} · ` : 'Home · '}${count} pergunta${count === 1 ? '' : 's'}`,
       }
     },
