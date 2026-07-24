@@ -242,8 +242,7 @@ git push -u origin creative/documentary-direction
 - resolve para infraestrutura Vercel;
 - antes desta entrega apresentava incompatibilidade de certificado;
 - foi associado ao projeto `roteiros-site` em 24 de julho de 2026;
-- a emissão/propagação do certificado deve ser confirmada após a atualização da
-  borda da Vercel.
+- certificado válido e resposta HTTP 200 confirmados após a associação.
 
 ### Variáveis encontradas
 
@@ -389,8 +388,7 @@ Concluído nesta entrega:
 6. capítulos posteriores preservados;
 7. host `www` associado ao projeto.
 
-Resta confirmar a propagação do certificado do `www` em uma verificação
-posterior.
+O certificado do `www` também foi confirmado nesta entrega.
 
 ### Fase 2 — Ativar Sanity localmente
 
@@ -432,7 +430,6 @@ Trabalhar um capítulo por vez, começando sempre por auditoria. Não iniciar um
 ### Alta prioridade
 
 - autenticar o GitHub e enviar a branch já commitada;
-- confirmar o certificado de `www.menosroteiros.com.br` após a propagação;
 - confirmar acesso ao projeto Sanity;
 - verificar se o dataset já contém conteúdo;
 - impedir que conteúdo antigo no Sanity sobrescreva o visual/copy aprovado.
