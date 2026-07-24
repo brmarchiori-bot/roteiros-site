@@ -29,6 +29,13 @@ O Sanity já está implementado no código e a Vercel já possui as variáveis
 Preview e Production. O ambiente local ainda não recebeu essas variáveis, e a
 conta Sanity não foi confirmada pela CLI nesta máquina.
 
+Após o primeiro deploy desta entrega, a validação visual revelou que o dataset
+remoto contém fotografia e textos antigos, diferentes do estado local aprovado.
+Por segurança, a leitura remota passou a ser opt-in por meio de
+`NEXT_PUBLIC_SANITY_CONTENT_ENABLED=true`. Enquanto essa variável estiver
+ausente ou diferente de `true`, o Studio permanece conectado, mas a Home usa os
+fallbacks locais aprovados.
+
 ## 2. Contrato permanente de direção
 
 ### Base aprovada e congelada
@@ -216,6 +223,12 @@ Preview e Production já possuem:
 - `NEXT_PUBLIC_SANITY_PROJECT_ID`;
 - `NEXT_PUBLIC_SANITY_DATASET`.
 
+Ainda não possuem:
+
+- `NEXT_PUBLIC_SANITY_CONTENT_ENABLED=true`.
+
+Essa ausência é intencional até a migração e revisão editorial do dataset.
+
 Os valores são secretos/criptografados e não estão registrados neste relatório.
 
 ### Vínculo local
@@ -293,6 +306,9 @@ queries com fallback
 componentes da Home
 ```
 
+O mesmo fallback é utilizado quando o projeto Sanity está configurado, mas a
+flag `NEXT_PUBLIC_SANITY_CONTENT_ENABLED` não está explicitamente ativa.
+
 Fluxo desejado:
 
 ```text
@@ -359,6 +375,8 @@ Viewports verificados:
 4. criar documentos singleton faltantes;
 5. evitar publicar conteúdo vazio;
 6. testar uma alteração reversível no Hero.
+7. comparar todos os capítulos remotos com os fallbacks aprovados;
+8. só então definir `NEXT_PUBLIC_SANITY_CONTENT_ENABLED=true`.
 
 ### Fase 4 — Evoluir o Studio
 
@@ -425,4 +443,3 @@ O próximo ciclo estará concluído quando:
 - `/studio` abrir com o projeto Sanity correto;
 - um editor autorizado conseguir alterar e publicar conteúdo;
 - a Home refletir a publicação sem perder fallback ou composição.
-

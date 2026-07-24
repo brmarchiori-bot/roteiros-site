@@ -1,13 +1,14 @@
 import { createClient } from 'next-sanity'
-import { apiVersion, dataset, hasSanityConfig, projectId, useCdn } from './env'
+import { apiVersion, dataset, hasSanityContent, projectId, useCdn } from './env'
 
 /**
  * Client de leitura do Sanity.
  *
- * É null enquanto NEXT_PUBLIC_SANITY_PROJECT_ID não estiver definida —
- * nesse caso, queries retornam null e o site usa fallback de src/content.
+ * É null enquanto o conteúdo remoto não estiver explicitamente habilitado.
+ * O Studio continua conectado só com projectId/dataset, mas a Home usa os
+ * fallbacks até NEXT_PUBLIC_SANITY_CONTENT_ENABLED=true.
  */
-export const sanityClient = hasSanityConfig
+export const sanityClient = hasSanityContent
   ? createClient({
       projectId,
       dataset,

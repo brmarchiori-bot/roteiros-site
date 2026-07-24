@@ -14,3 +14,12 @@ export const useCdn = process.env.NODE_ENV === 'production'
 
 /** True quando as env vars obrigatórias estão preenchidas. */
 export const hasSanityConfig = projectId.length > 0
+
+/**
+ * Publicação do conteúdo remoto é opt-in.
+ *
+ * O Studio pode permanecer conectado enquanto a Home usa os fallbacks locais
+ * aprovados. Só ativar depois de migrar e revisar os documentos do dataset.
+ */
+export const hasSanityContent =
+  hasSanityConfig && process.env.NEXT_PUBLIC_SANITY_CONTENT_ENABLED === 'true'
