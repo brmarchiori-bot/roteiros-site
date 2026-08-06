@@ -1,14 +1,16 @@
 import { defineField, defineType } from 'sanity'
+import { initialPartnerships } from '@/sanity/initial-values'
 
 export const partnershipsSchema = defineType({
   name: 'partnerships',
   title: 'Parcerias',
   type: 'document',
+  initialValue: initialPartnerships,
   description:
     'Apresentação pública curta. O portfólio detalhado continua privado e nunca é ligado pela home.',
   groups: [
-    { name: 'conteudo', title: 'Conteúdo principal', default: true },
-    { name: 'contato', title: 'Contato' },
+    { name: 'conteudo', title: 'Apresentação e formatos', default: true },
+    { name: 'contato', title: 'Canais de contato' },
   ],
   fields: [
     defineField({
@@ -28,6 +30,22 @@ export const partnershipsSchema = defineType({
       type: 'text',
       rows: 3,
       validation: (r) => r.required().max(320),
+    }),
+    defineField({
+      name: 'principles',
+      title: 'Três princípios em destaque',
+      description: '📍 Onde aparecem: nos três blocos ao lado do texto principal.',
+      group: 'conteudo',
+      type: 'array',
+      of: [{
+        type: 'object',
+        fields: [
+          defineField({ name: 'title', title: 'Título', type: 'string', validation: (r) => r.required().max(30) }),
+          defineField({ name: 'body', title: 'Explicação', type: 'text', rows: 2, validation: (r) => r.required().max(140) }),
+        ],
+        preview: { select: { title: 'title', subtitle: 'body' } },
+      }],
+      validation: (r) => r.required().min(3).max(3).error('Use exatamente os três blocos do layout.'),
     }),
     defineField({
       name: 'formats',
@@ -54,10 +72,24 @@ export const partnershipsSchema = defineType({
       type: 'email',
     }),
     defineField({
+      name: 'contactEmailLabel',
+      title: 'Texto do link de email',
+      group: 'contato',
+      type: 'string',
+      validation: (r) => r.max(55),
+    }),
+    defineField({
       name: 'whatsappUrl',
       title: 'Link do WhatsApp (opcional)',
       group: 'contato',
       type: 'url',
+    }),
+    defineField({
+      name: 'whatsappLabel',
+      title: 'Texto do link de WhatsApp',
+      group: 'contato',
+      type: 'string',
+      validation: (r) => r.max(40),
     }),
   ],
   preview: {

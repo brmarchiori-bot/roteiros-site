@@ -6,9 +6,10 @@ import { Reveal } from '@/components/shared/reveal'
 import { cn } from '@/lib/utils'
 import { toContainerSize, toImageStyle } from '@/lib/sanity-styles'
 import { getAboutFromSanity } from '@/sanity/queries'
+import type { AboutContent } from '@/types/content'
 
-export async function AboutSection() {
-  const about = await getAboutFromSanity()
+export async function AboutSection({ content }: { content?: AboutContent } = {}) {
+  const about = content ?? await getAboutFromSanity()
   const containerSize = toContainerSize(about.layout?.contentWidth)
   const imageOnRight = about.layout?.imagePosition === 'right'
 

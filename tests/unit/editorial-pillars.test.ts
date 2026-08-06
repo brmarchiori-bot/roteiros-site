@@ -115,7 +115,7 @@ describe('isolamento e contrato da camada editorial', () => {
   })
 
   it('configura drafts, sem CDN, com stega e sem cache apenas no cliente editorial', () => {
-    const source = readFileSync('src/sanity/editorial/pillars.ts', 'utf8')
+    const source = readFileSync('src/sanity/editorial/home.ts', 'utf8')
     const client = readFileSync('src/sanity/editorial/client.server.ts', 'utf8')
 
     expect(client).toContain("perspective: 'drafts'")
@@ -126,7 +126,7 @@ describe('isolamento e contrato da camada editorial', () => {
   })
 
   it('é server-only, não exporta cliente e não oferece operação de escrita', () => {
-    const source = readFileSync('src/sanity/editorial/pillars.ts', 'utf8')
+    const source = readFileSync('src/sanity/editorial/home.ts', 'utf8')
 
     expect(source.startsWith("import 'server-only'")).toBe(true)
     expect(source).not.toMatch(/export\s+const\s+client/)
@@ -138,7 +138,7 @@ describe('isolamento e contrato da camada editorial', () => {
   })
 
   it('não depende da flag pública nem altera as queries legadas', () => {
-    const editorial = readFileSync('src/sanity/editorial/pillars.ts', 'utf8')
+    const editorial = readFileSync('src/sanity/editorial/home.ts', 'utf8')
     const publicPage = readFileSync('src/app/(marketing)/page.tsx', 'utf8')
     const home = readFileSync('src/components/home/home-composition.tsx', 'utf8')
 
@@ -147,14 +147,14 @@ describe('isolamento e contrato da camada editorial', () => {
     expect(home).not.toContain('@/sanity/')
   })
 
-  it('mantém somente Pilares conectado no caminho editorial', () => {
+  it('conecta a Home inteira no caminho editorial', () => {
     const previewPage = readFileSync(
       'src/app/(marketing)/editorial-internal/home/page.tsx',
       'utf8',
     )
 
-    expect(previewPage).toContain('resolveEditorialPillars')
-    expect(previewPage).not.toMatch(/resolveEditorial(Hero|Now|About|Faq|Partnerships|Content)/)
+    expect(previewPage).toContain('resolveEditorialHome')
+    expect(previewPage).toContain('<HomeComposition content={home.content} />')
   })
 
   it('mantém o token fora de componentes cliente e da composição pública', () => {
@@ -176,7 +176,7 @@ describe('isolamento e contrato da camada editorial', () => {
 
     expect(source).toContain("import { draftMode } from 'next/headers'")
     expect(source).toContain('if (!isEnabled) notFound()')
-    expect(source).toContain('resolveEditorialPillars(true)')
+    expect(source).toContain('resolveEditorialHome(true)')
   })
 
   it('oferece as três mensagens editoriais sem detalhes técnicos', () => {

@@ -1,16 +1,18 @@
 import { defineField, defineType } from 'sanity'
 import { sectionLayoutFields } from './shared'
+import { initialContentHighlights } from '@/sanity/initial-values'
 
 export const contentHighlightsSchema = defineType({
   name: 'contentHighlights',
   title: 'Continuidade',
   type: 'document',
+  initialValue: initialContentHighlights,
   description:
     'Grade de cards com posts/vídeos + blocos convidando a seguir Instagram e YouTube.',
   groups: [
-    { name: 'conteudo', title: 'Conteúdo principal', default: true },
-    { name: 'imagem', title: 'Fotografias e capas' },
-    { name: 'aparencia', title: 'Enquadramento' },
+    { name: 'conteudo', title: 'Título e canais', default: true },
+    { name: 'imagem', title: 'Conteúdos em destaque' },
+    { name: 'aparencia', title: 'Ajustes visuais (opcional)' },
   ],
   fields: [
     defineField({

@@ -1,12 +1,14 @@
 import { defineField, defineType } from 'sanity'
+import { initialPillars } from '@/sanity/initial-values'
 
 export const pillarsSchema = defineType({
   name: 'pillars',
   title: 'O que você vai encontrar',
   type: 'document',
+  initialValue: initialPillars,
   description:
     'Os quatro assuntos que ajudam uma pessoa nova a entender o Menos Roteiros. Só mude quando a linha editorial mudar.',
-  groups: [{ name: 'conteudo', title: 'Conteúdo principal', default: true }],
+  groups: [{ name: 'conteudo', title: 'Textos da seção', default: true }],
   fields: [
     defineField({
       name: 'meta',
@@ -29,7 +31,6 @@ export const pillarsSchema = defineType({
         fields: [
           defineField({ name: 'title', title: 'Título', type: 'string', validation: (r) => r.required().max(45) }),
           defineField({ name: 'description', title: 'Descrição', type: 'text', rows: 2, validation: (r) => r.required().max(150) }),
-          defineField({ name: 'href', title: 'Link (opcional)', type: 'string', description: 'Âncora ou URL completa. Deixe vazio quando não houver destino real.' }),
         ],
         preview: { select: { title: 'title', subtitle: 'description' } },
       }],

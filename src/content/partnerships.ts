@@ -13,6 +13,23 @@ export const partnerships: PartnershipsContent = {
   },
   philosophy:
     'A gente trabalha com negócios que cabem de verdade no caminho. A proposta é simples: viver a experiência, entender o lugar e contar a história sem transformar tudo em anúncio.',
+  principles: [
+    {
+      id: 'proposito',
+      title: 'Propósito',
+      body: 'A história precisa fazer sentido dentro do caminho.',
+    },
+    {
+      id: 'conexao',
+      title: 'Conexão',
+      body: 'Pessoas, lugares e marcas entram pela relação verdadeira.',
+    },
+    {
+      id: 'impacto',
+      title: 'Impacto',
+      body: 'O conteúdo continua útil depois que a publicação termina.',
+    },
+  ],
   formats: [
     {
       id: 'pousada-de-alma',

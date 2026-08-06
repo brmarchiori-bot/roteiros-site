@@ -30,10 +30,10 @@ const PRIVATE_SINGLETON = {
 
 export const structure: StructureResolver = (S) =>
   S.list()
-    .title('Menos Roteiros — Painel editorial')
+    .title('Conteúdo do site')
     .items([
       S.listItem()
-        .title('Home')
+        .title('Home — editar por seção')
         .id('home-editorial')
         .child(
           S.list()

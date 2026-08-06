@@ -6,6 +6,7 @@ import { defineConfig } from 'sanity'
 import { presentationTool } from 'sanity/presentation'
 import { structureTool } from 'sanity/structure'
 import { dataset, projectId } from '@/sanity/env'
+import { EditorialDocumentGuide } from '@/sanity/components/editorial-document-guide'
 import { presentationResolve } from '@/sanity/presentation'
 import { PresentationPreviewHeader } from '@/sanity/presentation-preview-header'
 import { schemaTypes } from '@/sanity/schemas'
@@ -18,11 +19,15 @@ export default defineConfig({
   projectId,
   dataset,
   schema: { types: schemaTypes },
+  form: {
+    components: {
+      input: EditorialDocumentGuide,
+    },
+  },
   plugins: [
-    structureTool({ structure }),
     presentationTool({
       name: 'visualizar',
-      title: 'Visualizar página',
+      title: 'Editar site ao vivo',
       previewUrl: {
         initial: '/',
         previewMode: {
@@ -37,6 +42,11 @@ export default defineConfig({
           component: PresentationPreviewHeader,
         },
       },
+    }),
+    structureTool({
+      name: 'conteudo',
+      title: 'Conteúdo por seção',
+      structure,
     }),
   ],
 })

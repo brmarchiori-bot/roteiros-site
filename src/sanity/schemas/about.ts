@@ -1,16 +1,18 @@
 import { defineField, defineType } from 'sanity'
 import { sectionLayoutFields } from './shared'
+import { initialAbout } from '@/sanity/initial-values'
 
 export const aboutSchema = defineType({
   name: 'about',
   title: 'Nossa história',
   type: 'document',
+  initialValue: initialAbout,
   description:
     'Aparece após a capa. Foto principal do casal + blocos de história (capítulos). Cada bloco pode ter uma foto própria.',
   groups: [
-    { name: 'conteudo', title: 'Conteúdo principal', default: true },
-    { name: 'imagem', title: 'Fotografia' },
-    { name: 'aparencia', title: 'Enquadramento' },
+    { name: 'conteudo', title: 'História e capítulos', default: true },
+    { name: 'imagem', title: 'Foto principal' },
+    { name: 'aparencia', title: 'Ajustes visuais (opcional)' },
   ],
   fields: [
     defineField({

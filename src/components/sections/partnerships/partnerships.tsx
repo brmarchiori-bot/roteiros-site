@@ -2,17 +2,13 @@ import Link from 'next/link'
 import { Section } from '@/components/layout/section'
 import { Reveal } from '@/components/shared/reveal'
 import { getPartnershipsFromSanity } from '@/sanity/queries'
+import type { PartnershipsContent } from '@/types/content'
 
-export async function PartnershipsSection() {
-  const partnerships = await getPartnershipsFromSanity()
+export async function PartnershipsSection({ content }: { content?: PartnershipsContent } = {}) {
+  const partnerships = content ?? await getPartnershipsFromSanity()
   const publishedNumbers = partnerships.numbers.items.filter(
     (item) => item.value.trim() && item.value !== '—',
   )
-  const principles = [
-    { number: '01', title: 'Propósito', body: 'A história precisa fazer sentido dentro do caminho.' },
-    { number: '02', title: 'Conexão', body: 'Pessoas, lugares e marcas entram pela relação verdadeira.' },
-    { number: '03', title: 'Impacto', body: 'O conteúdo continua útil depois que a publicação termina.' },
-  ]
 
   return (
     <Section id="partnerships" spacing="lg" className="bg-foreground text-background" bordered={false}>
@@ -45,10 +41,10 @@ export async function PartnershipsSection() {
       </Reveal>
       </div>
       <ol className="grid gap-0 border-y border-white/20 md:col-span-7 md:grid-cols-3">
-        {principles.map((principle, i) => (
-          <Reveal key={principle.number} delay={i * 0.08} className="h-full">
+        {partnerships.principles.map((principle, i) => (
+          <Reveal key={principle.id} delay={i * 0.08} className="h-full">
             <li className="h-full border-b border-white/15 px-6 py-9 md:border-r md:border-b-0">
-              <p className="font-mono text-[10px] tracking-[0.2em] text-primary">{principle.number}</p>
+              <p className="font-mono text-[10px] tracking-[0.2em] text-primary">{String(i + 1).padStart(2, '0')}</p>
               <h3 className="mt-7 font-display text-2xl text-background">{principle.title}</h3>
               <p className="mt-4 text-sm leading-relaxed text-background/60">{principle.body}</p>
             </li>

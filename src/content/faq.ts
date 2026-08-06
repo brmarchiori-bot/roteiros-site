@@ -9,6 +9,7 @@ export const faq: FaqContent = {
     kicker: '07 · Perguntas',
     title: 'O básico que tira dúvida.',
   },
+  intro: 'Perguntas que costumam aparecer quando a estrada vira conversa.',
   items: [
     {
       question: 'Vocês são influenciadores?',

@@ -220,6 +220,11 @@ export type PartnershipNumber = {
 export type PartnershipsContent = {
   meta: SectionMeta
   philosophy: string
+  principles: Array<{
+    id: string
+    title: string
+    body: string
+  }>
   formats: PartnershipFormat[]
   numbers: {
     updatedAt: string
@@ -240,5 +245,18 @@ export type FaqItem = {
 
 export type FaqContent = {
   meta: SectionMeta
+  intro?: string
   items: FaqItem[]
+}
+
+/* ---------- Home completa ---------- */
+
+export type HomeContent = {
+  hero: HeroContent
+  now: NowContent
+  about: AboutContent
+  pillars: PillarsContent
+  contentHighlights: ContentBridgeContent
+  partnerships: PartnershipsContent
+  faq: FaqContent
 }

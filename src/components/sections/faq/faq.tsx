@@ -24,9 +24,11 @@ export function FaqSection({ faq }: { faq: FaqContent }) {
             </h2>
           </Reveal>
         )}
-        <p className="mt-8 max-w-xs text-sm leading-relaxed text-muted">
-          Perguntas que costumam aparecer quando a estrada vira conversa.
-        </p>
+        {faq.intro && (
+          <p className="mt-8 max-w-xs text-sm leading-relaxed text-muted">
+            {faq.intro}
+          </p>
+        )}
       </header>
 
       <div className="md:col-span-7 md:col-start-6">

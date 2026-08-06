@@ -7,8 +7,23 @@ describe('Presentation Tool', () => {
 
     expect(config).toContain("from 'sanity/presentation'")
     expect(config).toContain("name: 'visualizar'")
-    expect(config).toContain("title: 'Visualizar página'")
+    expect(config).toContain("title: 'Editar site ao vivo'")
     expect(config).toContain("initial: '/'")
+    expect(config.indexOf('presentationTool({')).toBeLessThan(config.indexOf('structureTool({'))
+  })
+
+  it('oferece orientação didática nos sete documentos da Home', () => {
+    const config = readFileSync('sanity.config.ts', 'utf8')
+    const guide = readFileSync('src/sanity/components/editorial-document-guide.tsx', 'utf8')
+    const initialValues = readFileSync('src/sanity/initial-values.ts', 'utf8')
+
+    expect(config).toContain('input: EditorialDocumentGuide')
+    for (const type of ['hero', 'now', 'about', 'pillars', 'contentHighlights', 'partnerships', 'faq']) {
+      expect(guide).toContain(`${type}: {`)
+    }
+    expect(guide).toContain('clique no trecho da página')
+    expect(initialValues).toContain('initialHero')
+    expect(initialValues).toContain('initialFaq')
   })
 
   it('usa exclusivamente as rotas oficiais de ativação e saída', () => {
@@ -77,22 +92,24 @@ describe('Presentation Tool', () => {
     expect(publicClient).not.toContain('SANITY_API_READ_TOKEN')
   })
 
-  it('preserva os campos e _key necessários para click-to-edit de Pilares', () => {
-    const query = readFileSync('src/sanity/editorial/pillars.ts', 'utf8')
+  it('carrega as sete seções com stega para click-to-edit', () => {
+    const query = readFileSync('src/sanity/editorial/home.ts', 'utf8')
 
-    expect(query).toContain('_id,')
-    expect(query).toContain('_type,')
-    expect(query).toContain('_key,')
-    expect(query).toContain('title,')
-    expect(query).toContain('description,')
-    expect(query).toContain('href')
-    expect(query).toContain('_key: item._key')
+    expect(query).toContain('createEditorialClient({ stega: true })')
+    expect(query).toContain("cache: 'no-store'")
+    expect(query).toContain('getHeroFromSanity(options)')
+    expect(query).toContain('getNowFromSanity(options)')
+    expect(query).toContain('getAboutFromSanity(options)')
+    expect(query).toContain('getPillarsFromSanity(options)')
+    expect(query).toContain('getContentHighlightsFromSanity(options)')
+    expect(query).toContain('getPartnershipsFromSanity(options)')
+    expect(query).toContain('getFaqFromSanity(options)')
   })
 
   it('não adiciona operações de escrita à camada editorial', () => {
     const source = [
       readFileSync('src/sanity/editorial/client.server.ts', 'utf8'),
-      readFileSync('src/sanity/editorial/pillars.ts', 'utf8'),
+      readFileSync('src/sanity/editorial/home.ts', 'utf8'),
     ].join('\n')
 
     expect(source).not.toContain('.mutate(')

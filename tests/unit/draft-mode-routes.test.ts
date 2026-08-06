@@ -146,6 +146,7 @@ describe('isolamento do cliente', () => {
 
     expect(process.env.NEXT_PUBLIC_SANITY_CONTENT_ENABLED).toBeUndefined()
     expect(client).toContain('hasSanityContent')
-    expect(queries).toContain('if (!sanityClient) return')
+    expect(queries).toContain('options?.client ?? sanityClient')
+    expect(queries).toContain('if (!context.client) return')
   })
 })

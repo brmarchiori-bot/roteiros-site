@@ -31,6 +31,23 @@ import { urlForImage } from './image'
 /** Revalidação a cada 60s. */
 const fetchOptions = { next: { revalidate: 60 } } as const
 
+type QueryClient = NonNullable<typeof sanityClient>
+
+export type SanityQueryOptions = {
+  client?: QueryClient
+  fetchOptions?: {
+    cache?: RequestCache
+    next?: { revalidate?: number }
+  }
+}
+
+function queryContext(options?: SanityQueryOptions) {
+  return {
+    client: options?.client ?? sanityClient,
+    options: options?.fetchOptions ?? fetchOptions,
+  }
+}
+
 /* ---------------- Helpers genéricos ---------------- */
 
 function reportSanityFallback(section: string, error: unknown) {
@@ -179,10 +196,11 @@ type RawHero = {
   contentWidth?: SectionLayout['contentWidth']
 }
 
-export async function getHeroFromSanity(): Promise<HeroContent> {
-  if (!sanityClient) return heroFallback
+export async function getHeroFromSanity(options?: SanityQueryOptions): Promise<HeroContent> {
+  const context = queryContext(options)
+  if (!context.client) return heroFallback
   try {
-    const raw = await sanityClient.fetch<RawHero | null>(HERO_QUERY, {}, fetchOptions)
+    const raw = await context.client.fetch<RawHero | null>(HERO_QUERY, {}, context.options)
     if (!raw) return heroFallback
 
     const cover = resolveImage(raw.imagemFundo, 2400)
@@ -255,10 +273,11 @@ type RawAbout = {
   imagePosition?: SectionLayout['imagePosition']
 }
 
-export async function getAboutFromSanity(): Promise<AboutContent> {
-  if (!sanityClient) return aboutFallback
+export async function getAboutFromSanity(options?: SanityQueryOptions): Promise<AboutContent> {
+  const context = queryContext(options)
+  if (!context.client) return aboutFallback
   try {
-    const raw = await sanityClient.fetch<RawAbout | null>(ABOUT_QUERY, {}, fetchOptions)
+    const raw = await context.client.fetch<RawAbout | null>(ABOUT_QUERY, {}, context.options)
     if (!raw) return aboutFallback
 
     const validChapters = (raw.chapters ?? [])
@@ -339,10 +358,11 @@ type RawNow = {
   imagePosition?: SectionLayout['imagePosition']
 }
 
-export const getNowFromSanity = cache(async function getNowFromSanity(): Promise<NowContent> {
-  if (!sanityClient) return nowFallback
+async function fetchNowFromSanity(options?: SanityQueryOptions): Promise<NowContent> {
+  const context = queryContext(options)
+  if (!context.client) return nowFallback
   try {
-    const raw = await sanityClient.fetch<RawNow | null>(NOW_QUERY, {}, fetchOptions)
+    const raw = await context.client.fetch<RawNow | null>(NOW_QUERY, {}, context.options)
     if (!raw) return nowFallback
 
     const localImg = resolveImage(raw.imagemLocal, 1600)
@@ -389,7 +409,13 @@ export const getNowFromSanity = cache(async function getNowFromSanity(): Promise
     reportSanityFallback('now', error)
     return nowFallback
   }
-})
+}
+
+const getCachedNowFromSanity = cache(() => fetchNowFromSanity())
+
+export function getNowFromSanity(options?: SanityQueryOptions): Promise<NowContent> {
+  return options ? fetchNowFromSanity(options) : getCachedNowFromSanity()
+}
 
 /* ================================================================
    CONTENT HIGHLIGHTS
@@ -426,10 +452,11 @@ type RawContent = {
   contentWidth?: SectionLayout['contentWidth']
 }
 
-export async function getContentHighlightsFromSanity(): Promise<ContentBridgeContent> {
-  if (!sanityClient) return contentFallback
+export async function getContentHighlightsFromSanity(options?: SanityQueryOptions): Promise<ContentBridgeContent> {
+  const context = queryContext(options)
+  if (!context.client) return contentFallback
   try {
-    const raw = await sanityClient.fetch<RawContent | null>(CONTENT_QUERY, {}, fetchOptions)
+    const raw = await context.client.fetch<RawContent | null>(CONTENT_QUERY, {}, context.options)
     if (!raw) return contentFallback
 
     const validHighlights = (raw.highlights ?? [])
@@ -486,13 +513,14 @@ const PILLARS_QUERY = groq`*[_id == "pillars-singleton"][0]{
   items[]{ _key, title, description, href }
 }`
 
-export async function getPillarsFromSanity(): Promise<PillarsContent> {
-  if (!sanityClient) return pillarsFallback
+export async function getPillarsFromSanity(options?: SanityQueryOptions): Promise<PillarsContent> {
+  const context = queryContext(options)
+  if (!context.client) return pillarsFallback
   try {
-    const raw = await sanityClient.fetch<{
+    const raw = await context.client.fetch<{
       meta?: { kicker?: string; title?: string }
       items?: Array<{ _key?: string; title?: string; description?: string; href?: string }>
-    } | null>(PILLARS_QUERY, {}, fetchOptions)
+    } | null>(PILLARS_QUERY, {}, context.options)
     if (!raw) return pillarsFallback
 
     const items = (raw.items ?? [])
@@ -520,25 +548,30 @@ export async function getPillarsFromSanity(): Promise<PillarsContent> {
    ================================================================ */
 
 const PARTNERSHIPS_QUERY = groq`*[_id == "partnerships-singleton"][0]{
-  meta, philosophy, contactEmail, whatsappUrl,
+  meta, philosophy, contactEmail, contactEmailLabel, whatsappUrl, whatsappLabel,
+  principles[]{ _key, title, body },
   formats[]{ _key, name, description, audience }
 }`
 
-export async function getPartnershipsFromSanity(): Promise<PartnershipsContent> {
-  if (!sanityClient) return partnershipsFallback
+export async function getPartnershipsFromSanity(options?: SanityQueryOptions): Promise<PartnershipsContent> {
+  const context = queryContext(options)
+  if (!context.client) return partnershipsFallback
   try {
-    const raw = await sanityClient.fetch<{
+    const raw = await context.client.fetch<{
       meta?: { kicker?: string; title?: string }
       philosophy?: string
       contactEmail?: string
+      contactEmailLabel?: string
       whatsappUrl?: string
+      whatsappLabel?: string
+      principles?: Array<{ _key?: string; title?: string; body?: string }>
       formats?: Array<{
         _key?: string
         name?: string
         description?: string
         audience?: string
       }>
-    } | null>(PARTNERSHIPS_QUERY, {}, fetchOptions)
+    } | null>(PARTNERSHIPS_QUERY, {}, context.options)
     if (!raw) return partnershipsFallback
 
     const formats = (raw.formats ?? [])
@@ -558,25 +591,38 @@ export async function getPartnershipsFromSanity(): Promise<PartnershipsContent> 
         audience: item.audience!.trim(),
       }))
 
+    const principles = (raw.principles ?? [])
+      .filter((item) => item._key && item.title?.trim() && item.body?.trim())
+      .slice(0, 3)
+      .map((item) => ({
+        id: item._key as string,
+        title: item.title!.trim(),
+        body: item.body!.trim(),
+      }))
+
     const email = raw.contactEmail?.trim()
     const whatsapp = raw.whatsappUrl?.trim()
 
     return {
       meta: mergeMeta(raw.meta, partnershipsFallback.meta),
       philosophy: pickString(raw.philosophy, partnershipsFallback.philosophy),
+      principles: principles.length === 3 ? principles : partnershipsFallback.principles,
       formats: formats.length > 0 ? formats : partnershipsFallback.formats,
       numbers: partnershipsFallback.numbers,
       ctas: {
         mediaKit: email
           ? {
-              label: partnershipsFallback.ctas.mediaKit.label,
+              label: pickString(raw.contactEmailLabel, partnershipsFallback.ctas.mediaKit.label),
               href: `mailto:${email}?subject=${encodeURIComponent(
                 'Quero conhecer o trabalho do Menos Roteiros',
               )}`,
             }
           : partnershipsFallback.ctas.mediaKit,
         whatsapp: whatsapp
-          ? { label: partnershipsFallback.ctas.whatsapp.label, href: whatsapp }
+          ? {
+              label: pickString(raw.whatsappLabel, partnershipsFallback.ctas.whatsapp.label),
+              href: whatsapp,
+            }
           : partnershipsFallback.ctas.whatsapp,
       },
     }
@@ -592,6 +638,7 @@ export async function getPartnershipsFromSanity(): Promise<PartnershipsContent> 
 
 const FAQ_QUERY = groq`*[_id == "faq-singleton"][0]{
   meta,
+  intro,
   items[]{ _key, question, answer }
 }`
 
@@ -603,13 +650,15 @@ type RawFaqItem = {
 
 type RawFaq = {
   meta?: { kicker?: string; title?: string }
+  intro?: string
   items?: RawFaqItem[]
 }
 
-export async function getFaqFromSanity(): Promise<FaqContent> {
-  if (!sanityClient) return faqFallback
+export async function getFaqFromSanity(options?: SanityQueryOptions): Promise<FaqContent> {
+  const context = queryContext(options)
+  if (!context.client) return faqFallback
   try {
-    const raw = await sanityClient.fetch<RawFaq | null>(FAQ_QUERY, {}, fetchOptions)
+    const raw = await context.client.fetch<RawFaq | null>(FAQ_QUERY, {}, context.options)
     if (!raw) return faqFallback
 
     // Filtra itens válidos: precisa ter pergunta E resposta (ambas não-vazias após trim)
@@ -628,6 +677,7 @@ export async function getFaqFromSanity(): Promise<FaqContent> {
 
     return {
       meta: mergeMeta(raw.meta, faqFallback.meta),
+      intro: pickString(raw.intro, faqFallback.intro),
       items,
     }
   } catch (error) {

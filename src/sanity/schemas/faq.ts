@@ -1,12 +1,14 @@
 import { defineField, defineType } from 'sanity'
+import { initialFaq } from '@/sanity/initial-values'
 
 export const faqSchema = defineType({
   name: 'faq',
   title: 'Perguntas frequentes',
   type: 'document',
+  initialValue: initialFaq,
   description:
     'Perguntas e respostas que aparecem no acordeão do rodapé da home.',
-  groups: [{ name: 'conteudo', title: 'Conteúdo principal', default: true }],
+  groups: [{ name: 'conteudo', title: 'Perguntas na ordem do site', default: true }],
   fields: [
     defineField({
       name: 'meta',
@@ -79,6 +81,15 @@ export const faqSchema = defineType({
         },
       ],
       validation: (r) => r.max(15).error('Máximo 15 perguntas.'),
+    }),
+    defineField({
+      name: 'intro',
+      title: 'Frase de introdução',
+      description: '📍 Onde aparece: abaixo do título, antes das perguntas.',
+      group: 'conteudo',
+      type: 'text',
+      rows: 2,
+      validation: (r) => r.max(160),
     }),
   ],
   preview: {

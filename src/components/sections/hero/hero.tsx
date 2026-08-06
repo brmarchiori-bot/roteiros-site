@@ -9,8 +9,17 @@ import { getHeroFromSanity, getNowFromSanity } from '@/sanity/queries'
 import type { HeroContent } from '@/types/content'
 import { HeroDynamicText } from './hero-dynamic-text'
 
-export async function HeroSection() {
-  const [hero, journey] = await Promise.all([getHeroFromSanity(), getNowFromSanity()])
+export async function HeroSection({
+  content,
+  journey: journeyContent,
+}: {
+  content?: HeroContent
+  journey?: Awaited<ReturnType<typeof getNowFromSanity>>
+} = {}) {
+  const [hero, journey] = await Promise.all([
+    content ?? getHeroFromSanity(),
+    journeyContent ?? getNowFromSanity(),
+  ])
   const containerSize = toContainerSize(hero.layout?.contentWidth)
 
   // Versão rotativa ativa só quando HÁ titlePrefix + pelo menos 2 frases válidas (≥ 3 chars)

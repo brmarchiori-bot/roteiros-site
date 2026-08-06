@@ -1,16 +1,18 @@
 import { defineField, defineType } from 'sanity'
 import { sectionLayoutFields } from './shared'
+import { initialNow } from '@/sanity/initial-values'
 
 export const nowSchema = defineType({
   name: 'now',
   title: 'Agora',
   type: 'document',
+  initialValue: initialNow,
   description:
     'O capítulo presente da jornada. Atualize somente quando a cidade, a etapa ou a história realmente mudar.',
   groups: [
-    { name: 'conteudo', title: 'Conteúdo principal', default: true },
-    { name: 'imagem', title: 'Fotografia' },
-    { name: 'aparencia', title: 'Enquadramento' },
+    { name: 'conteudo', title: 'Local e relato', default: true },
+    { name: 'imagem', title: 'Fotos do momento' },
+    { name: 'aparencia', title: 'Ajustes visuais (opcional)' },
   ],
   fields: [
     defineField({
@@ -73,14 +75,6 @@ export const nowSchema = defineType({
       validation: (r) => r.required().max(40),
     }),
     defineField({
-      name: 'state',
-      title: 'Detalhe do local (opcional)',
-      description: '📍 Onde aparece: complemento da cidade. Ex: "Sertão norte". Até 40 caracteres.',
-      group: 'conteudo',
-      type: 'string',
-      validation: (r) => r.max(40),
-    }),
-    defineField({
       name: 'country',
       title: 'País',
       description: '📍 Onde aparece: ao lado da cidade. Normalmente "Brasil".',
@@ -105,15 +99,6 @@ export const nowSchema = defineType({
       group: 'conteudo',
       type: 'date',
       validation: (r) => r.required(),
-    }),
-    defineField({
-      name: 'coordinates',
-      title: 'Coordenadas (opcional)',
-      description:
-        '📍 Onde aparece: como metadado discreto perto da localização. Ex: "−5.09° S · −42.80° W".',
-      group: 'conteudo',
-      type: 'string',
-      validation: (r) => r.max(40),
     }),
     defineField({
       name: 'cta',
@@ -143,14 +128,6 @@ export const nowSchema = defineType({
       title: 'Imagem documental principal',
       description:
         'Priorize pessoas, gestos e situações reais. A seção funciona também sem imagem.',
-      group: 'imagem',
-      type: 'controlledImage',
-    }),
-    defineField({
-      name: 'imagemSecundaria',
-      title: 'Imagem secundária (opcional)',
-      description:
-        'Use apenas quando um segundo detalhe acrescentar contexto. Evite repetir o mesmo enquadramento.',
       group: 'imagem',
       type: 'controlledImage',
     }),

@@ -1,17 +1,19 @@
 import { defineField, defineType } from 'sanity'
 import { HeroHelpInput } from './hero-help'
 import { sectionLayoutFields } from './shared'
+import { initialHero } from '@/sanity/initial-values'
 
 export const heroSchema = defineType({
   name: 'hero',
   title: 'Capa e abertura',
   type: 'document',
+  initialValue: initialHero,
   description:
-    'Primeira tela do site: título grande + frase de apoio + dois botões + imagem de fundo opcional.',
+    'Primeira tela do site: título grande + frase de apoio + botão principal + imagem de fundo opcional.',
   groups: [
-    { name: 'conteudo', title: 'Conteúdo principal', default: true },
-    { name: 'imagem', title: 'Fotografia' },
-    { name: 'aparencia', title: 'Enquadramento' },
+    { name: 'conteudo', title: 'Textos e botões', default: true },
+    { name: 'imagem', title: 'Foto da capa' },
+    { name: 'aparencia', title: 'Ajustes visuais (opcional)' },
   ],
   fields: [
     defineField({
@@ -70,7 +72,7 @@ export const heroSchema = defineType({
       name: 'headline',
       title: 'Título principal',
       description:
-        'Use esse campo se quiser um título fixo, sem animação.\nSe preencher "Palavras que trocam", esse campo será ignorado.',
+        'Use esse campo se quiser um título fixo, sem animação.\nSe preencher “Início do título” e pelo menos duas “Frases animadas”, este campo será ignorado.',
       group: 'conteudo',
       type: 'string',
       validation: (r) =>
@@ -111,28 +113,6 @@ export const heroSchema = defineType({
           title: 'Pra onde leva',
           description:
             'URL completa (https://...) ou âncora da mesma página (#sobre, #now, #conteudo).',
-          type: 'string',
-        }),
-      ],
-    }),
-    defineField({
-      name: 'secondaryCta',
-      title: 'Convite secundário',
-      description: '📍 Onde aparece: ao lado do botão principal. Opcional.',
-      group: 'conteudo',
-      type: 'object',
-      fields: [
-        defineField({
-          name: 'label',
-          title: 'Texto do botão',
-          description: 'Até 30 caracteres. Ex: "Saber mais".',
-          type: 'string',
-          validation: (r) => r.max(30),
-        }),
-        defineField({
-          name: 'href',
-          title: 'Pra onde leva',
-          description: 'URL completa ou âncora (#sobre, #now, etc).',
           type: 'string',
         }),
       ],
