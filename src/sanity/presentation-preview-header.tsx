@@ -6,7 +6,7 @@ import type { PreviewHeaderProps } from 'sanity/presentation'
 const VIEWPORTS = [
   { name: 'Desktop', width: 1440, mode: 'desktop' },
   { name: 'Tablet', width: 768, mode: 'desktop' },
-  { name: 'Mobile', width: 390, mode: 'mobile' },
+  { name: 'Mobile', width: 390, mode: 'desktop' },
 ] as const
 
 type ViewportName = (typeof VIEWPORTS)[number]['name']

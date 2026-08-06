@@ -103,15 +103,18 @@ function unauthorized() {
   })
 }
 
+const isVercelPreview = process.env.VERCEL_ENV === 'preview'
+const vercelPreviewSource = isVercelPreview ? ' https://vercel.live' : ''
+
 const CONTENT_SECURITY_POLICY = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' https://va.vercel-scripts.com",
-  "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob: https://cdn.sanity.io",
-  "font-src 'self' data:",
-  "connect-src 'self' https://*.sanity.io https://*.apicdn.sanity.io https://vitals.vercel-insights.com https://*.vercel-insights.com",
+  `script-src 'self' 'unsafe-inline' https://va.vercel-scripts.com${vercelPreviewSource}`,
+  `style-src 'self' 'unsafe-inline'${vercelPreviewSource}`,
+  `img-src 'self' data: blob: https://cdn.sanity.io${isVercelPreview ? ' https://vercel.live https://vercel.com' : ''}`,
+  `font-src 'self' data:${isVercelPreview ? ' https://assets.vercel.com' : ''}`,
+  `connect-src 'self' https://*.sanity.io https://*.apicdn.sanity.io https://vitals.vercel-insights.com https://*.vercel-insights.com${isVercelPreview ? ' https://vercel.live wss://ws-us3.pusher.com' : ''}`,
   "media-src 'self' blob: https:",
-  'frame-src https://www.youtube-nocookie.com',
+  `frame-src https://www.youtube-nocookie.com${vercelPreviewSource}`,
   "worker-src 'self' blob:",
   "manifest-src 'self'",
   "object-src 'none'",

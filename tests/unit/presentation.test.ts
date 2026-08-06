@@ -51,6 +51,7 @@ describe('Presentation Tool', () => {
     expect(source).toContain("{ name: 'Tablet', width: 768")
     expect(source).toContain("{ name: 'Mobile', width: 390")
     expect(source).toContain('props.setViewport(viewport.mode)')
+    expect(source).toContain("{ name: 'Mobile', width: 390, mode: 'desktop' }")
   })
 
   it('monta Visual Editing somente na rota editorial protegida', () => {
