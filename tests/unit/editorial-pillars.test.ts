@@ -137,13 +137,19 @@ describe('isolamento e contrato da camada editorial', () => {
     expect(source).not.toContain('.delete(')
   })
 
-  it('não depende da flag pública nem altera as queries legadas', () => {
+  it('mantém a prévia independente da flag e conecta a Home pública às queries publicadas', () => {
     const editorial = readFileSync('src/sanity/editorial/home.ts', 'utf8')
     const publicPage = readFileSync('src/app/(marketing)/page.tsx', 'utf8')
     const home = readFileSync('src/components/home/home-composition.tsx', 'utf8')
 
     expect(editorial).not.toContain('NEXT_PUBLIC_SANITY_CONTENT_ENABLED')
-    expect(publicPage).not.toContain('@/sanity/')
+    expect(publicPage).toContain("from '@/sanity/queries'")
+    expect(publicPage).toContain('await Promise.all([')
+    expect(publicPage).toContain('getHeroFromSanity()')
+    expect(publicPage).toContain('getFaqFromSanity()')
+    expect(publicPage).toContain(
+      'content={{ hero, now, about, pillars, contentHighlights, partnerships, faq }}',
+    )
     expect(home).not.toMatch(/^import (?!type).*@\/sanity\//m)
   })
 

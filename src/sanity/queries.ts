@@ -28,8 +28,8 @@ import type {
 import { sanityClient } from './client'
 import { urlForImage } from './image'
 
-/** Revalidação a cada 60s. */
-const fetchOptions = { next: { revalidate: 60 } } as const
+/** Mantém a Home rápida sem deixar uma publicação editorial presa em cache. */
+const fetchOptions = { next: { revalidate: 10 } } as const
 
 type QueryClient = NonNullable<typeof sanityClient>
 
