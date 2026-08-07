@@ -5,21 +5,19 @@ import { GrainOverlay } from '@/components/shared/grain-overlay'
 import { Reveal } from '@/components/shared/reveal'
 import { cn } from '@/lib/utils'
 import { toContainerSize, toImageStyle } from '@/lib/sanity-styles'
-import { getHeroFromSanity, getNowFromSanity } from '@/sanity/queries'
-import type { HeroContent } from '@/types/content'
+import { hero as heroFallback, now as nowFallback } from '@/content'
+import type { HeroContent, NowContent } from '@/types/content'
 import { HeroDynamicText } from './hero-dynamic-text'
 
-export async function HeroSection({
+export function HeroSection({
   content,
   journey: journeyContent,
 }: {
   content?: HeroContent
-  journey?: Awaited<ReturnType<typeof getNowFromSanity>>
+  journey?: NowContent
 } = {}) {
-  const [hero, journey] = await Promise.all([
-    content ?? getHeroFromSanity(),
-    journeyContent ?? getNowFromSanity(),
-  ])
+  const hero = content ?? heroFallback
+  const journey = journeyContent ?? nowFallback
   const containerSize = toContainerSize(hero.layout?.contentWidth)
 
   // Versão rotativa ativa só quando HÁ titlePrefix + pelo menos 2 frases válidas (≥ 3 chars)

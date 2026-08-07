@@ -4,11 +4,11 @@ import { Section } from '@/components/layout/section'
 import { Reveal } from '@/components/shared/reveal'
 import { cn } from '@/lib/utils'
 import { toContainerSize, toImageStyle } from '@/lib/sanity-styles'
-import { getNowFromSanity } from '@/sanity/queries'
+import { now as nowFallback } from '@/content'
 import type { NowContent } from '@/types/content'
 
-export async function NowSection({ content }: { content?: NowContent } = {}) {
-  const now = content ?? await getNowFromSanity()
+export function NowSection({ content }: { content?: NowContent } = {}) {
+  const now = content ?? nowFallback
   const ctaHref = now.cta?.href ?? now.link
   const ctaLabel = now.cta?.label ?? 'Ver no Instagram'
   const hasPhoto = Boolean(now.photo?.src)

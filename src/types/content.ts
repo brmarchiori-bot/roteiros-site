@@ -31,6 +31,8 @@ export type SectionLayout = {
 /* ---------- Hero ---------- */
 
 export type HeroContent = {
+  _id?: string
+  _type?: 'hero'
   meta: SectionMeta
   headline: string
   /** Começo fixo do título quando houver rotação (ex: "Viajando o mundo e"). */
@@ -66,6 +68,7 @@ export type ManifestoContent = {
 /* ---------- About ---------- */
 
 export type AboutChapter = {
+  _key?: string
   number: string
   title: string
   body: string
@@ -76,6 +79,8 @@ export type AboutChapter = {
 }
 
 export type AboutContent = {
+  _id?: string
+  _type?: 'about'
   meta: SectionMeta
   chapters: AboutChapter[]
   closingCta?: Cta
@@ -91,6 +96,8 @@ export type AboutContent = {
 /* ---------- Now ---------- */
 
 export type NowContent = {
+  _id?: string
+  _type?: 'now'
   meta: SectionMeta
   city: string
   state?: string
@@ -144,6 +151,7 @@ export type PillarsContent = {
 /* ---------- Content highlights ---------- */
 
 export type ContentHighlight = {
+  _key?: string
   id: string
   platform: 'instagram' | 'youtube' | 'tiktok'
   url: string
@@ -154,12 +162,15 @@ export type ContentHighlight = {
 }
 
 export type ContentChannel = {
+  _key?: string
   url: string
   cta: string
   note?: string
 }
 
 export type ContentBridgeContent = {
+  _id?: string
+  _type?: 'contentHighlights'
   meta: SectionMeta
   pullQuote?: string
   highlights: ContentHighlight[]
@@ -204,6 +215,7 @@ export type ComingSoonContent = {
 /* ---------- Partnerships ---------- */
 
 export type PartnershipFormat = {
+  _key?: string
   id: string
   number: string
   name: string
@@ -212,15 +224,19 @@ export type PartnershipFormat = {
 }
 
 export type PartnershipNumber = {
+  _key?: string
   label: string
   value: string
   note?: string
 }
 
 export type PartnershipsContent = {
+  _id?: string
+  _type?: 'partnerships'
   meta: SectionMeta
   philosophy: string
   principles: Array<{
+    _key?: string
     id: string
     title: string
     body: string
@@ -239,11 +255,14 @@ export type PartnershipsContent = {
 /* ---------- FAQ ---------- */
 
 export type FaqItem = {
+  _key?: string
   question: string
   answer: string
 }
 
 export type FaqContent = {
+  _id?: string
+  _type?: 'faq'
   meta: SectionMeta
   intro?: string
   items: FaqItem[]

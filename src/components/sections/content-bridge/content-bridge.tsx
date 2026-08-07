@@ -4,7 +4,7 @@ import { Section } from '@/components/layout/section'
 import { Reveal } from '@/components/shared/reveal'
 import { SocialIcon, type SocialPlatform } from '@/components/shared/social-icon'
 import { toContainerSize, toImageStyle } from '@/lib/sanity-styles'
-import { getContentHighlightsFromSanity } from '@/sanity/queries'
+import { contentHighlights as contentFallback } from '@/content'
 import type { ContentBridgeContent, ContentChannel } from '@/types/content'
 
 const PLATFORM_LABEL: Record<SocialPlatform, string> = {
@@ -13,8 +13,8 @@ const PLATFORM_LABEL: Record<SocialPlatform, string> = {
   tiktok: 'TikTok',
 }
 
-export async function ContentBridgeSection({ content }: { content?: ContentBridgeContent } = {}) {
-  const contentHighlights = content ?? await getContentHighlightsFromSanity()
+export function ContentBridgeSection({ content }: { content?: ContentBridgeContent } = {}) {
+  const contentHighlights = content ?? contentFallback
   const containerSize = toContainerSize(contentHighlights.layout?.contentWidth)
 
   return (

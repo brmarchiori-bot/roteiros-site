@@ -1,11 +1,11 @@
 import Link from 'next/link'
 import { Section } from '@/components/layout/section'
 import { Reveal } from '@/components/shared/reveal'
-import { getPartnershipsFromSanity } from '@/sanity/queries'
+import { partnerships as partnershipsFallback } from '@/content'
 import type { PartnershipsContent } from '@/types/content'
 
-export async function PartnershipsSection({ content }: { content?: PartnershipsContent } = {}) {
-  const partnerships = content ?? await getPartnershipsFromSanity()
+export function PartnershipsSection({ content }: { content?: PartnershipsContent } = {}) {
+  const partnerships = content ?? partnershipsFallback
   const publishedNumbers = partnerships.numbers.items.filter(
     (item) => item.value.trim() && item.value !== '—',
   )

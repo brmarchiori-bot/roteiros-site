@@ -34,6 +34,15 @@ export const faqSchema = defineType({
       ],
     }),
     defineField({
+      name: 'intro',
+      title: 'Frase de introdução',
+      description: '📍 Onde aparece: abaixo do título, antes das perguntas. Deixe vazio para não mostrar esta frase.',
+      group: 'conteudo',
+      type: 'text',
+      rows: 2,
+      validation: (r) => r.max(160),
+    }),
+    defineField({
       name: 'items',
       title: 'Perguntas e respostas',
       description:
@@ -81,15 +90,6 @@ export const faqSchema = defineType({
         },
       ],
       validation: (r) => r.max(15).error('Máximo 15 perguntas.'),
-    }),
-    defineField({
-      name: 'intro',
-      title: 'Frase de introdução',
-      description: '📍 Onde aparece: abaixo do título, antes das perguntas.',
-      group: 'conteudo',
-      type: 'text',
-      rows: 2,
-      validation: (r) => r.max(160),
     }),
   ],
   preview: {

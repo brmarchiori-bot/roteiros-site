@@ -40,6 +40,8 @@ const GUIDES: Record<string, { step: string; title: string; description: string 
   },
 }
 
+const NEEDS_COMPARISON = new Set(['hero', 'now', 'about', 'faq'])
+
 export function EditorialDocumentGuide(props: InputProps) {
   const isDocumentRoot = props.id === 'root' && props.schemaType.type?.name === 'document'
   const guide = isDocumentRoot ? GUIDES[props.schemaType.name] : undefined
@@ -84,9 +86,34 @@ export function EditorialDocumentGuide(props: InputProps) {
               Dica: use “Editar site ao vivo” no menu superior e clique no trecho da página que
               deseja alterar.
             </p>
+            <p style={{ fontSize: 12, lineHeight: 1.5, margin: '8px 0 0', opacity: 0.72 }}>
+              Alterar cria um rascunho. Publicar no painel ainda não troca a Home pública enquanto
+              a migração editorial não for aprovada.
+            </p>
           </div>
         </div>
       </aside>
+      {NEEDS_COMPARISON.has(props.schemaType.name) && (
+        <aside
+          role="note"
+          style={{
+            background: '#fff7dc',
+            border: '1px solid #d8b85d',
+            borderRadius: 8,
+            color: '#4b3a13',
+            marginBottom: 24,
+            padding: '14px 18px',
+          }}
+        >
+          <strong style={{ display: 'block', fontSize: 14, marginBottom: 4 }}>
+            Conteúdo protegido para comparação
+          </strong>
+          <p style={{ fontSize: 13, lineHeight: 1.5, margin: 0 }}>
+            Esta seção ainda usa a versão segura do site. Compare textos e fotografias antes de
+            solicitar que ela seja ativada na prévia.
+          </p>
+        </aside>
+      )}
       {props.renderDefault(props)}
     </div>
   )

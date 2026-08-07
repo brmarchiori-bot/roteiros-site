@@ -5,11 +5,11 @@ import { PhotoPlaceholder } from '@/components/shared/photo-placeholder'
 import { Reveal } from '@/components/shared/reveal'
 import { cn } from '@/lib/utils'
 import { toContainerSize, toImageStyle } from '@/lib/sanity-styles'
-import { getAboutFromSanity } from '@/sanity/queries'
+import { about as aboutFallback } from '@/content'
 import type { AboutContent } from '@/types/content'
 
-export async function AboutSection({ content }: { content?: AboutContent } = {}) {
-  const about = content ?? await getAboutFromSanity()
+export function AboutSection({ content }: { content?: AboutContent } = {}) {
+  const about = content ?? aboutFallback
   const containerSize = toContainerSize(about.layout?.contentWidth)
   const imageOnRight = about.layout?.imagePosition === 'right'
 

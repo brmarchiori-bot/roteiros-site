@@ -1,10 +1,10 @@
 import { Section } from '@/components/layout/section'
 import { Reveal } from '@/components/shared/reveal'
-import { getPillarsFromSanity } from '@/sanity/queries'
+import { pillars as pillarsFallback } from '@/content'
 import type { PillarsContent } from '@/types/content'
 
-export async function PillarsSection({ content }: { content?: PillarsContent } = {}) {
-  const pillars = content ?? await getPillarsFromSanity()
+export function PillarsSection({ content }: { content?: PillarsContent } = {}) {
+  const pillars = content ?? pillarsFallback
 
   return (
     <Section id="pillars" spacing="xl" className="bg-surface/70" bordered={false}>

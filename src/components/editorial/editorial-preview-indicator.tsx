@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 
-type EditorialSource = 'sanity' | 'fallback' | 'unavailable'
+type EditorialSource = 'sanity' | 'fallback' | 'unavailable' | 'mixed'
 
 export function EditorialPreviewIndicator() {
   const [isEnabled, setIsEnabled] = useState(false)
@@ -23,7 +23,7 @@ export function EditorialPreviewIndicator() {
           const resolved = document
             .querySelector<HTMLElement>('[data-editorial-preview-source]')
             ?.dataset.editorialPreviewSource
-          if (resolved === 'sanity' || resolved === 'fallback' || resolved === 'unavailable') {
+          if (resolved === 'sanity' || resolved === 'fallback' || resolved === 'unavailable' || resolved === 'mixed') {
             setSource(resolved)
           }
         }
@@ -67,6 +67,7 @@ export function EditorialPreviewIndicator() {
 function previewMessage(source: EditorialSource | null) {
   if (source === 'sanity') return 'Prévia editorial — conteúdo do painel'
   if (source === 'fallback') return 'Prévia editorial — usando versão segura do site'
+  if (source === 'mixed') return 'Prévia editorial — algumas seções usam conteúdo do painel'
   if (source === 'unavailable') return 'Prévia editorial — painel temporariamente indisponível'
   return 'Prévia editorial — o público não está vendo esta versão'
 }

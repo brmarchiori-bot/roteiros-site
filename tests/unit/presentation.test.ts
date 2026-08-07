@@ -97,13 +97,12 @@ describe('Presentation Tool', () => {
 
     expect(query).toContain('createEditorialClient({ stega: true })')
     expect(query).toContain("cache: 'no-store'")
-    expect(query).toContain('getHeroFromSanity(options)')
-    expect(query).toContain('getNowFromSanity(options)')
-    expect(query).toContain('getAboutFromSanity(options)')
-    expect(query).toContain('getPillarsFromSanity(options)')
-    expect(query).toContain('getContentHighlightsFromSanity(options)')
-    expect(query).toContain('getPartnershipsFromSanity(options)')
-    expect(query).toContain('getFaqFromSanity(options)')
+    expect(query).toContain('EDITORIAL_HOME_QUERY')
+    expect(query).toContain('_id,_type,meta')
+    expect(query).toContain('chapters[]{_key')
+    expect(query).toContain('items[]{_key')
+    expect(query).toContain('principles[]{_key')
+    expect(query).toContain('validateSection(section, raw)')
   })
 
   it('não adiciona operações de escrita à camada editorial', () => {

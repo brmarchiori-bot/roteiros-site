@@ -21,8 +21,8 @@ export const initialHero = {
 
 export const initialNow = {
   meta: now.meta,
-  dayCount: now.dayCount ?? undefined,
-  journeyState: now.journeyState,
+  ...(now.dayCount === null ? {} : { dayCount: now.dayCount }),
+  ...(now.journeyState ? { journeyState: now.journeyState } : {}),
   caption: now.caption,
   city: now.city,
   country: now.country,
@@ -55,7 +55,6 @@ export const initialPillars = {
     _type: 'object',
     title: item.title,
     description: item.description,
-    href: item.href,
   })),
 }
 
@@ -82,8 +81,6 @@ export const initialPartnerships = {
     description: format.description,
     audience: format.audience,
   })),
-  contactEmailLabel: partnerships.ctas.mediaKit.label,
-  whatsappLabel: partnerships.ctas.whatsapp.label,
 }
 
 export const initialFaq = {
