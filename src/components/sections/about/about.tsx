@@ -7,8 +7,10 @@ import { cn } from '@/lib/utils'
 import { toContainerSize, toImageStyle } from '@/lib/sanity-styles'
 import { about as aboutFallback } from '@/content'
 import type { AboutContent } from '@/types/content'
+import type { EditorialSectionResult } from '@/sanity/editorial/home'
+import { editorialDataAttribute } from '@/sanity/editorial/data-attribute'
 
-export function AboutSection({ content }: { content?: AboutContent } = {}) {
+export function AboutSection({ content, editorial }: { content?: AboutContent; editorial?: EditorialSectionResult<'about'> } = {}) {
   const about = content ?? aboutFallback
   const containerSize = toContainerSize(about.layout?.contentWidth)
   const imageOnRight = about.layout?.imagePosition === 'right'
@@ -81,10 +83,10 @@ export function AboutSection({ content }: { content?: AboutContent } = {}) {
                     <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-primary md:text-[11px]">
                       Movimento {chapter.number}
                     </p>
-                    <h3 className="mt-2 font-display text-2xl font-medium leading-[1.08] tracking-tight text-foreground md:text-3xl">
+                    <h3 data-sanity={editorialDataAttribute(editorial, chapterPath(editorial, i, 'title'))} className="mt-2 font-display text-2xl font-medium leading-[1.08] tracking-tight text-foreground md:text-3xl">
                       {chapter.title}
                     </h3>
-                    <p className="mt-5 text-base leading-relaxed text-foreground/80 md:leading-[1.75]">
+                    <p data-sanity={editorialDataAttribute(editorial, chapterPath(editorial, i, 'body'))} className="mt-5 text-base leading-relaxed text-foreground/80 md:leading-[1.75]">
                       {chapter.body}
                     </p>
                   </div>
@@ -128,4 +130,9 @@ export function AboutSection({ content }: { content?: AboutContent } = {}) {
       </div>
     </Section>
   )
+}
+
+function chapterPath(editorial: EditorialSectionResult<'about'> | undefined, index: number, field: string) {
+  const key = editorial?.editMetadata?.arrayKeys.chapters?.[index]
+  return key ? `chapters[_key=="${key}"].${field}` : 'chapters'
 }

@@ -16,7 +16,7 @@ export default async function EditorialHomePage() {
   return (
     <>
       <EditorialPreviewSourceMarker source={home.source} />
-      <HomeComposition content={home.content} />
+      <HomeComposition content={home.content} editorialSections={home.sections} />
       <VisualEditing />
     </>
   )

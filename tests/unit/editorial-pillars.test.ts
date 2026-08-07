@@ -144,7 +144,7 @@ describe('isolamento e contrato da camada editorial', () => {
 
     expect(editorial).not.toContain('NEXT_PUBLIC_SANITY_CONTENT_ENABLED')
     expect(publicPage).not.toContain('@/sanity/')
-    expect(home).not.toContain('@/sanity/')
+    expect(home).not.toMatch(/^import (?!type).*@\/sanity\//m)
   })
 
   it('conecta a Home inteira no caminho editorial', () => {
@@ -154,7 +154,7 @@ describe('isolamento e contrato da camada editorial', () => {
     )
 
     expect(previewPage).toContain('resolveEditorialHome')
-    expect(previewPage).toContain('<HomeComposition content={home.content} />')
+    expect(previewPage).toContain('content={home.content} editorialSections={home.sections}')
   })
 
   it('mantém o token fora de componentes cliente e da composição pública', () => {

@@ -6,8 +6,10 @@ import { cn } from '@/lib/utils'
 import { toContainerSize, toImageStyle } from '@/lib/sanity-styles'
 import { now as nowFallback } from '@/content'
 import type { NowContent } from '@/types/content'
+import type { EditorialSectionResult } from '@/sanity/editorial/home'
+import { editorialDataAttribute } from '@/sanity/editorial/data-attribute'
 
-export function NowSection({ content }: { content?: NowContent } = {}) {
+export function NowSection({ content, editorial }: { content?: NowContent; editorial?: EditorialSectionResult<'now'> } = {}) {
   const now = content ?? nowFallback
   const ctaHref = now.cta?.href ?? now.link
   const ctaLabel = now.cta?.label ?? 'Ver no Instagram'
@@ -36,7 +38,7 @@ export function NowSection({ content }: { content?: NowContent } = {}) {
               {now.meta.kicker}
             </p>
             {now.meta.title && (
-              <h2 className={`mt-5 font-display text-4xl font-medium leading-[1.02] tracking-tight md:text-5xl ${inverse ? 'text-white' : 'text-foreground'}`}>
+              <h2 data-sanity={editorialDataAttribute(editorial, 'meta.title')} className={`mt-5 font-display text-4xl font-medium leading-[1.02] tracking-tight md:text-5xl ${inverse ? 'text-white' : 'text-foreground'}`}>
                 {now.meta.title}
               </h2>
             )}
@@ -44,7 +46,7 @@ export function NowSection({ content }: { content?: NowContent } = {}) {
               <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-white/45">
                 Local atual
               </p>
-              <p className={`mt-3 font-display text-3xl ${inverse ? 'text-white' : 'text-foreground'}`}>
+              <p data-sanity={editorialDataAttribute(editorial, 'city')} className={`mt-3 font-display text-3xl ${inverse ? 'text-white' : 'text-foreground'}`}>
                 {now.city}
               </p>
               <p className={`mt-4 max-w-sm text-sm leading-relaxed ${inverse ? 'text-white/70' : 'text-foreground/70'}`}>

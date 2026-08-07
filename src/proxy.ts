@@ -105,10 +105,11 @@ function unauthorized() {
 
 const isVercelPreview = process.env.VERCEL_ENV === 'preview'
 const vercelPreviewSource = isVercelPreview ? ' https://vercel.live' : ''
+const developmentEvalSource = process.env.NODE_ENV === 'development' ? " 'unsafe-eval'" : ''
 
 const CONTENT_SECURITY_POLICY = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline' https://va.vercel-scripts.com${vercelPreviewSource}`,
+  `script-src 'self' 'unsafe-inline'${developmentEvalSource} https://va.vercel-scripts.com${vercelPreviewSource}`,
   `style-src 'self' 'unsafe-inline'${vercelPreviewSource}`,
   `img-src 'self' data: blob: https://cdn.sanity.io${isVercelPreview ? ' https://vercel.live https://vercel.com' : ''}`,
   `font-src 'self' data:${isVercelPreview ? ' https://assets.vercel.com' : ''}`,

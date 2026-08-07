@@ -1,8 +1,10 @@
 import { Section } from '@/components/layout/section'
 import { Reveal } from '@/components/shared/reveal'
 import type { FaqContent } from '@/types/content'
+import type { EditorialSectionResult } from '@/sanity/editorial/home'
+import { editorialDataAttribute } from '@/sanity/editorial/data-attribute'
 
-export function FaqSection({ faq }: { faq: FaqContent }) {
+export function FaqSection({ faq, editorial }: { faq: FaqContent; editorial?: EditorialSectionResult<'faq'> }) {
   return (
     <Section id="faq" spacing="xl" bordered={false}>
       {/* Header editorial consistente */}
@@ -43,7 +45,7 @@ export function FaqSection({ faq }: { faq: FaqContent }) {
                   <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted md:text-[11px]">
                     {String(i + 1).padStart(2, '0')}
                   </span>
-                  <h3 className="font-display text-xl font-medium leading-snug tracking-tight text-foreground transition-colors group-hover:text-primary md:text-2xl">
+                  <h3 data-sanity={editorialDataAttribute(editorial, faqPath(editorial, i, 'question'))} className="font-display text-xl font-medium leading-snug tracking-tight text-foreground transition-colors group-hover:text-primary md:text-2xl">
                     {item.question}
                   </h3>
                   <span
@@ -56,7 +58,7 @@ export function FaqSection({ faq }: { faq: FaqContent }) {
               </summary>
               <div className="grid grid-cols-[2.5rem_1fr_2rem] gap-4 pb-7 md:grid-cols-[3rem_1fr_2.5rem] md:pb-9">
                 <span aria-hidden="true" />
-                <p className="text-base leading-relaxed text-foreground/80 md:text-lg md:leading-[1.75]">
+                <p data-sanity={editorialDataAttribute(editorial, faqPath(editorial, i, 'answer'))} className="text-base leading-relaxed text-foreground/80 md:text-lg md:leading-[1.75]">
                   {item.answer}
                 </p>
                 <span aria-hidden="true" />
@@ -68,4 +70,9 @@ export function FaqSection({ faq }: { faq: FaqContent }) {
       </div>
     </Section>
   )
+}
+
+function faqPath(editorial: EditorialSectionResult<'faq'> | undefined, index: number, field: string) {
+  const key = editorial?.editMetadata?.arrayKeys.items?.[index]
+  return key ? `items[_key=="${key}"].${field}` : 'items'
 }

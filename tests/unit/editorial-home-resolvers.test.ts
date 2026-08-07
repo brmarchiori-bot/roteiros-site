@@ -23,7 +23,7 @@ const validPillars = {
 beforeEach(() => vi.restoreAllMocks())
 
 describe('resolvers editoriais seguros por seção', () => {
-  it('bloqueia Hero, Agora, História e FAQ antigos por padrão sem consultá-los', async () => {
+  it('bloqueia valores de Hero, Agora, História e FAQ antigos e usa somente metadados para edição', async () => {
     const fetch = vi.fn().mockResolvedValue([])
     const { resolveEditorialHome } = await import('@/sanity/editorial/home')
     const result = await resolveEditorialHome(true, { fetch })
@@ -33,10 +33,26 @@ describe('resolvers editoriais seguros por seção', () => {
       expect(result.sections[section].reason).toBe('not-authorized')
     }
     const params = fetch.mock.calls[0][1] as { ids: string[] }
-    expect(params.ids).not.toContain('hero-singleton')
-    expect(params.ids).not.toContain('now-singleton')
-    expect(params.ids).not.toContain('about-singleton')
-    expect(params.ids).not.toContain('faq-singleton')
+    expect(params.ids).toEqual(expect.arrayContaining([
+      'hero-singleton', 'now-singleton', 'about-singleton', 'faq-singleton',
+    ]))
+  })
+
+  it('preserva _id, _type e _key para navegar sem renderizar conteúdo antigo', async () => {
+    const oldAbout = {
+      _id: 'about-singleton', _type: 'about',
+      meta: { kicker: 'antigo', title: 'antigo' },
+      chapters: [{ _key: 'capitulo-real', number: '1', title: 'antigo', body: 'antigo' }],
+    }
+    const { resolveEditorialHome } = await import('@/sanity/editorial/home')
+    const result = await resolveEditorialHome(true, { fetch: vi.fn().mockResolvedValue([oldAbout]) })
+    expect(result.sections.about.content).not.toBe(oldAbout)
+    expect(result.sections.about.reason).toBe('not-authorized')
+    expect(result.sections.about.editMetadata).toEqual({
+      documentId: 'about-singleton',
+      documentType: 'about',
+      arrayKeys: { chapters: ['capitulo-real'] },
+    })
   })
 
   it('usa documento autorizado somente quando ele é integralmente válido', async () => {

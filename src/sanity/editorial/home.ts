@@ -29,6 +29,11 @@ export type EditorialSectionResult<K extends EditorialSection = EditorialSection
   source: EditorialContentSource
   documentId?: string
   reason: EditorialReason
+  editMetadata?: {
+    documentId: string
+    documentType: string
+    arrayKeys: Record<string, string[]>
+  }
 }
 export type EditorialHomeResult = {
   content: HomeContent
@@ -90,7 +95,9 @@ export async function resolveEditorialHome(
 
   let documents: RawDocument[]
   try {
-    const ids = EDITORIAL_SECTIONS.filter((section) => allowlist.has(section)).map((s) => IDS[s])
+    // Todos os IDs são consultados para preservar somente metadados de navegação
+    // (_id, _type e _key) dos documentos bloqueados. Seus valores nunca entram na UI.
+    const ids = EDITORIAL_SECTIONS.map((section) => IDS[section])
     documents = await fetchDocuments(EDITORIAL_HOME_QUERY, {
       ids, draftIds: ids.map((id) => `drafts.${id}`),
     })
@@ -101,11 +108,14 @@ export async function resolveEditorialHome(
 
   const sections = {} as EditorialHomeResult['sections']
   for (const section of EDITORIAL_SECTIONS) {
+    const raw = documents.find((doc) => normalizeId(doc._id) === IDS[section])
     if (!allowlist.has(section)) {
-      sections[section] = fallback(section, 'not-authorized') as never
+      sections[section] = {
+        ...fallback(section, 'not-authorized'),
+        ...(raw ? { editMetadata: extractEditMetadata(section, raw) } : {}),
+      } as never
       continue
     }
-    const raw = documents.find((doc) => normalizeId(doc._id) === IDS[section])
     if (!raw) {
       sections[section] = fallback(section, 'document-missing') as never
       continue
@@ -116,6 +126,22 @@ export async function resolveEditorialHome(
       : (fallback(section, 'document-invalid', 'invalid') as never)
   }
   return compose(sections)
+}
+
+function extractEditMetadata(section: EditorialSection, raw: RawDocument) {
+  const arrayKeys: Record<string, string[]> = {}
+  if (section === 'about') arrayKeys.chapters = keysFrom(raw.chapters)
+  if (section === 'faq' || section === 'pillars') arrayKeys.items = keysFrom(raw.items)
+  if (section === 'contentHighlights') arrayKeys.highlights = keysFrom(raw.highlights)
+  if (section === 'partnerships') {
+    arrayKeys.principles = keysFrom(raw.principles)
+    arrayKeys.formats = keysFrom(raw.formats)
+  }
+  return { documentId: normalizeId(raw._id), documentType: String(raw._type), arrayKeys }
+}
+
+function keysFrom(value: unknown) {
+  return array(value).map((item) => structuralString(object(item)?._key)).filter((key): key is string => Boolean(key))
 }
 
 function validateSection<K extends EditorialSection>(section: K, raw: RawDocument): SectionContent[K] | null {

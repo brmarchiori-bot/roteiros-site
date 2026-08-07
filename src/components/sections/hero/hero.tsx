@@ -7,14 +7,18 @@ import { cn } from '@/lib/utils'
 import { toContainerSize, toImageStyle } from '@/lib/sanity-styles'
 import { hero as heroFallback, now as nowFallback } from '@/content'
 import type { HeroContent, NowContent } from '@/types/content'
+import type { EditorialSectionResult } from '@/sanity/editorial/home'
+import { editorialDataAttribute } from '@/sanity/editorial/data-attribute'
 import { HeroDynamicText } from './hero-dynamic-text'
 
 export function HeroSection({
   content,
   journey: journeyContent,
+  editorial,
 }: {
   content?: HeroContent
   journey?: NowContent
+  editorial?: EditorialSectionResult<'hero'>
 } = {}) {
   const hero = content ?? heroFallback
   const journey = journeyContent ?? nowFallback
@@ -54,6 +58,7 @@ export function HeroSection({
             {kicker}
           </p>
           <h1
+            data-sanity={editorialDataAttribute(editorial, 'headline')}
             aria-label={h1AriaLabel}
             className={cn(
               'hero-master-title font-display font-medium',
@@ -78,7 +83,7 @@ export function HeroSection({
 
           <div className="hero-master-support">
             <Reveal delay={0.18}>
-              <p className={cn(
+              <p data-sanity={editorialDataAttribute(editorial, 'subheadline')} className={cn(
                 'hero-master-subheadline font-display italic',
                 hasCover ? 'text-[#eee7dc]/82' : 'text-foreground/75',
               )}>

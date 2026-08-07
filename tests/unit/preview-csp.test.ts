@@ -10,4 +10,10 @@ describe('CSP do Preview Vercel', () => {
     expect(source).toContain('wss://ws-us3.pusher.com')
     expect(source).toContain('https://assets.vercel.com')
   })
+
+  it('permite eval somente no desenvolvimento exigido pelo React', () => {
+    const source = readFileSync('src/proxy.ts', 'utf8')
+    expect(source).toContain("process.env.NODE_ENV === 'development'")
+    expect(source).toContain("? \" 'unsafe-eval'\" : ''")
+  })
 })
