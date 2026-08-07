@@ -4,15 +4,7 @@ import { PORTFOLIO_CATEGORIES } from '@/types/portfolio'
 import { sanityClient } from './client'
 import { urlForImage } from './image'
 
-const IMAGE = `{image,alt,caption,focusHorizontal,focusVertical,fit}`
-const VIDEO = `{url,title,"poster":poster${IMAGE}}`
-const QUERY = groq`*[_id=="private-portfolio-singleton"][0]{
- privacyLabel,kicker,title,introduction,"heroImage":heroImage${IMAGE},"heroVideo":heroVideo${VIDEO},heroCtaLabel,
- initialProjectCount,loadMoreLabel,contactKicker,contactTitle,contactText,contactLabel,contactUrl,contactEmail,footerText,footerLinks[]{_key,label,url},
- "contactBackground":contactBackground${IMAGE},projects[]{_key,title,client,category,projectType,visible,featured,order,context,
- "cover":cover${IMAGE},"primaryVideo":primaryVideo${VIDEO},responsibilities,externalLabel,externalUrl,
- modules[]{_key,_type,title,text,label,url,note,"image":image${IMAGE},"poster":poster${IMAGE},"images":images[]${IMAGE},credits[]{_key,name,role}}
-}`
+const QUERY = groq`*[_id == "private-portfolio-singleton"][0]`
 
 type Raw = Record<string, unknown>
 const text = (value: unknown) => typeof value === 'string' && value.trim() ? value.trim() : undefined
