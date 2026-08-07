@@ -725,6 +725,7 @@ footer::after {
   #about header::after,
   #content::before,
   #content::after,
+  #faq::before,
   #faq::after,
   footer::after {
     display: none;

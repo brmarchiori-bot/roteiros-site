@@ -28,7 +28,7 @@ export function HomeComposition({ content, editorialSections }: HomeCompositionP
       <AboutSection content={content?.about} editorial={editorialSections?.about} />
       <PillarsSection content={content?.pillars} />
       <ContentBridgeSection content={content?.contentHighlights} />
-      <PartnershipsSection content={content?.partnerships} />
+      <PartnershipsSection content={content?.partnerships} editorial={editorialSections?.partnerships} />
       <FaqSection faq={faq} editorial={editorialSections?.faq} />
     </>
   )

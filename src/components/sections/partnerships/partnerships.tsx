@@ -3,8 +3,16 @@ import { Section } from '@/components/layout/section'
 import { Reveal } from '@/components/shared/reveal'
 import { partnerships as partnershipsFallback } from '@/content'
 import type { PartnershipsContent } from '@/types/content'
+import type { EditorialSectionResult } from '@/sanity/editorial/home'
+import { editorialDataAttribute } from '@/sanity/editorial/data-attribute'
 
-export function PartnershipsSection({ content }: { content?: PartnershipsContent } = {}) {
+export function PartnershipsSection({
+  content,
+  editorial,
+}: {
+  content?: PartnershipsContent
+  editorial?: EditorialSectionResult<'partnerships'>
+} = {}) {
   const partnerships = content ?? partnershipsFallback
   const publishedNumbers = partnerships.numbers.items.filter(
     (item) => item.value.trim() && item.value !== '—',
@@ -18,7 +26,7 @@ export function PartnershipsSection({ content }: { content?: PartnershipsContent
         <Reveal>
           <div className="flex items-center gap-3">
             <span aria-hidden="true" className="h-px w-8 bg-primary md:w-12" />
-            <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-primary md:text-[11px]">
+            <p data-sanity={editorialDataAttribute(editorial, 'meta.kicker')} className="font-mono text-[10px] uppercase tracking-[0.25em] text-primary md:text-[11px]">
               {partnerships.meta.kicker}
             </p>
           </div>
@@ -26,7 +34,7 @@ export function PartnershipsSection({ content }: { content?: PartnershipsContent
 
         {partnerships.meta.title && (
           <Reveal delay={0.08}>
-            <h2 className="mt-6 max-w-4xl font-display text-4xl font-medium leading-[1.02] tracking-[-0.01em] text-background md:text-[60px]">
+            <h2 data-sanity={editorialDataAttribute(editorial, 'meta.title')} className="mt-6 max-w-4xl font-display text-4xl font-medium leading-[1.02] tracking-[-0.01em] text-background md:text-[60px]">
               {partnerships.meta.title}
             </h2>
           </Reveal>
@@ -35,7 +43,7 @@ export function PartnershipsSection({ content }: { content?: PartnershipsContent
 
       {/* 1. Filosofia — filtro silencioso */}
       <Reveal delay={0.1}>
-        <p className="max-w-xl text-base leading-relaxed text-background/70">
+        <p data-sanity={editorialDataAttribute(editorial, 'philosophy')} className="max-w-xl text-base leading-relaxed text-background/70">
           “{partnerships.philosophy}”
         </p>
       </Reveal>
@@ -45,15 +53,15 @@ export function PartnershipsSection({ content }: { content?: PartnershipsContent
           <Reveal key={principle.id} delay={i * 0.08} className="h-full">
             <li className="h-full border-b border-white/15 px-6 py-9 md:border-r md:border-b-0">
               <p className="font-mono text-[10px] tracking-[0.2em] text-primary">{String(i + 1).padStart(2, '0')}</p>
-              <h3 className="mt-7 font-display text-2xl text-background">{principle.title}</h3>
-              <p className="mt-4 text-sm leading-relaxed text-background/60">{principle.body}</p>
+              <h3 data-sanity={editorialDataAttribute(editorial, partnershipPath(editorial, 'principles', i, 'title'))} className="mt-7 font-display text-2xl text-background">{principle.title}</h3>
+              <p data-sanity={editorialDataAttribute(editorial, partnershipPath(editorial, 'principles', i, 'body'))} className="mt-4 text-sm leading-relaxed text-background/60">{principle.body}</p>
             </li>
           </Reveal>
         ))}
       </ol>
       </div>
 
-      <p className="mt-10 font-mono text-[9px] uppercase tracking-[0.2em] text-background/40">
+      <p data-sanity={editorialDataAttribute(editorial, 'formats')} className="mt-10 font-mono text-[9px] uppercase tracking-[0.2em] text-background/40">
         {partnerships.formats.map((format) => format.name).join(' · ')}
       </p>
 
@@ -98,6 +106,7 @@ export function PartnershipsSection({ content }: { content?: PartnershipsContent
         <Reveal>
           <div className="flex flex-col items-start gap-6 sm:flex-row sm:items-center sm:gap-10">
             <Link
+              data-sanity={editorialDataAttribute(editorial, 'contactEmailLabel')}
               href={partnerships.ctas.mediaKit.href}
               className="group inline-flex min-h-11 items-center gap-4 border-b border-primary/70 font-mono text-[10px] uppercase tracking-[0.18em] text-background transition-colors hover:border-background"
             >
@@ -105,6 +114,7 @@ export function PartnershipsSection({ content }: { content?: PartnershipsContent
               <span aria-hidden="true" className="text-primary transition-transform group-hover:translate-x-1">→</span>
             </Link>
             <Link
+              data-sanity={editorialDataAttribute(editorial, 'whatsappLabel')}
               href={partnerships.ctas.whatsapp.href}
               target={partnerships.ctas.whatsapp.href.startsWith('http') ? '_blank' : undefined}
               rel={
@@ -122,4 +132,14 @@ export function PartnershipsSection({ content }: { content?: PartnershipsContent
       </div>
     </Section>
   )
+}
+
+function partnershipPath(
+  editorial: EditorialSectionResult<'partnerships'> | undefined,
+  collection: 'principles' | 'formats',
+  index: number,
+  field: string,
+) {
+  const key = editorial?.editMetadata?.arrayKeys[collection]?.[index]
+  return key ? `${collection}[_key=="${key}"].${field}` : collection
 }

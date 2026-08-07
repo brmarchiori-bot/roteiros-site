@@ -13,7 +13,7 @@ export function FaqSection({ faq, editorial }: { faq: FaqContent; editorial?: Ed
         <Reveal>
           <div className="flex items-center gap-3">
             <span aria-hidden="true" className="h-px w-8 bg-primary md:w-12" />
-            <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-primary md:text-[11px]">
+            <p data-sanity={editorialDataAttribute(editorial, 'meta.kicker')} className="font-mono text-[10px] uppercase tracking-[0.25em] text-primary md:text-[11px]">
               {faq.meta.kicker}
             </p>
           </div>
@@ -21,13 +21,13 @@ export function FaqSection({ faq, editorial }: { faq: FaqContent; editorial?: Ed
 
         {faq.meta.title && (
           <Reveal delay={0.08}>
-            <h2 className="mt-8 max-w-3xl font-display text-3xl font-medium leading-[1.05] tracking-tight text-foreground md:text-5xl">
+            <h2 data-sanity={editorialDataAttribute(editorial, 'meta.title')} className="mt-8 max-w-3xl font-display text-3xl font-medium leading-[1.05] tracking-tight text-foreground md:text-5xl">
               {faq.meta.title}
             </h2>
           </Reveal>
         )}
         {faq.intro && (
-          <p className="mt-8 max-w-xs text-sm leading-relaxed text-muted">
+          <p data-sanity={editorialDataAttribute(editorial, 'intro')} className="mt-8 max-w-xs text-sm leading-relaxed text-muted">
             {faq.intro}
           </p>
         )}
