@@ -10,7 +10,7 @@ import type { NextRequest } from 'next/server'
  * Para desativar: basta remover/mudar ENABLE_PASSWORD na Vercel.
  * Nenhum outro arquivo precisa mudar.
  */
-export function proxy(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   if (req.nextUrl.pathname.startsWith('/portfolio/')) {
     const configuredKey = process.env.PRIVATE_PORTFOLIO_SLUG ?? ''
     const expectedPath = `/portfolio/${configuredKey}`
@@ -63,7 +63,7 @@ export function proxy(req: NextRequest) {
   return secureResponse(unauthorized())
 }
 
-function routeEditorialPreview(req: NextRequest) {
+async function routeEditorialPreview(req: NextRequest) {
   if (req.nextUrl.pathname.startsWith('/portfolio/')) {
     const configuredKey = process.env.PRIVATE_PORTFOLIO_SLUG ?? ''
     const expectedPath = `/portfolio/${configuredKey}`
@@ -72,9 +72,34 @@ function routeEditorialPreview(req: NextRequest) {
     }
 
     const destination = req.nextUrl.clone()
+    destination.pathname = '/portfolio'
+    const response = NextResponse.redirect(destination)
+    response.cookies.set('__portfolio_access', await privateAccessToken(configuredKey), {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'lax',
+      path: '/portfolio',
+    })
+    response.headers.set('Cache-Control', 'private, no-store, max-age=0')
+    response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive, noimageindex')
+    return secureResponse(response)
+  }
+
+  if (req.nextUrl.pathname === '/portfolio') {
+    const configuredKey = process.env.PRIVATE_PORTFOLIO_SLUG ?? ''
+    const suppliedToken = req.cookies.get('__portfolio_access')?.value ?? ''
+    const expectedToken = configuredKey.length >= 24 ? await privateAccessToken(configuredKey) : ''
+    if (!expectedToken || !constantTimeEqual(suppliedToken, expectedToken)) {
+      return secureResponse(new NextResponse('Não encontrado', {
+        status: 404,
+        headers: { 'X-Robots-Tag': 'noindex, nofollow, noarchive, noimageindex', 'Cache-Control': 'private, no-store, max-age=0' },
+      }))
+    }
+
+    const destination = req.nextUrl.clone()
     destination.pathname = '/portfolio/view'
     const requestHeaders = new Headers(req.headers)
-    requestHeaders.set('x-private-portfolio-auth', configuredKey)
+    requestHeaders.set('x-private-portfolio-auth', expectedToken)
     const response = NextResponse.rewrite(destination, { request: { headers: requestHeaders } })
     response.headers.set('Cache-Control', 'private, no-store, max-age=0')
     response.headers.set('CDN-Cache-Control', 'no-store')
@@ -111,6 +136,11 @@ function routeEditorialPreview(req: NextRequest) {
   }
 
   return secureResponse(NextResponse.next())
+}
+
+async function privateAccessToken(key: string) {
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(`menos-roteiro:${key}`))
+  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, '0')).join('')
 }
 
 function unauthorized() {

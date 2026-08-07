@@ -17,9 +17,15 @@ export const metadata: Metadata = {
 export default async function PrivatePortfolioView() {
   const configuredKey = process.env.PRIVATE_PORTFOLIO_SLUG ?? ''
   const authorization = (await headers()).get('x-private-portfolio-auth') ?? ''
-  if (configuredKey.length < 24 || !constantTimeEqual(authorization, configuredKey)) notFound()
+  const expectedAuthorization = configuredKey.length >= 24 ? await privateAccessToken(configuredKey) : ''
+  if (!expectedAuthorization || !constantTimeEqual(authorization, expectedAuthorization)) notFound()
   const published = await getPrivatePortfolio()
   return <PortfolioExperience portfolio={published ?? emptyPortfolio} />
+}
+
+async function privateAccessToken(key: string) {
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(`menos-roteiro:${key}`))
+  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, '0')).join('')
 }
 
 function constantTimeEqual(left: string, right: string) {
