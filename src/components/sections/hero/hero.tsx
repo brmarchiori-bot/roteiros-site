@@ -106,7 +106,11 @@ export function HeroSection({
         </div>
       </Container>
 
-      <div className="hero-master-credits pointer-events-none absolute left-0 right-0 z-10">
+      {hero.showJourneyCredits !== false && (
+      <div
+        data-sanity={editorialDataAttribute(editorial, 'showJourneyCredits')}
+        className="hero-master-credits absolute left-0 right-0 z-10"
+      >
         <Container
           size={containerSize}
           className="flex items-end justify-between gap-6"
@@ -119,6 +123,7 @@ export function HeroSection({
           </Reveal>
         </Container>
       </div>
+      )}
     </section>
   )
 }

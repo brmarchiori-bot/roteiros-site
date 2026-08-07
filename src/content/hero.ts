@@ -36,4 +36,5 @@ export const hero: HeroContent = {
     objectPosition: 'center',
     fitMode: 'cover',
   },
+  showJourneyCredits: true,
 }

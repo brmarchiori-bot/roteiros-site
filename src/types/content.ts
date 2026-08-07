@@ -54,6 +54,8 @@ export type HeroContent = {
     src: string
     alt: string
   } & PhotoControls
+  /** Exibe local e período da seção Agora no rodapé da capa. */
+  showJourneyCredits?: boolean
   layout?: SectionLayout
 }
 

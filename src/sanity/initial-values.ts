@@ -16,6 +16,7 @@ export const initialHero = {
   headline: hero.headline,
   subheadline: hero.subheadline,
   primaryCta: hero.ctas.primary,
+  showJourneyCredits: hero.showJourneyCredits,
   contentWidth: 'medium',
 }
 

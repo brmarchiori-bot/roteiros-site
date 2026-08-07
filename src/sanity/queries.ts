@@ -181,6 +181,7 @@ const HERO_QUERY = groq`*[_id == "hero-singleton"][0]{
   primaryCta,
   secondaryCta,
   "imagemFundo": imagemFundo${IMAGE_PROJ},
+  showJourneyCredits,
   contentWidth
 }`
 
@@ -193,6 +194,7 @@ type RawHero = {
   primaryCta?: Partial<Cta>
   secondaryCta?: Partial<Cta>
   imagemFundo?: RawControlledImage | null
+  showJourneyCredits?: boolean
   contentWidth?: SectionLayout['contentWidth']
 }
 
@@ -232,6 +234,7 @@ export async function getHeroFromSanity(options?: SanityQueryOptions): Promise<H
         alt: cover?.alt || heroFallback.media.alt,
       },
       coverImage,
+      showJourneyCredits: raw.showJourneyCredits ?? heroFallback.showJourneyCredits,
       layout: mergeLayout({ contentWidth: raw.contentWidth }, heroFallback.layout),
     }
   } catch (error) {

@@ -64,7 +64,7 @@ export function getEditorialAllowlist(value = process.env.SANITY_EDITORIAL_ALLOW
 }
 
 export const EDITORIAL_HOME_QUERY = `*[_id in $ids || _id in $draftIds]{
-  _id,_type,meta,titlePrefix,dynamicWords,headline,subheadline,primaryCta,
+  _id,_type,meta,titlePrefix,dynamicWords,headline,subheadline,primaryCta,showJourneyCredits,
   imagemFundo{image{asset->{url},hotspot,crop},alt,caption,focusHorizontal,focusVertical,fit},
   city,country,date,period,dayCount,journeyState,atmosphere,caption,cta,
   imagemLocal{image{asset->{url},hotspot,crop},alt,caption,focusHorizontal,focusVertical,fit},
@@ -159,7 +159,8 @@ const MAPPERS: { [K in EditorialSection]: (raw: RawDocument) => SectionContent[K
     const image = optionalImage(raw.imagemFundo)
     return { _id: String(raw._id), _type: 'hero', meta, headline: headline ?? '', titlePrefix: prefix,
       dynamicWords: words, subheadline, ctas: { primary, secondary: hero.ctas.secondary },
-      media: hero.media, ...(image ? { coverImage: image } : {}), layout: layout(raw) }
+      media: hero.media, ...(image ? { coverImage: image } : {}),
+      showJourneyCredits: clean(raw.showJourneyCredits) !== false, layout: layout(raw) }
   },
   now: (raw) => {
     const meta = requiredMeta(raw.meta); const city = text(raw.city); const country = text(raw.country)

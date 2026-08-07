@@ -125,6 +125,15 @@ export const heroSchema = defineType({
       group: 'imagem',
       type: 'controlledImage',
     }),
+    defineField({
+      name: 'showJourneyCredits',
+      title: 'Mostrar localização abaixo da foto',
+      description:
+        'Exibe no rodapé da capa o local e o período preenchidos na seção “Agora”. Desative para esconder toda a linha.',
+      group: 'conteudo',
+      type: 'boolean',
+      initialValue: true,
+    }),
     ...sectionLayoutFields().map((f) => ({ ...f, group: 'aparencia' })),
   ],
   preview: {
