@@ -28,8 +28,8 @@ import type {
 import { sanityClient } from './client'
 import { urlForImage } from './image'
 
-/** Mantém a Home rápida sem deixar uma publicação editorial presa em cache. */
-const fetchOptions = { next: { revalidate: 10 } } as const
+/** Publicações do Studio devem aparecer na próxima abertura da Home, sem ISR defasado. */
+const fetchOptions = { cache: 'no-store' } as const
 
 type QueryClient = NonNullable<typeof sanityClient>
 
