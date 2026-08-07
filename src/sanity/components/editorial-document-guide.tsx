@@ -87,8 +87,8 @@ export function EditorialDocumentGuide(props: InputProps) {
               deseja alterar.
             </p>
             <p style={{ fontSize: 12, lineHeight: 1.5, margin: '8px 0 0', opacity: 0.72 }}>
-              Alterar cria um rascunho. Publicar no painel ainda não troca a Home pública enquanto
-              a migração editorial não for aprovada.
+              Alterar cria um rascunho. Quando estiver satisfeito, clique em “Publicar” para enviar
+              a mudança à Home oficial.
             </p>
           </div>
         </div>
@@ -106,11 +106,11 @@ export function EditorialDocumentGuide(props: InputProps) {
           }}
         >
           <strong style={{ display: 'block', fontSize: 14, marginBottom: 4 }}>
-            Conteúdo protegido para comparação
+            Publicação segura
           </strong>
           <p style={{ fontSize: 13, lineHeight: 1.5, margin: 0 }}>
-            Esta seção ainda usa a versão segura do site. Compare textos e fotografias antes de
-            solicitar que ela seja ativada na prévia.
+            Confira textos e fotografias na prévia. O público só verá a mudança depois que você
+            clicar em “Publicar”.
           </p>
         </aside>
       )}
