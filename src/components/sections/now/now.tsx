@@ -68,7 +68,10 @@ export function NowSection({ content, editorial }: { content?: NowContent; edito
 
         <div className="md:col-span-5">
           <Reveal>
-            <figure className="now-evidence-frame relative mx-auto w-[82%] max-w-[390px] bg-[#e8dfd0] p-5 pb-14">
+            <figure
+              data-sanity={editorialDataAttribute(editorial, 'imagemLocal')}
+              className="now-evidence-frame relative mx-auto w-[82%] max-w-[390px] bg-[#e8dfd0] p-5 pb-14"
+            >
               <span aria-hidden="true" className="now-evidence-tape" />
               {hasPhoto && now.photo?.src ? (
                 <div className="relative aspect-square w-full overflow-hidden bg-black/20">
