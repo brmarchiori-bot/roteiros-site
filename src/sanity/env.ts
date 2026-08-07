@@ -9,8 +9,8 @@ export const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID ?? ''
 export const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET ?? 'production'
 export const apiVersion = process.env.NEXT_PUBLIC_SANITY_API_VERSION ?? '2025-01-01'
 
-/** Liga a CDN do Sanity em produção (mais rápido, cache ~1min). */
-export const useCdn = process.env.NODE_ENV === 'production'
+/** Conteúdo editorial publicado precisa refletir imediatamente; assets continuam no CDN. */
+export const useCdn = false
 
 /** True quando as env vars obrigatórias estão preenchidas. */
 export const hasSanityConfig = projectId.length > 0
