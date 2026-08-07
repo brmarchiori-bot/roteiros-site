@@ -25,7 +25,7 @@ const HOME_SINGLETONS: Array<{ id: string; type: string; title: string }> = [
 const PRIVATE_SINGLETON = {
   id: 'private-portfolio-singleton',
   type: 'privatePortfolio',
-  title: 'Portfólio',
+  title: 'Portfólio privado — projetos e apresentação',
 }
 
 export const structure: StructureResolver = (S) =>
