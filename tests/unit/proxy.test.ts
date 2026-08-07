@@ -40,6 +40,9 @@ describe('proxy', () => {
     )
 
     expect(response.status).toBe(200)
+    expect(response.headers.get('x-middleware-rewrite')).toBe('https://menosroteiros.com.br/portfolio/view')
+    expect(response.headers.get('cache-control')).toContain('no-store')
+    expect(response.headers.get('x-robots-tag')).toContain('noimageindex')
     expect(response.headers.get('content-security-policy')).toContain("object-src 'none'")
     expect(response.headers.get('content-security-policy')).not.toContain("'unsafe-eval'")
   })

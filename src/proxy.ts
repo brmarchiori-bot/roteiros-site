@@ -64,6 +64,25 @@ export function proxy(req: NextRequest) {
 }
 
 function routeEditorialPreview(req: NextRequest) {
+  if (req.nextUrl.pathname.startsWith('/portfolio/')) {
+    const configuredKey = process.env.PRIVATE_PORTFOLIO_SLUG ?? ''
+    const expectedPath = `/portfolio/${configuredKey}`
+    if (configuredKey.length < 24 || !constantTimeEqual(req.nextUrl.pathname, expectedPath)) {
+      return secureResponse(new NextResponse('Não encontrado', { status: 404 }))
+    }
+
+    const destination = req.nextUrl.clone()
+    destination.pathname = '/portfolio/view'
+    const requestHeaders = new Headers(req.headers)
+    requestHeaders.set('x-private-portfolio-auth', configuredKey)
+    const response = NextResponse.rewrite(destination, { request: { headers: requestHeaders } })
+    response.headers.set('Cache-Control', 'private, no-store, max-age=0')
+    response.headers.set('CDN-Cache-Control', 'no-store')
+    response.headers.set('Vercel-CDN-Cache-Control', 'no-store')
+    response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive, noimageindex')
+    return secureResponse(response)
+  }
+
   if (req.nextUrl.pathname.startsWith('/editorial-internal/')) {
     if (req.headers.get('x-editorial-internal-rewrite') === '1') {
       const response = NextResponse.next()
