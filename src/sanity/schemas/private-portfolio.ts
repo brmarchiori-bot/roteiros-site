@@ -1,367 +1,149 @@
-import { defineField, defineType } from 'sanity'
+import { defineArrayMember, defineField, defineType } from 'sanity'
+import { PORTFOLIO_CATEGORY_LABELS, PORTFOLIO_RESPONSIBILITIES } from '@/types/portfolio'
 
-const mediaKinds = [
-  { title: '🖼️ Imagem', value: 'image' },
-  { title: '📱 Reel', value: 'reel' },
-  { title: '▶️ YouTube', value: 'youtube' },
-  { title: '🎬 Vídeo', value: 'video' },
-  { title: '📱 Vídeo vertical', value: 'verticalVideo' },
-  { title: '🖥️ Vídeo horizontal', value: 'horizontalVideo' },
+const categories = Object.entries(PORTFOLIO_CATEGORY_LABELS).map(([value, title]) => ({ title, value }))
+const projectTypes = [
+  { title: 'Audiovisual', value: 'audiovisual' },
+  { title: 'Fotografia', value: 'photography' },
+  { title: 'Digital', value: 'digital' },
+  { title: 'Híbrido', value: 'hybrid' },
+]
+const responsibilities = PORTFOLIO_RESPONSIBILITIES.map((title) => ({ title, value: title }))
+
+const videoFields = [
+  defineField({ name: 'source', title: 'Como adicionar o vídeo?', description: 'Envie o arquivo aqui ou use um link público do YouTube, Vimeo ou de um arquivo MP4/WebM.', type: 'string', initialValue: 'upload', options: { list: [{ title: 'Enviar arquivo pelo Studio', value: 'upload' }, { title: 'Colar link público', value: 'url' }], layout: 'radio' } }),
+  defineField({ name: 'file', title: 'Arquivo do vídeo', description: 'Recomendado: MP4 otimizado para web. Para Reels, use 1080 × 1920.', type: 'file', options: { accept: 'video/mp4,video/webm' }, hidden: ({ parent }) => parent?.source === 'url', validation: (r) => r.custom((value, context) => { const parent = context.parent as { source?: string; url?: string } | undefined; return parent?.source === 'url' || parent?.url || value ? true : 'Envie o arquivo do vídeo.' }) }),
+  defineField({ name: 'url', title: 'Link público do vídeo', description: 'Aceita YouTube, Vimeo ou URL direta terminada em .mp4/.webm. Links de páginas do Instagram não são arquivos de vídeo.', type: 'url', hidden: ({ parent }) => parent?.source !== 'url' && Boolean(parent?.source), validation: (r) => r.custom((value, context) => { const parent = context.parent as { source?: string; file?: unknown } | undefined; return parent?.source === 'upload' || parent?.file || value ? true : 'Cole o link público do vídeo.' }) }),
+  defineField({ name: 'format', title: 'Formato de exibição', description: 'Escolha o mesmo formato em que o material foi produzido. Vídeos antigos sem seleção continuam horizontais.', type: 'string', initialValue: 'horizontal', options: { list: [{ title: 'Vertical · Reel (9:16)', value: 'vertical' }, { title: 'Horizontal · Filme (16:9)', value: 'horizontal' }, { title: 'Quadrado (1:1)', value: 'square' }], layout: 'radio' } }),
+  defineField({ name: 'title', title: 'Legenda (opcional)', type: 'string', validation: (r) => r.max(100) }),
+  defineField({ name: 'poster', title: 'Capa do vídeo', type: 'controlledImage' }),
+]
+
+const moduleMembers = [
+  defineArrayMember({
+    name: 'portfolioTextModule', title: 'Texto curto', type: 'object', icon: () => 'T',
+    fields: [
+      defineField({ name: 'title', title: 'Título (opcional)', type: 'string', validation: (r) => r.max(80) }),
+      defineField({ name: 'text', title: 'Texto', type: 'text', rows: 4, validation: (r) => r.required().max(700) }),
+    ], preview: { select: { title: 'title', subtitle: 'text' }, prepare: ({ title, subtitle }) => ({ title: title || 'Texto curto', subtitle }) },
+  }),
+  defineArrayMember({
+    name: 'portfolioImageModule', title: 'Imagem grande', type: 'object',
+    fields: [defineField({ name: 'image', title: 'Imagem', type: 'controlledImage', validation: (r) => r.required() })],
+    preview: { select: { media: 'image.image', title: 'image.caption' }, prepare: ({ media, title }) => ({ title: title || 'Imagem grande', media }) },
+  }),
+  defineArrayMember({
+    name: 'portfolioGalleryModule', title: 'Galeria de fotos', type: 'object',
+    fields: [
+      defineField({ name: 'title', title: 'Título (opcional)', type: 'string', validation: (r) => r.max(80) }),
+      defineField({ name: 'images', title: 'Fotografias', type: 'array', of: [{ type: 'controlledImage' }], validation: (r) => r.required().min(1).max(12) }),
+    ], preview: { select: { title: 'title', images: 'images' }, prepare: ({ title, images }) => ({ title: title || 'Galeria de fotos', subtitle: `${images?.length || 0} imagem(ns)` }) },
+  }),
+  defineArrayMember({
+    name: 'portfolioInterfacesModule', title: 'Galeria de interfaces', type: 'object',
+    fields: [
+      defineField({ name: 'title', title: 'Título (opcional)', type: 'string', validation: (r) => r.max(80) }),
+      defineField({ name: 'images', title: 'Telas desktop e mobile', type: 'array', of: [{ type: 'controlledImage' }], validation: (r) => r.required().min(1).max(12) }),
+    ], preview: { select: { title: 'title', images: 'images' }, prepare: ({ title, images }) => ({ title: title || 'Galeria de interfaces', subtitle: `${images?.length || 0} tela(s)` }) },
+  }),
+  defineArrayMember({
+    name: 'portfolioVideoModule', title: 'Vídeo', type: 'object', fields: videoFields,
+    preview: { select: { title: 'title', subtitle: 'url', media: 'poster.image' }, prepare: ({ title, subtitle, media }) => ({ title: title || 'Vídeo', subtitle, media }) },
+  }),
+  defineArrayMember({
+    name: 'portfolioSocialCarouselModule', title: 'Carrossel para Instagram', type: 'object',
+    description: 'Simula uma publicação navegável, respeitando a ordem das artes.',
+    fields: [
+      defineField({ name: 'title', title: 'Título do carrossel (opcional)', type: 'string', validation: (r) => r.max(80) }),
+      defineField({ name: 'profileName', title: 'Nome exibido na simulação', description: 'Exemplo: nome do cliente ou da marca. Não precisa usar @.', type: 'string', validation: (r) => r.max(60) }),
+      defineField({ name: 'format', title: 'Formato das artes', type: 'string', initialValue: 'portrait', options: { list: [{ title: 'Retrato · recomendado (4:5)', value: 'portrait' }, { title: 'Quadrado (1:1)', value: 'square' }, { title: 'Paisagem (1.91:1)', value: 'landscape' }], layout: 'radio' }, validation: (r) => r.required() }),
+      defineField({ name: 'images', title: 'Páginas do carrossel', description: 'Envie de 2 a 20 artes. Arraste para colocar na mesma ordem da publicação.', type: 'array', of: [{ type: 'controlledImage' }], validation: (r) => r.required().min(2).max(20) }),
+      defineField({ name: 'caption', title: 'Legenda da publicação (opcional)', description: 'Texto apresentado abaixo da simulação.', type: 'text', rows: 4, validation: (r) => r.max(1000) }),
+      defineField({ name: 'showAllSlides', title: 'Mostrar também todas as páginas em grade', description: 'Útil para o cliente analisar a sequência completa no computador.', type: 'boolean', initialValue: true }),
+    ],
+    preview: { select: { title: 'title', images: 'images', media: 'images.0.image' }, prepare: ({ title, images, media }) => ({ title: title || 'Carrossel para Instagram', subtitle: `${images?.length || 0} página(s)`, media }) },
+  }),
+  defineArrayMember({
+    name: 'portfolioWorkModule', title: 'Nosso trabalho', type: 'object',
+    fields: [defineField({ name: 'note', title: 'Nota interna', description: 'As responsabilidades selecionadas no projeto aparecem automaticamente.', type: 'string', readOnly: true })],
+    preview: { prepare: () => ({ title: 'Nosso trabalho' }) },
+  }),
+  defineArrayMember({
+    name: 'portfolioLinkModule', title: 'Link externo', type: 'object', fields: [
+      defineField({ name: 'label', title: 'Texto do botão', type: 'string', validation: (r) => r.required().max(40) }),
+      defineField({ name: 'url', title: 'URL pública real', type: 'url', validation: (r) => r.required() }),
+    ], preview: { select: { title: 'label', subtitle: 'url' } },
+  }),
+  defineArrayMember({
+    name: 'portfolioCreditsModule', title: 'Créditos', type: 'object', fields: [
+      defineField({ name: 'credits', title: 'Pessoas e funções', type: 'array', of: [{ type: 'object', fields: [
+        defineField({ name: 'name', title: 'Nome', type: 'string', validation: (r) => r.required().max(80) }),
+        defineField({ name: 'role', title: 'Função', type: 'string', validation: (r) => r.max(100) }),
+      ] }], validation: (r) => r.required().min(1).max(20) }),
+    ], preview: { select: { credits: 'credits' }, prepare: ({ credits }) => ({ title: 'Créditos', subtitle: `${credits?.length || 0} pessoa(s)` }) },
+  }),
 ]
 
 export const privatePortfolioSchema = defineType({
-  name: 'privatePortfolio',
-  title: 'Portfólio',
-  type: 'document',
-  description:
-    'Conteúdo enviado manualmente a parceiros. Não aparece no menu, sitemap ou mecanismos de busca.',
-  fields: [
-    defineField({
-      name: 'title',
-      title: 'Título',
-      type: 'string',
-      validation: (rule) => rule.required().max(80),
-    }),
-    defineField({
-      name: 'introduction',
-      title: 'Introdução',
-      type: 'text',
-      rows: 4,
-      validation: (rule) => rule.max(600),
-    }),
-    defineField({
-      name: 'categories',
-      title: 'Categorias',
-      description:
-        'Crie apenas as categorias necessárias e arraste para definir a ordem de apresentação.',
-      type: 'array',
-      of: [
-        {
-          type: 'object',
-          name: 'portfolioCategory',
-          fields: [
-            defineField({
-              name: 'title',
-              title: 'Nome da categoria',
-              type: 'string',
-              validation: (rule) => rule.required().max(60),
-            }),
-            defineField({
-              name: 'description',
-              title: 'Descrição da categoria',
-              type: 'text',
-              rows: 3,
-              validation: (rule) => rule.max(400),
-            }),
-            defineField({
-              name: 'projects',
-              title: 'Trabalhos',
-              type: 'array',
-              of: [
-                {
-                  type: 'object',
-                  name: 'portfolioProject',
-                  fields: [
-                    defineField({
-                      name: 'title',
-                      title: 'Título do trabalho',
-                      type: 'string',
-                      validation: (rule) => rule.required().max(100),
-                    }),
-                    defineField({
-                      name: 'client',
-                      title: 'Cliente',
-                      type: 'string',
-                      validation: (rule) => rule.max(100),
-                    }),
-                    defineField({
-                      name: 'visible',
-                      title: 'Exibir na apresentação',
-                      description:
-                        'Desative para guardar o trabalho no Studio sem mostrá-lo no portfólio.',
-                      type: 'boolean',
-                      initialValue: true,
-                    }),
-                    defineField({
-                      name: 'featured',
-                      title: 'Marcar como destaque',
-                      description: 'Adiciona um selo discreto ao trabalho.',
-                      type: 'boolean',
-                      initialValue: false,
-                    }),
-                    defineField({
-                      name: 'city',
-                      title: 'Cidade (opcional)',
-                      type: 'string',
-                      validation: (rule) => rule.max(100),
-                    }),
-                    defineField({
-                      name: 'date',
-                      title: 'Data do trabalho (opcional)',
-                      type: 'date',
-                    }),
-                    defineField({
-                      name: 'format',
-                      title: 'Formato ou entrega principal',
-                      description: 'Ex.: Reel, vídeo horizontal, fotografia ou pacote de conteúdo.',
-                      type: 'string',
-                      validation: (rule) => rule.max(100),
-                    }),
-                    defineField({
-                      name: 'question',
-                      title: 'Pergunta central',
-                      description:
-                        'A pergunta humana que conduz a história. Ex.: o que faz alguém querer ficar?',
-                      type: 'text',
-                      rows: 2,
-                      validation: (rule) => rule.max(240),
-                    }),
-                    defineField({
-                      name: 'context',
-                      title: 'Contexto',
-                      description:
-                        'O que o visitante precisa saber antes de entrar na história.',
-                      type: 'text',
-                      rows: 3,
-                      validation: (rule) => rule.max(600),
-                    }),
-                    defineField({
-                      name: 'objective',
-                      title: 'Objetivo',
-                      description: 'Use somente quando houver um objetivo de trabalho real.',
-                      type: 'text',
-                      rows: 3,
-                      validation: (rule) => rule.max(500),
-                    }),
-                    defineField({
-                      name: 'description',
-                      title: 'Descrição',
-                      type: 'text',
-                      rows: 4,
-                      validation: (rule) => rule.max(1000),
-                    }),
-                    defineField({
-                      name: 'process',
-                      title: 'Imersão e processo',
-                      description:
-                        'Como a história foi encontrada, acompanhada e transformada em conteúdo.',
-                      type: 'text',
-                      rows: 4,
-                      validation: (rule) => rule.max(1000),
-                    }),
-                    defineField({
-                      name: 'result',
-                      title: 'Resultado',
-                      description:
-                        'Registre somente resultados comprováveis. Deixe vazio quando não houver.',
-                      type: 'text',
-                      rows: 3,
-                      validation: (rule) => rule.max(500),
-                    }),
-                    defineField({
-                      name: 'learning',
-                      title: 'O que ficou',
-                      description:
-                        'Aprendizado, mudança de olhar ou consequência humana da história.',
-                      type: 'text',
-                      rows: 3,
-                      validation: (rule) => rule.max(600),
-                    }),
-                    defineField({
-                      name: 'services',
-                      title: 'Serviços executados',
-                      description:
-                        'Adicione somente o que foi realizado neste trabalho. Arraste para ordenar.',
-                      type: 'array',
-                      of: [
-                        {
-                          type: 'string',
-                          validation: (rule) => rule.required().max(80),
-                        },
-                      ],
-                      validation: (rule) => rule.unique().max(12),
-                    }),
-                    defineField({
-                      name: 'testimonial',
-                      title: 'Depoimento (opcional)',
-                      type: 'object',
-                      fields: [
-                        defineField({
-                          name: 'quote',
-                          title: 'Depoimento',
-                          type: 'text',
-                          rows: 4,
-                          validation: (rule) => rule.required().max(700),
-                        }),
-                        defineField({
-                          name: 'author',
-                          title: 'Nome',
-                          type: 'string',
-                          validation: (rule) => rule.max(100),
-                        }),
-                        defineField({
-                          name: 'role',
-                          title: 'Cargo ou relação com o projeto',
-                          type: 'string',
-                          validation: (rule) => rule.max(120),
-                        }),
-                      ],
-                    }),
-                    defineField({
-                      name: 'cover',
-                      title: 'Capa do trabalho (opcional)',
-                      description:
-                        'Imagem principal usada antes das demais mídias. Prefira enquadramento horizontal.',
-                      type: 'controlledImage',
-                    }),
-                    defineField({
-                      name: 'media',
-                      title: 'Mídia',
-                      type: 'array',
-                      of: [
-                        {
-                          type: 'object',
-                          name: 'portfolioMedia',
-                          fields: [
-                            defineField({
-                              name: 'kind',
-                              title: 'Tipo',
-                              type: 'string',
-                              options: { list: mediaKinds, layout: 'radio' },
-                              validation: (rule) => rule.required(),
-                            }),
-                            defineField({
-                              name: 'title',
-                              title: 'Título ou contexto',
-                              type: 'string',
-                              validation: (rule) => rule.max(100),
-                            }),
-                            defineField({
-                              name: 'url',
-                              title: 'Link do vídeo ou publicação',
-                              type: 'url',
-                              hidden: ({ parent }) => parent?.kind === 'image',
-                              validation: (rule) =>
-                                rule.custom((value, context) =>
-                                  (context.parent as { kind?: string } | undefined)?.kind !==
-                                    'image' && !value
-                                    ? 'Informe o link desta mídia.'
-                                    : true,
-                                ),
-                            }),
-                            defineField({
-                              name: 'image',
-                              title: 'Imagem',
-                              type: 'controlledImage',
-                              hidden: ({ parent }) => parent?.kind !== 'image',
-                              validation: (rule) =>
-                                rule.custom((value, context) =>
-                                  (context.parent as { kind?: string } | undefined)?.kind ===
-                                    'image' && !value
-                                    ? 'Escolha a imagem.'
-                                    : true,
-                                ),
-                            }),
-                          ],
-                          preview: {
-                            select: {
-                              title: 'title',
-                              kind: 'kind',
-                              media: 'image.image',
-                            },
-                            prepare: ({ title, kind, media }) => ({
-                              title: title || 'Mídia sem título',
-                              subtitle: kind || 'Tipo não definido',
-                              media,
-                            }),
-                          },
-                        },
-                      ],
-                      validation: (rule) => rule.max(20),
-                    }),
-                    defineField({
-                      name: 'links',
-                      title: 'Links complementares',
-                      type: 'array',
-                      of: [
-                        {
-                          type: 'object',
-                          name: 'portfolioLink',
-                          fields: [
-                            defineField({
-                              name: 'label',
-                              title: 'Texto',
-                              type: 'string',
-                              validation: (rule) => rule.required().max(60),
-                            }),
-                            defineField({
-                              name: 'url',
-                              title: 'URL',
-                              type: 'url',
-                              validation: (rule) => rule.required(),
-                            }),
-                          ],
-                          preview: {
-                            select: { title: 'label', subtitle: 'url' },
-                          },
-                        },
-                      ],
-                      validation: (rule) => rule.max(10),
-                    }),
-                  ],
-                  preview: {
-                    select: {
-                      title: 'title',
-                      subtitle: 'client',
-                      media: 'media.0.image.image',
-                    },
-                    prepare: ({ title, subtitle, media }) => ({
-                      title: title || 'Trabalho sem título',
-                      subtitle: subtitle || 'Cliente não informado',
-                      media,
-                    }),
-                  },
-                },
-              ],
-              validation: (rule) => rule.max(50),
-            }),
-          ],
-          preview: {
-            select: { title: 'title', projects: 'projects' },
-            prepare: ({ title, projects }) => ({
-              title: title || 'Categoria sem nome',
-              subtitle: `${Array.isArray(projects) ? projects.length : 0} trabalho(s)`,
-            }),
-          },
-        },
-      ],
-      validation: (rule) => rule.max(30),
-    }),
-    defineField({
-      name: 'contactLabel',
-      title: 'Texto do contato final',
-      type: 'string',
-      validation: (rule) => rule.max(60),
-    }),
-    defineField({
-      name: 'contactUrl',
-      title: 'Link do contato final',
-      description: 'Pode ser mailto:, WhatsApp ou URL completa.',
-      type: 'string',
-      validation: (rule) =>
-        rule.custom((value) => {
-          if (!value) return true
-          return /^(https?:\/\/|mailto:)/.test(value)
-            ? true
-            : 'Use uma URL https:// ou um link mailto:.'
-        }),
-    }),
+  name: 'privatePortfolio', title: 'Portfólio privado', type: 'document',
+  description: 'Apresentação comercial privada. Conteúdo flexível; identidade visual protegida pelo sistema.',
+  groups: [
+    { name: 'opening', title: '1 · Abertura', default: true },
+    { name: 'projects', title: '2 · Projetos' },
+    { name: 'contact', title: '3 · Contato' },
+    { name: 'footer', title: '4 · Rodapé' },
+    { name: 'settings', title: '5 · Exibição' },
   ],
-  preview: {
-    select: { categories: 'categories' },
-    prepare: ({ categories }) => ({
-      title: 'Portfólio',
-      subtitle: `${Array.isArray(categories) ? categories.length : 0} categoria(s)`,
+  fields: [
+    defineField({ name: 'privacyLabel', title: 'Selo de privacidade', group: 'opening', type: 'string', initialValue: 'Portfólio privado', validation: (r) => r.max(35) }),
+    defineField({ name: 'kicker', title: 'Rótulo da abertura', group: 'opening', type: 'string', initialValue: 'Portfólio', validation: (r) => r.max(30) }),
+    defineField({ name: 'title', title: 'Título principal', group: 'opening', type: 'string', validation: (r) => r.required().max(90) }),
+    defineField({ name: 'introduction', title: 'Texto de apoio', group: 'opening', type: 'text', rows: 3, validation: (r) => r.max(360) }),
+    defineField({ name: 'heroImage', title: 'Imagem da abertura', group: 'opening', type: 'controlledImage' }),
+    defineField({ name: 'heroVideo', title: 'Reel da abertura (opcional)', group: 'opening', type: 'object', fields: videoFields }),
+    defineField({ name: 'heroCtaLabel', title: 'Texto para assistir ao reel', group: 'opening', type: 'string', initialValue: 'Assistir reel', validation: (r) => r.max(35) }),
+    defineField({
+      name: 'projects', title: 'Projetos', group: 'projects', type: 'array', validation: (r) => r.max(60).custom((items) => {
+        const featured = (items ?? []).filter((item) => {
+          const project = item as { featured?: boolean; visible?: boolean }
+          return project.featured && project.visible !== false
+        })
+        return featured.length <= 1 || 'Escolha somente um projeto principal. Desmarque “Projeto principal” nos demais.'
+      }),
+      description: 'Nenhum projeto publicado no Portfólio ainda? Deixe esta lista vazia. Para adicionar, clique em “Adicionar item”. Arraste para organizar.',
+      of: [defineArrayMember({ name: 'portfolioProject', title: 'Projeto', type: 'object', groups: [
+        { name: 'identity', title: '1 · O que é', default: true }, { name: 'work', title: '2 · O que fizemos' },
+        { name: 'display', title: '3 · Como aparece' }, { name: 'story', title: '4 · História' }, { name: 'link', title: '5 · Link' },
+      ], fields: [
+        defineField({ name: 'title', title: 'Nome do projeto', group: 'identity', type: 'string', validation: (r) => r.required().max(100) }),
+        defineField({ name: 'client', title: 'Cliente (opcional)', group: 'identity', type: 'string', validation: (r) => r.max(100) }),
+        defineField({ name: 'category', title: 'Categoria comercial', group: 'identity', type: 'string', options: { list: categories, layout: 'dropdown' }, validation: (r) => r.required() }),
+        defineField({ name: 'projectType', title: 'Tipo predominante', group: 'identity', type: 'string', options: { list: projectTypes, layout: 'radio' }, validation: (r) => r.required() }),
+        defineField({ name: 'context', title: 'Contexto curto', group: 'identity', type: 'text', rows: 3, validation: (r) => r.max(360) }),
+        defineField({ name: 'responsibilities', title: 'Nosso trabalho', group: 'work', description: 'Selecione somente o que o Menos Roteiro realmente realizou.', type: 'array', of: [{ type: 'string' }], options: { list: responsibilities }, validation: (r) => r.unique().max(12) }),
+        defineField({ name: 'visible', title: 'Exibir no portfólio', group: 'display', type: 'boolean', initialValue: true }),
+        defineField({ name: 'featured', title: 'Projeto principal desta página', group: 'display', description: 'Marque apenas o trabalho que deve aparecer na grande seção expandida.', type: 'boolean', initialValue: false }),
+        defineField({ name: 'order', title: 'Ordem', group: 'display', type: 'number', initialValue: 100, validation: (r) => r.required().integer().min(0).max(999) }),
+        defineField({ name: 'cover', title: 'Capa do projeto', group: 'display', type: 'controlledImage' }),
+        defineField({ name: 'primaryVideo', title: 'Vídeo principal (opcional)', group: 'story', type: 'object', fields: videoFields }),
+        defineField({ name: 'modules', title: 'Blocos da história', group: 'story', description: 'Adicione somente o necessário e arraste para definir a narrativa.', type: 'array', of: moduleMembers, validation: (r) => r.max(20) }),
+        defineField({ name: 'externalLabel', title: 'Texto do link', group: 'link', type: 'string', initialValue: 'Visitar projeto', validation: (r) => r.max(40) }),
+        defineField({ name: 'externalUrl', title: 'URL pública real', group: 'link', type: 'url' }),
+      ], preview: { select: { title: 'title', category: 'category', type: 'projectType', media: 'cover.image', featured: 'featured' }, prepare: ({ title, category, type, media, featured }) => ({ title: `${featured ? '★ ' : ''}${title || 'Projeto sem nome'}`, subtitle: `${PORTFOLIO_CATEGORY_LABELS[category as keyof typeof PORTFOLIO_CATEGORY_LABELS] || 'Sem categoria'} · ${type || 'tipo pendente'}`, media }) } })],
     }),
-  },
+    defineField({ name: 'contactKicker', title: 'Rótulo', group: 'contact', type: 'string', initialValue: 'Vamos conversar?', validation: (r) => r.max(30) }),
+    defineField({ name: 'contactTitle', title: 'Título', group: 'contact', type: 'string', validation: (r) => r.required().max(90) }),
+    defineField({ name: 'contactText', title: 'Texto', group: 'contact', type: 'text', rows: 3, validation: (r) => r.max(300) }),
+    defineField({ name: 'contactLabel', title: 'Texto do botão', group: 'contact', type: 'string', validation: (r) => r.max(40) }),
+    defineField({ name: 'contactUrl', title: 'WhatsApp ou URL', group: 'contact', type: 'url' }),
+    defineField({ name: 'contactEmail', title: 'E-mail', group: 'contact', type: 'email' }),
+    defineField({ name: 'contactBackground', title: 'Imagem do contato', group: 'contact', type: 'controlledImage' }),
+    defineField({ name: 'footerText', title: 'Texto do rodapé', group: 'footer', type: 'string', initialValue: 'Portfólio privado · não indexado', validation: (r) => r.max(100) }),
+    defineField({ name: 'footerLinks', title: 'Links do rodapé', group: 'footer', description: 'Somente links públicos que podem aparecer nesta apresentação.', type: 'array', of: [{ type: 'object', fields: [
+      defineField({ name: 'label', title: 'Nome do link', type: 'string', validation: (r) => r.required().max(30) }),
+      defineField({ name: 'url', title: 'URL', type: 'url', validation: (r) => r.required() }),
+    ], preview: { select: { title: 'label', subtitle: 'url' } } }], validation: (r) => r.max(8) }),
+    defineField({ name: 'initialProjectCount', title: 'Projetos exibidos inicialmente', group: 'settings', type: 'number', initialValue: 9, validation: (r) => r.required().integer().min(3).max(24) }),
+    defineField({ name: 'loadMoreLabel', title: 'Texto de carregar mais', group: 'settings', type: 'string', initialValue: 'Carregar mais projetos', validation: (r) => r.max(40) }),
+  ], preview: { select: { title: 'title', projects: 'projects' }, prepare: ({ title, projects }) => ({ title: title || 'Portfólio privado', subtitle: `${projects?.length || 0} projeto(s)` }) },
 })
