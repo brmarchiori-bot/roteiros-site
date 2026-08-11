@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import { useMemo, useState } from 'react'
-import { featuredPortfolioProject, filterPortfolioProjects, visiblePortfolioProjects, youtubePrivacyUrl, type PortfolioMediaFilter } from '@/lib/portfolio'
+import { featuredPortfolioProject, filterPortfolioProjects, visiblePortfolioProjects, vimeoPrivacyUrl, youtubePrivacyUrl, type PortfolioMediaFilter } from '@/lib/portfolio'
 import { PORTFOLIO_CATEGORY_LABELS, type PortfolioCategory, type PortfolioModule, type PortfolioProject, type PrivatePortfolio } from '@/types/portfolio'
 import { toImageStyle } from '@/lib/sanity-styles'
 
@@ -76,6 +76,7 @@ function Module({ module, project }: { module: PortfolioModule; project: Portfol
   if (module.type === 'text') return <div className="max-w-3xl">{module.title && <h3 className="font-display text-3xl">{module.title}</h3>}<p className="mt-3 leading-relaxed text-white/70">{module.text}</p></div>
   if (module.type === 'image') return <ImageBlock image={module.image} />
   if (module.type === 'video') return <Video video={module.video} />
+  if (module.type === 'socialCarousel') return <SocialCarousel module={module} />
   if (module.type === 'work') return <Work responsibilities={project.responsibilities} />
   if (module.type === 'link') return <a href={module.url} target="_blank" rel="noopener noreferrer" className="inline-flex border border-[#d7a24a] px-6 py-3 font-mono text-[9px] uppercase tracking-[.18em]">{module.label} ↗</a>
   if (module.type === 'credits') return <div><p className="font-mono text-[9px] uppercase tracking-[.2em] text-[#e5bd6c]">Créditos</p><ul className="mt-4 grid gap-2 text-sm text-white/70">{module.credits.map((c) => <li key={`${c.name}-${c.role}`}>{c.name}{c.role ? ` · ${c.role}` : ''}</li>)}</ul></div>
@@ -85,5 +86,34 @@ function Module({ module, project }: { module: PortfolioModule; project: Portfol
 function Work({ responsibilities }: { responsibilities: string[] }) { return responsibilities.length ? <div className="mt-8"><p className="font-mono text-[9px] uppercase tracking-[.2em] text-[#e5bd6c]">Nosso trabalho</p><p className="mt-3 text-sm leading-relaxed text-white/70">{responsibilities.join(' · ')}</p></div> : null }
 function EmptyProjects({ hasPublishedProjects }: { hasPublishedProjects: boolean }) { return <div className="my-8 border border-white/15 px-6 py-20 text-center"><p className="font-mono text-[9px] uppercase tracking-[.2em] text-[#e5bd6c]">{hasPublishedProjects ? 'Seleção atual' : 'Portfólio em preparação'}</p><h2 className="mx-auto mt-5 max-w-xl font-display text-4xl md:text-5xl">{hasPublishedProjects ? 'Nenhum projeto neste filtro.' : 'Os primeiros trabalhos serão apresentados aqui.'}</h2>{!hasPublishedProjects && <p className="mx-auto mt-5 max-w-lg text-sm leading-relaxed text-white/55">Esta área continua privada enquanto a seleção editorial está sendo organizada.</p>}</div> }
 function ImageBlock({ image, compact = false }: { image: NonNullable<PortfolioProject['cover']>; compact?: boolean }) { return <figure><div className={`relative overflow-hidden bg-black ${compact ? 'aspect-[4/3]' : 'aspect-video'}`}><Image src={image.src} alt={image.alt} fill sizes="(min-width:768px) 65vw, 100vw" style={toImageStyle(image)} className="object-cover" /></div>{image.caption && <figcaption className="mt-2 text-xs text-white/50">{image.caption}</figcaption>}</figure> }
-function Video({ video }: { video: NonNullable<PortfolioProject['primaryVideo']> }) { const youtube = youtubePrivacyUrl(video.url); return <figure>{youtube ? <iframe src={youtube} title={video.title || 'Vídeo do projeto'} loading="lazy" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowFullScreen className="aspect-video w-full bg-black" /> : <video controls playsInline preload="none" poster={video.poster?.src} className="aspect-video w-full bg-black object-contain"><source src={video.url} /></video>}{video.title && <figcaption className="mt-2 text-xs text-white/50">{video.title}</figcaption>}</figure> }
+const VIDEO_RATIO = { horizontal: 'aspect-video', vertical: 'aspect-[9/16] max-h-[78svh]', square: 'aspect-square max-h-[78svh]' }
+function Video({ video }: { video: NonNullable<PortfolioProject['primaryVideo']> }) {
+  const embed = youtubePrivacyUrl(video.url) ?? vimeoPrivacyUrl(video.url)
+  const ratio = VIDEO_RATIO[video.format]
+  return <figure className={video.format === 'horizontal' ? '' : 'mx-auto max-w-md'}><div className={`mx-auto overflow-hidden bg-black ${ratio}`}>{embed ? <iframe src={embed} title={video.title || 'Vídeo do projeto'} loading="lazy" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowFullScreen className="size-full bg-black" /> : <video controls playsInline preload="none" poster={video.poster?.src} className="size-full bg-black object-contain"><source src={video.url} />Seu navegador não oferece suporte a este vídeo.</video>}</div>{video.title && <figcaption className="mt-2 text-xs text-white/50">{video.title}</figcaption>}</figure>
+}
+
+const CAROUSEL_RATIO = { portrait: 'aspect-[4/5]', square: 'aspect-square', landscape: 'aspect-[1.91/1]' }
+function SocialCarousel({ module }: { module: Extract<PortfolioModule, { type: 'socialCarousel' }> }) {
+  const [active, setActive] = useState(0)
+  const [touchStart, setTouchStart] = useState<number | null>(null)
+  const current = module.images[active]
+  const move = (direction: number) => setActive((value) => (value + direction + module.images.length) % module.images.length)
+  return <section aria-label={module.title || 'Carrossel para Instagram'} className="border-y border-white/15 py-8">
+    {module.title && <h3 className="mb-6 font-display text-3xl">{module.title}</h3>}
+    <div className={`grid gap-8 ${module.showAllSlides ? 'lg:grid-cols-[minmax(300px,440px)_1fr]' : 'place-items-center'}`}>
+      <div className="w-full max-w-[440px] overflow-hidden rounded-sm border border-white/20 bg-[#11120f] shadow-2xl">
+        <header className="flex items-center gap-3 px-4 py-3"><span className="grid size-8 place-items-center rounded-full border border-[#d7a24a]/60 bg-[#25251f] font-mono text-[9px] text-[#e5bd6c]">MR</span><div className="min-w-0 flex-1"><p className="truncate text-sm font-medium">{module.profileName || 'Menos Roteiro'}</p><p className="font-mono text-[8px] uppercase tracking-[.15em] text-white/45">Projeto editorial</p></div><span className="font-mono text-xs text-white/45" aria-hidden>•••</span></header>
+        <div className={`relative touch-pan-y bg-black ${CAROUSEL_RATIO[module.format]}`} onTouchStart={(event) => setTouchStart(event.touches[0]?.clientX ?? null)} onTouchEnd={(event) => { const end = event.changedTouches[0]?.clientX; if (touchStart !== null && end !== undefined && Math.abs(end - touchStart) > 45) move(end < touchStart ? 1 : -1); setTouchStart(null) }}>
+          <Image src={current.src} alt={current.alt} fill sizes="(min-width:1024px) 440px, 100vw" className="object-contain" />
+          <span className="absolute right-3 top-3 rounded-full bg-black/65 px-2 py-1 font-mono text-[9px] text-white">{active + 1}/{module.images.length}</span>
+          <button type="button" onClick={() => move(-1)} aria-label="Página anterior" className="absolute left-2 top-1/2 grid size-9 -translate-y-1/2 place-items-center rounded-full bg-black/60 text-xl text-white">‹</button>
+          <button type="button" onClick={() => move(1)} aria-label="Próxima página" className="absolute right-2 top-1/2 grid size-9 -translate-y-1/2 place-items-center rounded-full bg-black/60 text-xl text-white">›</button>
+        </div>
+        <div className="px-4 py-4"><div className="flex items-center justify-between"><div className="flex gap-4 text-lg" aria-hidden><span>♡</span><span>○</span><span>⌁</span></div><span aria-hidden>▱</span></div><div className="mt-3 flex justify-center gap-1.5" aria-label={`Página ${active + 1} de ${module.images.length}`}>{module.images.map((_, index) => <button key={index} type="button" onClick={() => setActive(index)} aria-label={`Ir para página ${index + 1}`} className={`size-1.5 rounded-full ${index === active ? 'bg-[#d7a24a]' : 'bg-white/30'}`} />)}</div>{module.caption && <p className="mt-4 whitespace-pre-line text-sm leading-relaxed text-white/70"><strong className="text-white">{module.profileName || 'Menos Roteiro'}</strong> {module.caption}</p>}</div>
+      </div>
+      {module.showAllSlides && <div><p className="mb-4 font-mono text-[9px] uppercase tracking-[.18em] text-[#e5bd6c]">Sequência completa · {module.images.length} páginas</p><div className="grid grid-cols-2 gap-2 sm:grid-cols-3">{module.images.map((image, index) => <button type="button" key={`${image.src}-${index}`} onClick={() => setActive(index)} className={`relative overflow-hidden border ${CAROUSEL_RATIO[module.format]} ${index === active ? 'border-[#d7a24a]' : 'border-white/15'}`} aria-label={`Visualizar página ${index + 1}`}><Image src={image.src} alt={image.alt} fill sizes="(min-width:1024px) 18vw, 45vw" className="object-contain" /><span className="absolute left-2 top-2 grid size-5 place-items-center rounded-full bg-black/70 font-mono text-[8px]">{index + 1}</span></button>)}</div></div>}
+    </div>
+  </section>
+}
 function Contact({ portfolio }: { portfolio: PrivatePortfolio }) { const c = portfolio.contact; return <section className="grid border-t border-white/20 md:min-h-[430px] md:grid-cols-[.85fr_1.15fr]">{c.background ? <div className="relative min-h-[280px]"><Image src={c.background.src} alt={c.background.alt} fill sizes="(min-width:768px) 45vw, 100vw" style={toImageStyle(c.background)} className="object-cover opacity-75" /></div> : <div className="hidden bg-[#12130f] md:block" />}<div className="px-6 py-16 md:px-12 md:py-20"><p className="font-mono text-[9px] uppercase tracking-[.2em] text-[#e5bd6c]">{c.kicker}</p><h2 className="mt-4 max-w-2xl font-display text-5xl leading-none md:text-6xl">{c.title}</h2>{c.text && <p className="mt-6 max-w-xl text-white/65">{c.text}</p>}<div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">{c.contactUrl && c.ctaLabel && <a href={c.contactUrl} target="_blank" rel="noopener noreferrer" className="border border-[#d7a24a] px-6 py-3 text-center font-mono text-[9px] uppercase tracking-[.18em]">{c.ctaLabel}</a>}{c.email && <a href={`mailto:${c.email}`} className="border-b border-white/30 px-2 py-3 text-sm">{c.email}</a>}</div></div></section> }

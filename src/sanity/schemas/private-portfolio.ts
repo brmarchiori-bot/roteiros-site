@@ -11,7 +11,10 @@ const projectTypes = [
 const responsibilities = PORTFOLIO_RESPONSIBILITIES.map((title) => ({ title, value: title }))
 
 const videoFields = [
-  defineField({ name: 'url', title: 'URL do vídeo', type: 'url', validation: (r) => r.required() }),
+  defineField({ name: 'source', title: 'Como adicionar o vídeo?', description: 'Envie o arquivo aqui ou use um link público do YouTube, Vimeo ou de um arquivo MP4/WebM.', type: 'string', initialValue: 'upload', options: { list: [{ title: 'Enviar arquivo pelo Studio', value: 'upload' }, { title: 'Colar link público', value: 'url' }], layout: 'radio' } }),
+  defineField({ name: 'file', title: 'Arquivo do vídeo', description: 'Recomendado: MP4 otimizado para web. Para Reels, use 1080 × 1920.', type: 'file', options: { accept: 'video/mp4,video/webm' }, hidden: ({ parent }) => parent?.source === 'url', validation: (r) => r.custom((value, context) => { const parent = context.parent as { source?: string; url?: string } | undefined; return parent?.source === 'url' || parent?.url || value ? true : 'Envie o arquivo do vídeo.' }) }),
+  defineField({ name: 'url', title: 'Link público do vídeo', description: 'Aceita YouTube, Vimeo ou URL direta terminada em .mp4/.webm. Links de páginas do Instagram não são arquivos de vídeo.', type: 'url', hidden: ({ parent }) => parent?.source !== 'url' && Boolean(parent?.source), validation: (r) => r.custom((value, context) => { const parent = context.parent as { source?: string; file?: unknown } | undefined; return parent?.source === 'upload' || parent?.file || value ? true : 'Cole o link público do vídeo.' }) }),
+  defineField({ name: 'format', title: 'Formato de exibição', description: 'Escolha o mesmo formato em que o material foi produzido. Vídeos antigos sem seleção continuam horizontais.', type: 'string', initialValue: 'horizontal', options: { list: [{ title: 'Vertical · Reel (9:16)', value: 'vertical' }, { title: 'Horizontal · Filme (16:9)', value: 'horizontal' }, { title: 'Quadrado (1:1)', value: 'square' }], layout: 'radio' } }),
   defineField({ name: 'title', title: 'Legenda (opcional)', type: 'string', validation: (r) => r.max(100) }),
   defineField({ name: 'poster', title: 'Capa do vídeo', type: 'controlledImage' }),
 ]
@@ -46,6 +49,19 @@ const moduleMembers = [
   defineArrayMember({
     name: 'portfolioVideoModule', title: 'Vídeo', type: 'object', fields: videoFields,
     preview: { select: { title: 'title', subtitle: 'url', media: 'poster.image' }, prepare: ({ title, subtitle, media }) => ({ title: title || 'Vídeo', subtitle, media }) },
+  }),
+  defineArrayMember({
+    name: 'portfolioSocialCarouselModule', title: 'Carrossel para Instagram', type: 'object',
+    description: 'Simula uma publicação navegável, respeitando a ordem das artes.',
+    fields: [
+      defineField({ name: 'title', title: 'Título do carrossel (opcional)', type: 'string', validation: (r) => r.max(80) }),
+      defineField({ name: 'profileName', title: 'Nome exibido na simulação', description: 'Exemplo: nome do cliente ou da marca. Não precisa usar @.', type: 'string', validation: (r) => r.max(60) }),
+      defineField({ name: 'format', title: 'Formato das artes', type: 'string', initialValue: 'portrait', options: { list: [{ title: 'Retrato · recomendado (4:5)', value: 'portrait' }, { title: 'Quadrado (1:1)', value: 'square' }, { title: 'Paisagem (1.91:1)', value: 'landscape' }], layout: 'radio' }, validation: (r) => r.required() }),
+      defineField({ name: 'images', title: 'Páginas do carrossel', description: 'Envie de 2 a 20 artes. Arraste para colocar na mesma ordem da publicação.', type: 'array', of: [{ type: 'controlledImage' }], validation: (r) => r.required().min(2).max(20) }),
+      defineField({ name: 'caption', title: 'Legenda da publicação (opcional)', description: 'Texto apresentado abaixo da simulação.', type: 'text', rows: 4, validation: (r) => r.max(1000) }),
+      defineField({ name: 'showAllSlides', title: 'Mostrar também todas as páginas em grade', description: 'Útil para o cliente analisar a sequência completa no computador.', type: 'boolean', initialValue: true }),
+    ],
+    preview: { select: { title: 'title', images: 'images', media: 'images.0.image' }, prepare: ({ title, images, media }) => ({ title: title || 'Carrossel para Instagram', subtitle: `${images?.length || 0} página(s)`, media }) },
   }),
   defineArrayMember({
     name: 'portfolioWorkModule', title: 'Nosso trabalho', type: 'object',

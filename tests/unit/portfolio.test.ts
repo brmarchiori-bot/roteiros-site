@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { emptyPortfolio } from '@/content/portfolio-empty'
-import { featuredPortfolioProject, filterPortfolioProjects, hasProjectMedia, visiblePortfolioProjects, youtubePrivacyUrl } from '@/lib/portfolio'
+import { featuredPortfolioProject, filterPortfolioProjects, hasProjectMedia, visiblePortfolioProjects, vimeoPrivacyUrl, youtubePrivacyUrl } from '@/lib/portfolio'
 import { PORTFOLIO_CATEGORIES, PORTFOLIO_RESPONSIBILITIES, type PortfolioProject } from '@/types/portfolio'
 
 const base = (partial: Partial<PortfolioProject>): PortfolioProject => ({
@@ -11,15 +11,15 @@ const image = { src: '/fixture.jpg', alt: 'Descrição objetiva da imagem' }
 
 describe('arquitetura comercial do portfólio privado', () => {
   const fixtures: PortfolioProject[] = [
-    base({ id: 'direct-video', projectType: 'audiovisual', primaryVideo: { url: 'https://cdn.example/video.mp4' } }),
-    base({ id: 'youtube', projectType: 'audiovisual', primaryVideo: { url: 'https://youtu.be/abc123XYZ' } }),
+    base({ id: 'direct-video', projectType: 'audiovisual', primaryVideo: { url: 'https://cdn.example/video.mp4', format: 'vertical' } }),
+    base({ id: 'youtube', projectType: 'audiovisual', primaryVideo: { url: 'https://youtu.be/abc123XYZ', format: 'horizontal' } }),
     base({ id: 'photo', projectType: 'photography', cover: image, modules: [{ id: 'g', type: 'gallery', images: [image] }] }),
     base({ id: 'digital', category: 'digital', projectType: 'digital', modules: [{ id: 'ui', type: 'interfaces', images: [image] }, { id: 'link', type: 'link', label: 'Conhecer projeto', url: 'https://example.com' }] }),
     base({ id: 'hybrid', projectType: 'hybrid', cover: image, modules: [{ id: 'copy', type: 'text', text: 'Contexto do projeto.' }] }),
-    base({ id: 'no-cover', projectType: 'audiovisual', primaryVideo: { url: 'https://cdn.example/video.mp4' } }),
+    base({ id: 'no-cover', projectType: 'audiovisual', primaryVideo: { url: 'https://cdn.example/video.mp4', format: 'vertical' } }),
     base({ id: 'no-video', projectType: 'photography', cover: image }),
     base({ id: 'no-gallery', projectType: 'digital', externalLink: { label: 'Abrir experiência', url: 'https://example.com' } }),
-    base({ id: 'script-only', projectType: 'audiovisual', primaryVideo: { url: 'https://cdn.example/final.mp4' }, responsibilities: ['Roteiro'] }),
+    base({ id: 'script-only', projectType: 'audiovisual', primaryVideo: { url: 'https://cdn.example/final.mp4', format: 'horizontal' }, responsibilities: ['Roteiro'] }),
   ]
 
   it.each(fixtures)('aceita a variante $id sem depender de campos irrelevantes', (project) => {
@@ -41,6 +41,11 @@ describe('arquitetura comercial do portfólio privado', () => {
   it('usa o domínio de incorporação do YouTube com privacidade reforçada', () => {
     expect(youtubePrivacyUrl('https://www.youtube.com/watch?v=abc123XYZ')).toBe('https://www.youtube-nocookie.com/embed/abc123XYZ')
     expect(youtubePrivacyUrl('https://cdn.example/video.mp4')).toBeNull()
+  })
+
+  it('reconhece Vimeo e usa o player com proteção contra rastreamento', () => {
+    expect(vimeoPrivacyUrl('https://vimeo.com/123456789')).toBe('https://player.vimeo.com/video/123456789?dnt=1')
+    expect(vimeoPrivacyUrl('https://instagram.com/reel/exemplo')).toBeNull()
   })
 
   it('não contém CTA vazio na variante digital', () => {
@@ -80,7 +85,7 @@ describe('arquitetura comercial do portfólio privado', () => {
   it('suporta um projeto digital completo somente por módulos', () => {
     const digital = base({
       id: 'digital-complete', category: 'digital', projectType: 'digital', cover: image,
-      primaryVideo: { url: 'https://cdn.example/demo.mp4', poster: image },
+      primaryVideo: { url: 'https://cdn.example/demo.mp4', poster: image, format: 'horizontal' },
       responsibilities: ['Estratégia', 'Produto', 'UX/UI', 'Direção visual', 'Desenvolvimento'],
       modules: [
         { id: 'context', type: 'text', text: 'Contexto.' },
@@ -96,14 +101,20 @@ describe('arquitetura comercial do portfólio privado', () => {
 
   it('suporta hospedagem, restaurante, evento, fotografia e híbrido sem mudar o frontend', () => {
     const formats = [
-      base({ category: 'hospitality', primaryVideo: { url: 'https://cdn.example/main.mp4' }, modules: [{ id: 'gallery', type: 'gallery', images: [image] }, { id: 'other-video', type: 'video', video: { url: 'https://cdn.example/other.mp4' } }] }),
-      base({ category: 'gastronomy', primaryVideo: { url: 'https://cdn.example/food.mp4' }, modules: [{ id: 'photos', type: 'gallery', images: [image] }] }),
-      base({ category: 'events', projectType: 'audiovisual', primaryVideo: { url: 'https://cdn.example/event.mp4' } }),
+      base({ category: 'hospitality', primaryVideo: { url: 'https://cdn.example/main.mp4', format: 'horizontal' }, modules: [{ id: 'gallery', type: 'gallery', images: [image] }, { id: 'other-video', type: 'video', video: { url: 'https://cdn.example/other.mp4', format: 'vertical' } }] }),
+      base({ category: 'gastronomy', primaryVideo: { url: 'https://cdn.example/food.mp4', format: 'horizontal' }, modules: [{ id: 'photos', type: 'gallery', images: [image] }] }),
+      base({ category: 'events', projectType: 'audiovisual', primaryVideo: { url: 'https://cdn.example/event.mp4', format: 'vertical' } }),
       fixtures.find(({ id }) => id === 'photo')!,
-      base({ projectType: 'hybrid', primaryVideo: { url: 'https://cdn.example/hybrid.mp4' }, modules: [{ id: 'photos', type: 'gallery', images: [image] }, { id: 'ui', type: 'interfaces', images: [image] }] }),
+      base({ projectType: 'hybrid', primaryVideo: { url: 'https://cdn.example/hybrid.mp4', format: 'square' }, modules: [{ id: 'photos', type: 'gallery', images: [image] }, { id: 'ui', type: 'interfaces', images: [image] }] }),
     ]
     expect(formats).toHaveLength(5)
     expect(formats.every((project) => project.modules && project.projectType)).toBe(true)
+  })
+
+  it('trata carrossel social como conteúdo fotográfico editável', () => {
+    const carousel = base({ id: 'carousel', modules: [{ id: 'social', type: 'socialCarousel', format: 'portrait', images: [image, image], showAllSlides: true }] })
+    expect(hasProjectMedia(carousel)).toBe(true)
+    expect(filterPortfolioProjects([carousel], 'all', 'photo')).toEqual([carousel])
   })
 
   it('não cria links vazios quando WhatsApp, email ou link externo estão ausentes', () => {

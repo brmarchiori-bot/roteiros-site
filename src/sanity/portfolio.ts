@@ -1,8 +1,9 @@
 import { groq } from 'next-sanity'
-import type { PortfolioImage, PortfolioModule, PortfolioProject, PrivatePortfolio } from '@/types/portfolio'
+import type { PortfolioImage, PortfolioModule, PortfolioProject, PortfolioVideoFormat, PrivatePortfolio } from '@/types/portfolio'
 import { PORTFOLIO_CATEGORIES } from '@/types/portfolio'
 import { sanityClient } from './client'
 import { urlForImage } from './image'
+import { dataset, projectId } from './env'
 
 const QUERY = groq`*[_id == "private-portfolio-singleton"][0]`
 
@@ -23,8 +24,17 @@ function image(raw?: Raw): PortfolioImage | undefined {
 }
 
 function video(raw?: Raw) {
-  const url = text(raw?.url); if (!url) return undefined
-  return { url, title: text(raw?.title), poster: image(record(raw?.poster)) }
+  const url = text(raw?.url) ?? fileUrl(record(raw?.file)?.asset)
+  if (!url) return undefined
+  const value = text(raw?.format)
+  const format: PortfolioVideoFormat = value === 'vertical' || value === 'square' ? value : 'horizontal'
+  return { url, title: text(raw?.title), poster: image(record(raw?.poster)), format }
+}
+
+function fileUrl(value: unknown) {
+  const reference = text(record(value)?._ref)
+  const match = reference?.match(/^file-([a-zA-Z0-9]+)-([a-zA-Z0-9]+)$/)
+  return match && projectId && dataset ? `https://cdn.sanity.io/files/${projectId}/${dataset}/${match[1]}.${match[2]}` : undefined
 }
 
 function module(raw: Raw): PortfolioModule | null {
@@ -32,6 +42,7 @@ function module(raw: Raw): PortfolioModule | null {
   if (raw._type === 'portfolioTextModule') { const value = text(raw.text); return value ? { id: key(raw._key), type: 'text', title: text(raw.title), text: value } : null }
   if (raw._type === 'portfolioImageModule') { const value = image(record(raw.image)); return value ? { id: String(raw._key), type: 'image', image: value } : null }
   if (raw._type === 'portfolioGalleryModule' || raw._type === 'portfolioInterfacesModule') { const images = records(raw.images).map(image).filter(Boolean) as PortfolioImage[]; return images.length ? { id: String(raw._key), type: raw._type === 'portfolioGalleryModule' ? 'gallery' : 'interfaces', title: text(raw.title), images } : null }
+  if (raw._type === 'portfolioSocialCarouselModule') { const images = records(raw.images).map(image).filter(Boolean) as PortfolioImage[]; const format = text(raw.format); return images.length >= 2 ? { id: key(raw._key), type: 'socialCarousel', title: text(raw.title), profileName: text(raw.profileName), caption: text(raw.caption), format: format === 'square' || format === 'landscape' ? format : 'portrait', showAllSlides: raw.showAllSlides !== false, images } : null }
   if (raw._type === 'portfolioVideoModule') { const value = video(raw); return value ? { id: key(raw._key), type: 'video', video: value } : null }
   if (raw._type === 'portfolioWorkModule') return { id: key(raw._key), type: 'work' }
   if (raw._type === 'portfolioLinkModule') { const label = text(raw.label); const url = text(raw.url); return label && url ? { id: key(raw._key), type: 'link', label, url } : null }

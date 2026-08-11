@@ -164,7 +164,7 @@ const CONTENT_SECURITY_POLICY = [
   `font-src 'self' data:${isVercelPreview ? ' https://assets.vercel.com' : ''}`,
   `connect-src 'self' https://*.sanity.io https://*.apicdn.sanity.io https://vitals.vercel-insights.com https://*.vercel-insights.com${isVercelPreview ? ' https://vercel.live wss://ws-us3.pusher.com' : ''}`,
   "media-src 'self' blob: https:",
-  `frame-src https://www.youtube-nocookie.com${vercelPreviewSource}`,
+  `frame-src https://www.youtube-nocookie.com https://player.vimeo.com${vercelPreviewSource}`,
   "worker-src 'self' blob:",
   "manifest-src 'self'",
   "object-src 'none'",

@@ -21,13 +21,15 @@ export const PORTFOLIO_RESPONSIBILITIES = [
 
 export type PortfolioProjectType = 'audiovisual' | 'photography' | 'digital' | 'hybrid'
 export type PortfolioImage = { src: string; alt: string; caption?: string } & PhotoControls
-export type PortfolioVideo = { url: string; title?: string; poster?: PortfolioImage }
+export type PortfolioVideoFormat = 'horizontal' | 'vertical' | 'square'
+export type PortfolioVideo = { url: string; title?: string; poster?: PortfolioImage; format: PortfolioVideoFormat }
 export type PortfolioCredit = { name: string; role?: string }
 
 export type PortfolioModule =
   | { id: string; type: 'text'; title?: string; text: string }
   | { id: string; type: 'image'; image: PortfolioImage }
   | { id: string; type: 'gallery' | 'interfaces'; title?: string; images: PortfolioImage[] }
+  | { id: string; type: 'socialCarousel'; title?: string; profileName?: string; caption?: string; format: 'portrait' | 'square' | 'landscape'; showAllSlides: boolean; images: PortfolioImage[] }
   | { id: string; type: 'video'; video: PortfolioVideo }
   | { id: string; type: 'work' }
   | { id: string; type: 'link'; label: string; url: string }
