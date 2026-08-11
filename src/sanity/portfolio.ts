@@ -1,11 +1,13 @@
-import { groq } from 'next-sanity'
+import { createClient, groq } from 'next-sanity'
 import type { PortfolioImage, PortfolioModule, PortfolioProject, PortfolioVideoFormat, PrivatePortfolio } from '@/types/portfolio'
 import { PORTFOLIO_CATEGORIES } from '@/types/portfolio'
-import { sanityClient } from './client'
 import { urlForImage } from './image'
-import { dataset, projectId } from './env'
+import { apiVersion, dataset, projectId } from './env'
 
 const QUERY = groq`*[_id == "private-portfolio-singleton"][0]`
+const portfolioClient = projectId && dataset
+  ? createClient({ projectId, dataset, apiVersion, useCdn: false, perspective: 'published' })
+  : null
 
 type Raw = Record<string, unknown>
 const text = (value: unknown) => typeof value === 'string' && value.trim() ? value.trim() : undefined
@@ -67,9 +69,9 @@ function project(raw: Raw): PortfolioProject | null {
 }
 
 export async function getPrivatePortfolio(): Promise<PrivatePortfolio | null> {
-  if (!sanityClient) return null
+  if (!portfolioClient) return null
   try {
-    const raw = await sanityClient.fetch<Raw | null>(QUERY, {}, { cache: 'no-store' })
+    const raw = await portfolioClient.fetch<Raw | null>(QUERY, {}, { cache: 'no-store' })
     const title = text(raw?.title); const contactTitle = text(raw?.contactTitle)
     if (!raw || !title || !contactTitle) return null
     return {
