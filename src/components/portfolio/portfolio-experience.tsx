@@ -72,11 +72,29 @@ function ProjectCard({ project, onOpen }: { project: PortfolioProject; onOpen: (
   const hasVideo = Boolean(project.primaryVideo || project.modules.some((module) => module.type === 'video'))
   return <article className="group relative aspect-[16/10] min-h-[280px] overflow-hidden border border-white/20 bg-[#141512]">
     {project.cover && <Image src={project.cover.src} alt={project.cover.alt} fill sizes="(min-width:1024px) 33vw, 100vw" style={toImageStyle(project.cover)} className="object-cover transition-transform duration-700 group-hover:scale-[1.025]" />}
+    {project.previewVideoUrl && <CardPreview src={project.previewVideoUrl} poster={project.cover?.src} />}
     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
-    {hasVideo && <span className="absolute left-1/2 top-1/2 grid size-12 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border border-white/60 bg-black/35 text-sm" aria-hidden>▶</span>}
+    {hasVideo && <span className="absolute left-1/2 top-1/2 grid size-12 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border border-white/65 bg-black/35 backdrop-blur-sm transition-transform duration-300 group-hover:scale-105" aria-hidden><svg viewBox="0 0 24 24" className="ml-0.5 size-4 fill-white" focusable="false"><path d="M8.5 5.7v12.6L18 12 8.5 5.7Z" /></svg></span>}
     <button onClick={onOpen} className="absolute inset-0 z-10 text-left" aria-label={`Abrir projeto ${project.title}`} />
     <div className="absolute inset-x-0 bottom-0 p-5"><div className="flex gap-2 font-mono text-[8px] uppercase tracking-[.15em] text-[#e5bd6c]">{project.featured && <span>Destaque ·</span>}<span>{PORTFOLIO_CATEGORY_LABELS[project.category]}</span></div><h2 className="mt-2 font-display text-3xl">{project.title}</h2><p className="mt-2 text-xs text-white/65">{TYPE_LABEL[project.projectType]}{project.responsibilities.length ? ` · ${project.responsibilities.join(' · ')}` : ''}</p></div>
   </article>
+}
+
+function CardPreview({ src, poster }: { src: string; poster?: string }) {
+  const videoRef = useRef<HTMLVideoElement>(null)
+
+  useEffect(() => {
+    const video = videoRef.current
+    if (!video || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry?.isIntersecting) void video.play().catch(() => undefined)
+      else video.pause()
+    }, { threshold: 0.35 })
+    observer.observe(video)
+    return () => observer.disconnect()
+  }, [])
+
+  return <video ref={videoRef} src={src} muted loop playsInline preload="metadata" poster={poster} aria-hidden="true" className="absolute inset-0 size-full object-cover motion-reduce:hidden" />
 }
 
 function ProjectDetail({ project, ref }: { project: PortfolioProject; ref: React.Ref<HTMLElement> }) {

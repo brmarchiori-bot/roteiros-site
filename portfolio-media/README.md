@@ -3,6 +3,7 @@
 Guarde cada material na pasta do respectivo cliente.
 
 - `videos/finais`: arquivos prontos para publicação, preferencialmente MP4.
+- `videos/previews`: clipes leves de 5 a 8 segundos usados nas capas.
 - `videos/brutos`: gravações originais que ainda precisam de seleção ou edição.
 - `fotos/capa`: uma imagem principal horizontal para representar o cliente.
 - `fotos/selecionadas`: fotografias prontas para o portfólio.
@@ -26,4 +27,3 @@ Salve somente a imagem escolhida como capa dentro de `fotos/capa`. Recomendaçã
 ```text
 cliente-foto-capa-horizontal-01.jpg
 ```
-

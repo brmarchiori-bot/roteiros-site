@@ -46,6 +46,7 @@ export type PortfolioProject = {
   order: number
   context?: string
   cover?: PortfolioImage
+  previewVideoUrl?: string
   primaryVideo?: PortfolioVideo
   responsibilities: string[]
   externalLink?: { label: string; url: string }

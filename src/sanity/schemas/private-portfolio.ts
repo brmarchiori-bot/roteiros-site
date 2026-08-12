@@ -128,6 +128,7 @@ export const privatePortfolioSchema = defineType({
         defineField({ name: 'featured', title: 'Projeto principal desta página', group: 'display', description: 'Marque apenas o trabalho que deve aparecer na grande seção expandida.', type: 'boolean', initialValue: false }),
         defineField({ name: 'order', title: 'Ordem', group: 'display', type: 'number', initialValue: 100, validation: (r) => r.required().integer().min(0).max(999) }),
         defineField({ name: 'cover', title: 'Capa do projeto', group: 'display', type: 'controlledImage' }),
+        defineField({ name: 'previewVideo', title: 'Preview animado da capa (opcional)', group: 'display', description: 'Vídeo curto, leve e sem áudio, recomendado com 5 a 8 segundos. MP4 de até 5 MB.', type: 'file', options: { accept: '.mp4,video/mp4' } }),
         defineField({ name: 'primaryVideo', title: 'Vídeo principal (opcional)', group: 'story', type: 'object', fields: videoFields }),
         defineField({ name: 'modules', title: 'Blocos da história', group: 'story', description: 'Adicione somente o necessário e arraste para definir a narrativa.', type: 'array', of: moduleMembers, validation: (r) => r.max(20) }),
         defineField({ name: 'externalLabel', title: 'Texto do link', group: 'link', type: 'string', initialValue: 'Visitar projeto', validation: (r) => r.max(40) }),

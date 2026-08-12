@@ -61,7 +61,7 @@ function project(raw: Raw): PortfolioProject | null {
     id: key(raw._key), title, client: text(raw.client), category: category as PortfolioProject['category'],
     projectType: projectType && ['audiovisual','photography','digital','hybrid'].includes(projectType) ? projectType as PortfolioProject['projectType'] : 'hybrid',
     visible: true, featured: raw.featured === true, order: number(raw.order, 100),
-    context: text(raw.context), cover: image(record(raw.cover)), primaryVideo: video(record(raw.primaryVideo)),
+    context: text(raw.context), cover: image(record(raw.cover)), previewVideoUrl: fileUrl(record(raw.previewVideo)?.asset), primaryVideo: video(record(raw.primaryVideo)),
     responsibilities: Array.isArray(raw.responsibilities) ? [...new Set(raw.responsibilities.map(text).filter(Boolean))] as string[] : [],
     externalLink: text(raw.externalLabel) && text(raw.externalUrl) ? { label: text(raw.externalLabel)!, url: text(raw.externalUrl)! } : undefined,
     modules: records(raw.modules).map(module).filter(Boolean) as PortfolioModule[],
