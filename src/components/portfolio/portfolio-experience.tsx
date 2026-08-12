@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { featuredPortfolioProject, filterPortfolioProjects, visiblePortfolioProjects, vimeoPrivacyUrl, youtubePrivacyUrl, type PortfolioMediaFilter } from '@/lib/portfolio'
 import { PORTFOLIO_CATEGORY_LABELS, type PortfolioCategory, type PortfolioModule, type PortfolioProject, type PrivatePortfolio } from '@/types/portfolio'
 import { toImageStyle } from '@/lib/sanity-styles'
@@ -13,10 +13,26 @@ export function PortfolioExperience({ portfolio }: { portfolio: PrivatePortfolio
   const [media, setMedia] = useState<PortfolioMediaFilter>('all')
   const [limit, setLimit] = useState(portfolio.initialProjectCount)
   const [selected, setSelected] = useState<string | null>(portfolio.projects.find((p) => p.featured)?.id ?? null)
+  const detailRef = useRef<HTMLElement>(null)
+  const shouldScrollToDetail = useRef(false)
   const projects = useMemo(() => visiblePortfolioProjects(portfolio.projects), [portfolio.projects])
   const filtered = useMemo(() => filterPortfolioProjects(projects, category, media), [projects, category, media])
   const visible = filtered.slice(0, limit)
   const featured = featuredPortfolioProject(projects, selected)
+
+  useEffect(() => {
+    if (!selected || !shouldScrollToDetail.current) return
+    shouldScrollToDetail.current = false
+    const detail = detailRef.current
+    if (!detail) return
+    detail.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    detail.focus({ preventScroll: true })
+  }, [selected])
+
+  const openProject = (projectId: string) => {
+    shouldScrollToDetail.current = true
+    setSelected(projectId)
+  }
 
   return <main className="min-h-screen overflow-x-hidden bg-[#0b0c0a] text-[#eee8dc]">
     <section className="relative min-h-[82svh] border-b border-white/20">
@@ -40,11 +56,11 @@ export function PortfolioExperience({ portfolio }: { portfolio: PrivatePortfolio
           {([['video', 'Vídeo'], ['photo', 'Foto'], ['all', 'Todos']] as const).map(([key, label]) => <button key={key} role="tab" aria-selected={media === key} onClick={() => { setMedia(key); setLimit(portfolio.initialProjectCount) }} className={`border px-3 py-2 ${media === key ? 'border-[#d7a24a] text-[#e5bd6c]' : 'border-white/15 text-white/55'}`}>{label}</button>)}
         </div>
       </div>
-      {visible.length ? <div className="mt-7 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{visible.map((project) => <ProjectCard key={project.id} project={project} onOpen={() => setSelected(project.id)} />)}</div> : <EmptyProjects hasPublishedProjects={projects.length > 0} />}
+      {visible.length ? <div className="mt-7 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{visible.map((project) => <ProjectCard key={project.id} project={project} onOpen={() => openProject(project.id)} />)}</div> : <EmptyProjects hasPublishedProjects={projects.length > 0} />}
       {visible.length < filtered.length && <div className="mt-8 text-center"><button onClick={() => setLimit((v) => v + portfolio.initialProjectCount)} className="border border-[#d7a24a] px-8 py-3 font-mono text-[9px] uppercase tracking-[.2em] text-[#e5bd6c]">{portfolio.loadMoreLabel}</button></div>}
     </section>
 
-    {featured && <ProjectDetail project={featured} />}
+    {featured && <ProjectDetail key={featured.id} ref={detailRef} project={featured} />}
     <Contact portfolio={portfolio} />
     <footer className="flex flex-col gap-6 border-t border-white/15 px-6 py-8 font-mono text-[9px] uppercase tracking-[.16em] text-white/50 md:flex-row md:items-center md:justify-between"><span className="text-white">Menos<br/>Roteiro</span><nav className="flex flex-wrap gap-5" aria-label="Links do portfólio">{portfolio.footer.links.map((link) => <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer" className="hover:text-[#e5bd6c]">{link.label}</a>)}</nav><span>{portfolio.footer.text}</span></footer>
   </main>
@@ -63,11 +79,11 @@ function ProjectCard({ project, onOpen }: { project: PortfolioProject; onOpen: (
   </article>
 }
 
-function ProjectDetail({ project }: { project: PortfolioProject }) {
+function ProjectDetail({ project, ref }: { project: PortfolioProject; ref: React.Ref<HTMLElement> }) {
   const hasWorkModule = project.modules.some((module) => module.type === 'work')
   const hasLinkModule = project.modules.some((module) => module.type === 'link')
-  return <section className="border-t border-white/20 px-5 py-14 md:px-10 md:py-20"><div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[.7fr_1.8fr]">
-    <aside><p className="font-mono text-[9px] uppercase tracking-[.2em] text-[#e5bd6c]">Projeto em destaque</p><h2 className="mt-5 font-display text-5xl leading-none md:text-6xl">{project.title}</h2><p className="mt-4 font-mono text-[9px] uppercase text-[#e5bd6c]">{PORTFOLIO_CATEGORY_LABELS[project.category]}</p>{project.context && <p className="mt-7 text-sm leading-relaxed text-white/70">{project.context}</p>}{!hasWorkModule && <Work responsibilities={project.responsibilities} />}{project.externalLink && !hasLinkModule && <a href={project.externalLink.url} target="_blank" rel="noopener noreferrer" className="mt-8 inline-flex border-b border-[#d7a24a] pb-2 font-mono text-[9px] uppercase tracking-[.18em]">{project.externalLink.label} ↗</a>}</aside>
+  return <section ref={ref} tabIndex={-1} aria-labelledby={`portfolio-project-${project.id}`} className="scroll-mt-4 border-t border-white/20 px-5 py-14 outline-none md:px-10 md:py-20"><div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[.7fr_1.8fr]">
+    <aside><p className="font-mono text-[9px] uppercase tracking-[.2em] text-[#e5bd6c]">Projeto em destaque</p><h2 id={`portfolio-project-${project.id}`} className="mt-5 font-display text-5xl leading-none md:text-6xl">{project.title}</h2><p className="mt-4 font-mono text-[9px] uppercase text-[#e5bd6c]">{PORTFOLIO_CATEGORY_LABELS[project.category]}</p>{project.context && <p className="mt-7 text-sm leading-relaxed text-white/70">{project.context}</p>}{!hasWorkModule && <Work responsibilities={project.responsibilities} />}{project.externalLink && !hasLinkModule && <a href={project.externalLink.url} target="_blank" rel="noopener noreferrer" className="mt-8 inline-flex border-b border-[#d7a24a] pb-2 font-mono text-[9px] uppercase tracking-[.18em]">{project.externalLink.label} ↗</a>}</aside>
     <div className="space-y-8">{project.primaryVideo ? <Video video={project.primaryVideo} /> : project.cover && <ImageBlock image={project.cover} />}{project.modules.map((module) => <Module key={module.id} module={module} project={project} />)}</div>
   </div></section>
 }
