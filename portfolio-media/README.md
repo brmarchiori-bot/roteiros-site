@@ -4,6 +4,7 @@ Guarde cada material na pasta do respectivo cliente.
 
 - `videos/finais`: arquivos prontos para publicação, preferencialmente MP4.
 - `videos/brutos`: gravações originais que ainda precisam de seleção ou edição.
+- `fotos/capa`: uma imagem principal horizontal para representar o cliente.
 - `fotos/selecionadas`: fotografias prontas para o portfólio.
 - `fotos/brutas`: fotografias originais ou ainda não selecionadas.
 
@@ -19,4 +20,10 @@ cliente-foto-capa-horizontal-01.jpg
 ```
 
 Não renomeie arquivos depois que eles forem publicados no Sanity sem avisar.
+
+Salve somente a imagem escolhida como capa dentro de `fotos/capa`. Recomendação:
+
+```text
+cliente-foto-capa-horizontal-01.jpg
+```
 
