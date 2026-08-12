@@ -2,6 +2,8 @@
 
 Guarde cada material na pasta do respectivo cliente.
 
+- `capa-principal/videos`: vídeo cinematográfico vertical usado no fundo da abertura do portfólio.
+
 - `videos/finais`: arquivos prontos para publicação, preferencialmente MP4.
 - `videos/previews`: clipes leves de 5 a 8 segundos usados nas capas.
 - `videos/brutos`: gravações originais que ainda precisam de seleção ou edição.

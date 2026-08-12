@@ -37,6 +37,7 @@ export function PortfolioExperience({ portfolio }: { portfolio: PrivatePortfolio
   return <main className="min-h-screen overflow-x-hidden bg-[#0b0c0a] text-[#eee8dc]">
     <section className="relative min-h-[82svh] border-b border-white/20">
       {portfolio.heroImage && <Image src={portfolio.heroImage.src} alt={portfolio.heroImage.alt} fill priority sizes="100vw" style={toImageStyle(portfolio.heroImage)} className="object-cover opacity-60" />}
+      {portfolio.heroBackgroundVideoUrl && <HeroBackgroundVideo src={portfolio.heroBackgroundVideoUrl} poster={portfolio.heroImage?.src} />}
       <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/45 to-black/20" />
       <div className="relative z-10 flex min-h-[82svh] flex-col justify-between px-6 py-7 md:px-12 md:py-10">
         <header className="flex items-center justify-between font-mono text-[10px] uppercase tracking-[.22em]"><span>Menos<br/>Roteiro</span><span>▱ {portfolio.privacyLabel}</span></header>
@@ -64,6 +65,10 @@ export function PortfolioExperience({ portfolio }: { portfolio: PrivatePortfolio
     <Contact portfolio={portfolio} />
     <footer className="flex flex-col gap-6 border-t border-white/15 px-6 py-8 font-mono text-[9px] uppercase tracking-[.16em] text-white/50 md:flex-row md:items-center md:justify-between"><span className="text-white">Menos<br/>Roteiro</span><nav className="flex flex-wrap gap-5" aria-label="Links do portfólio">{portfolio.footer.links.map((link) => <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer" className="hover:text-[#e5bd6c]">{link.label}</a>)}</nav><span>{portfolio.footer.text}</span></footer>
   </main>
+}
+
+function HeroBackgroundVideo({ src, poster }: { src: string; poster?: string }) {
+  return <video src={src} muted loop autoPlay playsInline preload="metadata" poster={poster} aria-hidden="true" className="absolute inset-0 size-full object-cover opacity-65 motion-reduce:hidden" />
 }
 
 function Filter({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) { return <button role="tab" aria-selected={active} onClick={onClick} className={`shrink-0 pb-3 ${active ? 'border-b-2 border-[#d7a24a] text-[#e5bd6c]' : 'text-white/65'}`}>{children}</button> }

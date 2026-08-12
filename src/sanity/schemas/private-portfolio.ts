@@ -100,6 +100,7 @@ export const privatePortfolioSchema = defineType({
     defineField({ name: 'title', title: 'Título principal', group: 'opening', type: 'string', validation: (r) => r.required().max(90) }),
     defineField({ name: 'introduction', title: 'Texto de apoio', group: 'opening', type: 'text', rows: 3, validation: (r) => r.max(360) }),
     defineField({ name: 'heroImage', title: 'Imagem da abertura', group: 'opening', type: 'controlledImage' }),
+    defineField({ name: 'heroBackgroundVideo', title: 'Vídeo de fundo da abertura (opcional)', group: 'opening', description: 'Loop cinematográfico vertical, mudo na página. Recomendado: MP4 H.264, 1080 × 1920, até 30 segundos e preferencialmente até 15 MB.', type: 'file', options: { accept: '.mp4,video/mp4' } }),
     defineField({ name: 'heroVideo', title: 'Reel da abertura (opcional)', group: 'opening', type: 'object', fields: videoFields }),
     defineField({ name: 'heroCtaLabel', title: 'Texto para assistir ao reel', group: 'opening', type: 'string', initialValue: 'Assistir reel', validation: (r) => r.max(35) }),
     defineField({

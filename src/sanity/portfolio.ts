@@ -76,7 +76,7 @@ export async function getPrivatePortfolio(): Promise<PrivatePortfolio | null> {
     if (!raw || !title || !contactTitle) return null
     return {
       privacyLabel: text(raw.privacyLabel) ?? 'Portfólio privado', kicker: text(raw.kicker) ?? 'Portfólio', title,
-      introduction: text(raw.introduction), heroImage: image(record(raw.heroImage)), heroVideo: video(record(raw.heroVideo)), heroCtaLabel: text(raw.heroCtaLabel),
+      introduction: text(raw.introduction), heroImage: image(record(raw.heroImage)), heroBackgroundVideoUrl: fileUrl(record(raw.heroBackgroundVideo)?.asset), heroVideo: video(record(raw.heroVideo)), heroCtaLabel: text(raw.heroCtaLabel),
       initialProjectCount: number(raw.initialProjectCount, 9),
       loadMoreLabel: text(raw.loadMoreLabel) ?? 'Carregar mais projetos',
       contact: { kicker: text(raw.contactKicker), title: contactTitle, text: text(raw.contactText), ctaLabel: text(raw.contactLabel), contactUrl: text(raw.contactUrl), email: text(raw.contactEmail), background: image(record(raw.contactBackground)) },

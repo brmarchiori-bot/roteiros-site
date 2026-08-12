@@ -59,6 +59,7 @@ export type PrivatePortfolio = {
   title: string
   introduction?: string
   heroImage?: PortfolioImage
+  heroBackgroundVideoUrl?: string
   heroVideo?: PortfolioVideo
   heroCtaLabel?: string
   initialProjectCount: number
