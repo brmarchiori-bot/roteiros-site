@@ -40,7 +40,7 @@ export function PortfolioExperience({ portfolio }: { portfolio: PrivatePortfolio
       {portfolio.heroBackgroundVideoUrl && <HeroBackgroundVideo src={portfolio.heroBackgroundVideoUrl} poster={portfolio.heroImage?.src} />}
       <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/45 to-black/20" />
       <div className="relative z-10 flex min-h-[82svh] flex-col justify-between px-6 py-7 md:px-12 md:py-10">
-        <header className="flex items-center justify-between font-mono text-[10px] uppercase tracking-[.22em]"><span>Menos<br/>Roteiro</span><span>▱ {portfolio.privacyLabel}</span></header>
+        <header className="flex items-center justify-between font-mono text-[10px] uppercase tracking-[.22em]"><span>Menos<br/>Roteiros</span><span>▱ {portfolio.privacyLabel}</span></header>
         <div className="max-w-2xl pb-12 md:pb-16"><p className="font-mono text-[10px] uppercase tracking-[.24em] text-[#d7a24a]">{portfolio.kicker}</p><h1 className="mt-5 font-display text-5xl uppercase leading-[.88] tracking-[-.04em] sm:text-7xl md:text-8xl">{portfolio.title}</h1>{portfolio.introduction && <p className="mt-7 max-w-lg text-base leading-relaxed text-white/75">{portfolio.introduction}</p>}{portfolio.heroVideo && portfolio.heroCtaLabel && <a href="#portfolio-reel" className="mt-8 inline-flex items-center gap-3 border-b border-[#d7a24a] pb-2 font-mono text-[9px] uppercase tracking-[.2em] text-[#e5bd6c]">{portfolio.heroCtaLabel} <span aria-hidden>▶</span></a>}</div>
       </div>
     </section>
@@ -49,9 +49,15 @@ export function PortfolioExperience({ portfolio }: { portfolio: PrivatePortfolio
 
     <section className="px-5 py-8 md:px-10">
       <div className="flex flex-col gap-5 border-b border-white/20 pb-4 lg:flex-row lg:items-end lg:justify-between">
-        <div className="flex gap-6 overflow-x-auto font-mono text-[9px] uppercase tracking-[.16em]" role="tablist" aria-label="Filtrar por categoria">
-          <Filter active={category === 'all'} onClick={() => { setCategory('all'); setLimit(portfolio.initialProjectCount) }}>Todos</Filter>
-          {Object.entries(PORTFOLIO_CATEGORY_LABELS).map(([key, label]) => <Filter key={key} active={category === key} onClick={() => { setCategory(key as PortfolioCategory); setLimit(portfolio.initialProjectCount) }}>{label}</Filter>)}
+        <div className="min-w-0">
+          <p className="mb-3 flex items-center justify-between font-mono text-[8px] uppercase tracking-[.16em] text-white/45 lg:hidden"><span>Escolha uma categoria</span><span className="text-[#e5bd6c]">Deslize para ver mais →</span></p>
+          <div className="relative -mr-5 lg:mr-0">
+            <div className="flex snap-x snap-mandatory gap-6 overflow-x-auto pr-14 font-mono text-[9px] uppercase tracking-[.16em] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" role="tablist" aria-label="Filtrar por categoria">
+              <Filter active={category === 'all'} onClick={() => { setCategory('all'); setLimit(portfolio.initialProjectCount) }}>Todos</Filter>
+              {Object.entries(PORTFOLIO_CATEGORY_LABELS).map(([key, label]) => <Filter key={key} active={category === key} onClick={() => { setCategory(key as PortfolioCategory); setLimit(portfolio.initialProjectCount) }}>{label}</Filter>)}
+            </div>
+            <div aria-hidden className="pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-r from-transparent to-[#0b0c0a] lg:hidden" />
+          </div>
         </div>
         <div className="flex gap-2 font-mono text-[9px] uppercase tracking-[.16em]" role="tablist" aria-label="Filtrar por formato">
           {([['video', 'Vídeo'], ['photo', 'Foto'], ['all', 'Todos']] as const).map(([key, label]) => <button key={key} role="tab" aria-selected={media === key} onClick={() => { setMedia(key); setLimit(portfolio.initialProjectCount) }} className={`border px-3 py-2 ${media === key ? 'border-[#d7a24a] text-[#e5bd6c]' : 'border-white/15 text-white/55'}`}>{label}</button>)}
@@ -63,7 +69,7 @@ export function PortfolioExperience({ portfolio }: { portfolio: PrivatePortfolio
 
     {featured && <ProjectDetail key={featured.id} ref={detailRef} project={featured} />}
     <Contact portfolio={portfolio} />
-    <footer className="flex flex-col gap-6 border-t border-white/15 px-6 py-8 font-mono text-[9px] uppercase tracking-[.16em] text-white/50 md:flex-row md:items-center md:justify-between"><span className="text-white">Menos<br/>Roteiro</span><nav className="flex flex-wrap gap-5" aria-label="Links do portfólio">{portfolio.footer.links.map((link) => <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer" className="hover:text-[#e5bd6c]">{link.label}</a>)}</nav><span>{portfolio.footer.text}</span></footer>
+    <footer className="flex flex-col gap-6 border-t border-white/15 px-6 py-8 font-mono text-[9px] uppercase tracking-[.16em] text-white/50 md:flex-row md:items-center md:justify-between"><span className="text-white">Menos<br/>Roteiros</span><nav className="flex flex-wrap gap-5" aria-label="Links do portfólio">{portfolio.footer.links.map((link) => <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer" className="hover:text-[#e5bd6c]">{link.label}</a>)}</nav><span>{portfolio.footer.text}</span></footer>
   </main>
 }
 
@@ -71,13 +77,13 @@ function HeroBackgroundVideo({ src, poster }: { src: string; poster?: string }) 
   return <video src={src} muted loop autoPlay playsInline preload="metadata" poster={poster} aria-hidden="true" className="absolute inset-0 size-full object-cover opacity-65 motion-reduce:hidden" />
 }
 
-function Filter({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) { return <button role="tab" aria-selected={active} onClick={onClick} className={`shrink-0 pb-3 ${active ? 'border-b-2 border-[#d7a24a] text-[#e5bd6c]' : 'text-white/65'}`}>{children}</button> }
+function Filter({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) { return <button role="tab" aria-selected={active} onClick={onClick} className={`shrink-0 snap-start pb-3 ${active ? 'border-b-2 border-[#d7a24a] text-[#e5bd6c]' : 'text-white/65'}`}>{children}</button> }
 
 function ProjectCard({ project, onOpen }: { project: PortfolioProject; onOpen: () => void }) {
   const hasVideo = Boolean(project.primaryVideo || project.modules.some((module) => module.type === 'video'))
   return <article className="group relative aspect-[16/10] min-h-[280px] overflow-hidden border border-white/20 bg-[#141512]">
     {project.cover && <Image src={project.cover.src} alt={project.cover.alt} fill sizes="(min-width:1024px) 33vw, 100vw" style={toImageStyle(project.cover)} className="object-cover transition-transform duration-700 group-hover:scale-[1.025]" />}
-    {project.previewVideoUrl && <CardPreview src={project.previewVideoUrl} poster={project.cover?.src} />}
+    {project.previewVideoUrl && <CardPreview src={project.previewVideoUrl} poster={project.cover?.src} format={project.primaryVideo?.format} />}
     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
     {hasVideo && <span className="absolute left-1/2 top-1/2 grid size-12 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border border-white/65 bg-black/35 backdrop-blur-sm transition-transform duration-300 group-hover:scale-105" aria-hidden><svg viewBox="0 0 24 24" className="ml-0.5 size-4 fill-white" focusable="false"><path d="M8.5 5.7v12.6L18 12 8.5 5.7Z" /></svg></span>}
     <button onClick={onOpen} className="absolute inset-0 z-10 text-left" aria-label={`Abrir projeto ${project.title}`} />
@@ -85,7 +91,7 @@ function ProjectCard({ project, onOpen }: { project: PortfolioProject; onOpen: (
   </article>
 }
 
-function CardPreview({ src, poster }: { src: string; poster?: string }) {
+function CardPreview({ src, poster, format }: { src: string; poster?: string; format?: NonNullable<PortfolioProject['primaryVideo']>['format'] }) {
   const videoRef = useRef<HTMLVideoElement>(null)
 
   useEffect(() => {
@@ -99,7 +105,11 @@ function CardPreview({ src, poster }: { src: string; poster?: string }) {
     return () => observer.disconnect()
   }, [])
 
-  return <video ref={videoRef} src={src} muted loop playsInline preload="metadata" poster={poster} aria-hidden="true" className="absolute inset-0 size-full object-cover motion-reduce:hidden" />
+  const preserveFrame = format === 'vertical' || format === 'square'
+  return <>
+    {preserveFrame && <video src={src} muted loop autoPlay playsInline preload="metadata" poster={poster} aria-hidden="true" className="absolute inset-0 size-full scale-110 object-cover opacity-45 blur-xl motion-reduce:hidden" />}
+    <video ref={videoRef} src={src} muted loop playsInline preload="metadata" poster={poster} aria-hidden="true" className={`absolute inset-0 size-full motion-reduce:hidden ${preserveFrame ? 'object-contain' : 'object-cover'}`} />
+  </>
 }
 
 function ProjectDetail({ project, ref }: { project: PortfolioProject; ref: React.Ref<HTMLElement> }) {
