@@ -47,7 +47,7 @@ export function PortfolioExperience({ portfolio }: { portfolio: PrivatePortfolio
 
     {portfolio.heroVideo && <section id="portfolio-reel" className="border-b border-white/20 px-5 py-10 md:px-10 md:py-16"><div className="mx-auto max-w-6xl"><Video video={portfolio.heroVideo} /></div></section>}
 
-    <section className="px-5 py-8 md:px-10">
+    <section className="w-full min-w-0 overflow-hidden px-5 py-8 md:px-10">
       <div className="flex flex-col gap-5 border-b border-white/20 pb-4 lg:flex-row lg:items-end lg:justify-between">
         <div className="min-w-0">
           <p className="mb-3 flex items-center justify-between font-mono text-[8px] uppercase tracking-[.16em] text-white/45 lg:hidden"><span>Escolha uma categoria</span><span className="text-[#e5bd6c]">Deslize para ver mais →</span></p>
@@ -63,7 +63,7 @@ export function PortfolioExperience({ portfolio }: { portfolio: PrivatePortfolio
           {([['video', 'Vídeo'], ['photo', 'Foto'], ['all', 'Todos']] as const).map(([key, label]) => <button key={key} role="tab" aria-selected={media === key} onClick={() => { setMedia(key); setLimit(portfolio.initialProjectCount) }} className={`border px-3 py-2 ${media === key ? 'border-[#d7a24a] text-[#e5bd6c]' : 'border-white/15 text-white/55'}`}>{label}</button>)}
         </div>
       </div>
-      {visible.length ? <div className="mt-7 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{visible.map((project) => <ProjectCard key={project.id} project={project} onOpen={() => openProject(project.id)} />)}</div> : <EmptyProjects hasPublishedProjects={projects.length > 0} />}
+      {visible.length ? <div className="mt-7 grid w-full min-w-0 max-w-full grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">{visible.map((project) => <ProjectCard key={project.id} project={project} onOpen={() => openProject(project.id)} />)}</div> : <EmptyProjects hasPublishedProjects={projects.length > 0} />}
       {visible.length < filtered.length && <div className="mt-8 text-center"><button onClick={() => setLimit((v) => v + portfolio.initialProjectCount)} className="border border-[#d7a24a] px-8 py-3 font-mono text-[9px] uppercase tracking-[.2em] text-[#e5bd6c]">{portfolio.loadMoreLabel}</button></div>}
     </section>
 
@@ -81,13 +81,13 @@ function Filter({ active, onClick, children }: { active: boolean; onClick: () =>
 
 function ProjectCard({ project, onOpen }: { project: PortfolioProject; onOpen: () => void }) {
   const hasVideo = Boolean(project.primaryVideo || project.modules.some((module) => module.type === 'video'))
-  return <article className="group relative aspect-[16/10] min-h-[280px] overflow-hidden border border-white/20 bg-[#141512]">
+  return <article className="group relative aspect-[16/10] min-h-[280px] w-full min-w-0 max-w-full overflow-hidden border border-white/20 bg-[#141512]">
     {project.cover && <Image src={project.cover.src} alt={project.cover.alt} fill sizes="(min-width:1024px) 33vw, 100vw" style={toImageStyle(project.cover)} className="object-cover transition-transform duration-700 group-hover:scale-[1.025]" />}
     {project.previewVideoUrl && <CardPreview src={project.previewVideoUrl} poster={project.cover?.src} />}
     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
     {hasVideo && <span className="absolute left-1/2 top-1/2 grid size-12 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border border-white/65 bg-black/35 backdrop-blur-sm transition-transform duration-300 group-hover:scale-105" aria-hidden><svg viewBox="0 0 24 24" className="ml-0.5 size-4 fill-white" focusable="false"><path d="M8.5 5.7v12.6L18 12 8.5 5.7Z" /></svg></span>}
     <button onClick={onOpen} className="absolute inset-0 z-10 text-left" aria-label={`Abrir projeto ${project.title}`} />
-    <div className="absolute inset-x-0 bottom-0 p-5"><div className="flex gap-2 font-mono text-[8px] uppercase tracking-[.15em] text-[#e5bd6c]">{project.featured && <span>Destaque ·</span>}<span>{PORTFOLIO_CATEGORY_LABELS[project.category]}</span></div><h2 className="mt-2 font-display text-3xl">{project.title}</h2><p className="mt-2 text-xs text-white/65">{TYPE_LABEL[project.projectType]}{project.responsibilities.length ? ` · ${project.responsibilities.join(' · ')}` : ''}</p></div>
+    <div className="absolute inset-x-0 bottom-0 min-w-0 p-5"><div className="flex min-w-0 gap-2 font-mono text-[8px] uppercase tracking-[.15em] text-[#e5bd6c]">{project.featured && <span>Destaque ·</span>}<span className="min-w-0">{PORTFOLIO_CATEGORY_LABELS[project.category]}</span></div><h2 className="mt-2 font-display text-3xl">{project.title}</h2><p className="mt-2 max-w-full text-xs text-white/65">{TYPE_LABEL[project.projectType]}{project.responsibilities.length ? ` · ${project.responsibilities.join(' · ')}` : ''}</p></div>
   </article>
 }
 
