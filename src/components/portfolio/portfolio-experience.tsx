@@ -83,7 +83,7 @@ function ProjectCard({ project, onOpen }: { project: PortfolioProject; onOpen: (
   const hasVideo = Boolean(project.primaryVideo || project.modules.some((module) => module.type === 'video'))
   return <article className="group relative aspect-[16/10] min-h-[280px] overflow-hidden border border-white/20 bg-[#141512]">
     {project.cover && <Image src={project.cover.src} alt={project.cover.alt} fill sizes="(min-width:1024px) 33vw, 100vw" style={toImageStyle(project.cover)} className="object-cover transition-transform duration-700 group-hover:scale-[1.025]" />}
-    {project.previewVideoUrl && <CardPreview src={project.previewVideoUrl} poster={project.cover?.src} format={project.primaryVideo?.format} />}
+    {project.previewVideoUrl && <CardPreview src={project.previewVideoUrl} poster={project.cover?.src} />}
     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
     {hasVideo && <span className="absolute left-1/2 top-1/2 grid size-12 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border border-white/65 bg-black/35 backdrop-blur-sm transition-transform duration-300 group-hover:scale-105" aria-hidden><svg viewBox="0 0 24 24" className="ml-0.5 size-4 fill-white" focusable="false"><path d="M8.5 5.7v12.6L18 12 8.5 5.7Z" /></svg></span>}
     <button onClick={onOpen} className="absolute inset-0 z-10 text-left" aria-label={`Abrir projeto ${project.title}`} />
@@ -91,7 +91,7 @@ function ProjectCard({ project, onOpen }: { project: PortfolioProject; onOpen: (
   </article>
 }
 
-function CardPreview({ src, poster, format }: { src: string; poster?: string; format?: NonNullable<PortfolioProject['primaryVideo']>['format'] }) {
+function CardPreview({ src, poster }: { src: string; poster?: string }) {
   const videoRef = useRef<HTMLVideoElement>(null)
 
   useEffect(() => {
@@ -105,11 +105,7 @@ function CardPreview({ src, poster, format }: { src: string; poster?: string; fo
     return () => observer.disconnect()
   }, [])
 
-  const preserveFrame = format === 'vertical' || format === 'square'
-  return <>
-    {preserveFrame && <video src={src} muted loop autoPlay playsInline preload="metadata" poster={poster} aria-hidden="true" className="absolute inset-0 size-full scale-110 object-cover opacity-45 blur-xl motion-reduce:hidden" />}
-    <video ref={videoRef} src={src} muted loop playsInline preload="metadata" poster={poster} aria-hidden="true" className={`absolute inset-0 size-full motion-reduce:hidden ${preserveFrame ? 'object-contain' : 'object-cover'}`} />
-  </>
+  return <video ref={videoRef} src={src} muted loop playsInline preload="metadata" poster={poster} aria-hidden="true" className="absolute inset-0 size-full object-cover motion-reduce:hidden" />
 }
 
 function ProjectDetail({ project, ref }: { project: PortfolioProject; ref: React.Ref<HTMLElement> }) {
