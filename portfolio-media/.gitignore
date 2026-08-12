@@ -1,0 +1,15 @@
+# Os arquivos de mídia ficam apenas no computador e no Sanity.
+# A estrutura de pastas e este guia podem permanecer no GitHub.
+*.mp4
+*.mov
+*.webm
+*.avi
+*.mkv
+*.jpg
+*.jpeg
+*.png
+*.heic
+*.tif
+*.tiff
+*.raw
+*.dng
